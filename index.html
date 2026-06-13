@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Engineering Synergy 2026</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+<style>
+:root{
+  --navy:#1a3560;--navy2:#0f2248;--navy3:#f8f9fb;
+  --accent:#2563eb;--accent2:#38bdf8;
+  --green:#16a34a;--red:#dc2626;
+  --text:#1a3560;--sub:#94a3b8;--muted:#64748b;
+  --border:#e2e6ed;--card:#ffffff;
+  --input-bg:#ffffff;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue','Segoe UI',sans-serif;background:var(--navy3);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;}
+.wrap{max-width:440px;margin:0 auto;padding:0 20px 80px;position:relative;z-index:1;}
+.page{display:none;}.page.active{display:block;}
+
+/* Loading */
+#loading{position:fixed;inset:0;background:rgba(248,249,251,.92);z-index:500;display:none;align-items:center;justify-content:center;flex-direction:column;gap:12px;backdrop-filter:blur(4px);}
+#loading.show{display:flex;}
+.spin{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--navy);border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Cards */
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:14px;}
+
+/* Buttons */
+.btn{width:100%;padding:14px;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;transition:.2s;text-align:center;display:block;}
+.btn+.btn{margin-top:10px;}
+.btn-navy{background:var(--navy);color:#fff;}
+.btn-navy:hover{background:var(--navy2);}
+.btn-ghost{background:#eef1f8;border:1px solid var(--border);color:var(--muted);}
+.btn-ghost:hover{border-color:var(--navy);color:var(--navy);}
+.btn-admin{width:100%;padding:10px;background:#f1f4f9;border:1px solid var(--border);border-radius:10px;color:#94a3b8;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;}
+.btn-logout-wrap{display:flex;justify-content:center;margin-top:8px;}
+.btn-logout{padding:8px 22px;background:#fff;border:1px solid #fecaca;border-radius:10px;color:var(--red);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;}
+
+/* Inputs */
+.form-lbl{font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px;display:block;}
+.field-group{background:var(--input-bg);border:1px solid var(--border);border-radius:12px;overflow:visible;margin-bottom:6px;}
+.field-row{display:flex;}
+.field-row:not(:last-child){border-bottom:1px solid var(--border);}
+.fi{width:100%;padding:13px 14px;background:transparent;border:none;outline:none;font-size:15px;color:var(--text);font-family:inherit;}
+.fi::placeholder{color:#bcc8d8;}
+.fi:focus{background:#f5f8ff;}
+.fd{width:1px;background:var(--border);flex-shrink:0;}
+
+/* Alerts */
+.err{background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:10px 14px;color:#dc2626;font-size:13px;margin-bottom:12px;display:none;}
+.ok-box{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:10px 14px;color:#15803d;font-size:13px;margin-bottom:12px;display:none;}
+.back-btn{background:none;border:none;color:var(--accent);font-size:14px;font-weight:600;cursor:pointer;padding:0 0 14px;display:flex;align-items:center;gap:5px;font-family:inherit;}
+
+/* Suggest */
+.suggest-wrap{position:relative;margin-bottom:6px;}
+.suggest-list{position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;z-index:100;box-shadow:0 8px 24px rgba(0,40,100,.1);}
+.sug-item{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid #f5f7fb;cursor:pointer;transition:.12s;}
+.sug-item:last-child{border-bottom:none;}
+.sug-item:hover,.sug-item.sel{background:#f0f5ff;}
+.sug-name{font-size:14px;font-weight:500;color:var(--text);}
+.sug-name.dim{color:var(--sub);}
+.sug-dept{font-size:10px;font-weight:700;color:var(--accent);background:#eff6ff;padding:2px 8px;border-radius:8px;border:1px solid #bfdbfe;}
+.sug-dept.dim{color:var(--sub);background:#f1f5f9;border-color:var(--border);}
+
+/* Dept pill */
+.dept-pill{display:flex;align-items:center;gap:8px;padding:9px 13px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;margin-bottom:16px;}
+.dp-dot{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0;}
+.dp-lbl{font-size:12px;color:#166534;}
+.dp-val{font-size:13px;font-weight:700;color:#15803d;margin-left:auto;}
+
+/* ── PREVIEW PAGE ── */
+.preview-wrap{padding-top:32px;text-align:center;}
+.smpc-logo{width:100px;height:58px;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;}
+.smpc-logo img{width:100%;height:100%;object-fit:contain;mix-blend-mode:multiply;}
+.ev-divider{height:1px;background:var(--border);width:40px;margin:0 auto 14px;}
+.ev-title{font-size:28px;font-weight:800;color:var(--navy);letter-spacing:-.7px;line-height:1.15;margin-bottom:6px;}
+.ev-title em{font-style:normal;color:var(--accent);}
+.ev-tagline{font-size:13px;color:var(--muted);margin-bottom:14px;}
+.ev-chips{display:flex;justify-content:center;gap:7px;margin-bottom:20px;}
+.ec{font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;}
+.ec-n{background:#eef1f8;color:var(--navy);border:1px solid #c8d2e6;}
+.ec-b{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;}
+.ec-t{background:#f0fdf4;color:#166534;border:1px solid #bbf7d0;}
+.ev-info{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px;}
+.ev-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:14px;text-align:center;}
+.ev-card.full{grid-column:1/-1;}
+.ev-ico{font-size:22px;margin-bottom:5px;}
+.ev-lbl{font-size:9px;font-weight:700;color:var(--sub);letter-spacing:.6px;text-transform:uppercase;margin-bottom:3px;}
+.ev-val{font-size:13px;font-weight:700;color:var(--navy);}
+
+/* Countdown */
+.cd-wrap{text-align:center;margin-bottom:20px;}
+.cd-ring{width:52px;height:52px;margin:0 auto 8px;position:relative;}
+.cd-ring svg{transform:rotate(-90deg);}
+.cd-ring circle{fill:none;stroke:var(--border);stroke-width:3;}
+.cd-prog{stroke:var(--navy);stroke-linecap:round;stroke-dasharray:113;stroke-dashoffset:113;transition:stroke-dashoffset .9s linear;}
+.cd-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:var(--navy);}
+.cd-lbl{font-size:11px;color:var(--sub);}
+
+.btn-preview{width:100%;padding:14px;background:var(--navy);border:none;border-radius:12px;color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;opacity:0;transition:opacity .5s;pointer-events:none;}
+.btn-preview.show{opacity:1;pointer-events:auto;}
+.preview-link{margin-top:14px;text-align:center;font-size:12px;color:var(--sub);}
+.preview-link button{background:none;border:none;color:var(--accent);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;}
+
+/* ── REGISTER FORM ── */
+.reg-header{display:flex;align-items:center;gap:10px;padding-top:20px;margin-bottom:20px;}
+.reg-back{width:34px;height:34px;border-radius:10px;background:#eef1f8;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--navy);cursor:pointer;flex-shrink:0;}
+.reg-logo{width:64px;height:32px;flex-shrink:0;}
+.reg-logo img{width:100%;height:100%;object-fit:contain;mix-blend-mode:multiply;}
+.reg-titles{flex:1;}
+.reg-title{font-size:12px;font-weight:800;color:var(--navy);letter-spacing:-.2px;}
+.reg-sub{font-size:10px;color:var(--sub);}
+.step-row{display:flex;align-items:center;gap:6px;margin-bottom:22px;}
+.step{width:24px;height:24px;border-radius:50%;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.step.done{background:var(--navy);color:#fff;}
+.step.active{background:var(--accent);color:#fff;}
+.step-lbl{font-size:11px;color:var(--sub);white-space:nowrap;}
+.step-lbl.active{color:var(--navy);font-weight:600;}
+.step-line{flex:1;height:1px;background:var(--border);}
+
+/* QR Done */
+.qr-box{background:#f5f8ff;border:1px solid #bfdbfe;border-radius:16px;padding:22px;text-align:center;margin:20px 0;}
+.qr-box img{border-radius:10px;}
+.uid-pill{margin-top:12px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:8px 14px;font-size:13px;color:var(--accent);}
+
+/* ── HOME ── */
+.home-header{padding:28px 0 16px;display:flex;align-items:flex-start;justify-content:space-between;}
+.h-greet{font-size:13px;color:var(--sub);margin-bottom:3px;}
+.h-name{font-size:24px;font-weight:800;color:var(--navy);letter-spacing:-.5px;}
+.h-dept{font-size:11px;font-weight:700;color:var(--accent);background:#eff6ff;border:1px solid #bfdbfe;padding:4px 10px;border-radius:20px;margin-top:4px;display:inline-block;}
+
+/* Rank card — navy bg */
+.rank-card{background:var(--navy);border-radius:18px;padding:18px 20px;margin-bottom:14px;display:flex;align-items:center;gap:16px;}
+.rc-circle{width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.25);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;}
+.rc-lbl{font-size:9px;color:rgba(255,255,255,.6);font-weight:700;letter-spacing:.5px;}
+.rc-num{font-size:22px;font-weight:800;color:#fff;line-height:1.1;}
+.rc-info{flex:1;}
+.rc-sl{font-size:11px;color:rgba(255,255,255,.5);margin-bottom:3px;}
+.rc-score{font-size:30px;font-weight:800;color:#fff;line-height:1;}
+.rc-sub{font-size:11px;color:rgba(255,255,255,.4);margin-top:2px;}
+.rc-refresh{font-size:18px;color:rgba(255,255,255,.3);background:none;border:none;cursor:pointer;}
+
+/* Timeline */
+.tl-bar{display:flex;align-items:center;gap:8px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:9px 12px;margin-bottom:16px;}
+.tl-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);flex-shrink:0;animation:pulse 1.5s ease infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.tl-txt{font-size:11px;color:#1d4ed8;font-weight:600;flex:1;}
+.tl-time{font-size:10px;color:#60a5fa;font-weight:600;}
+
+/* Station grid */
+.sec-lbl{font-size:10px;font-weight:700;color:var(--sub);letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px;}
+.st-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;}
+.st-card{background:#fff;border:1.5px solid var(--border);border-radius:16px;padding:16px 12px;text-align:center;cursor:pointer;position:relative;overflow:hidden;transition:.2s;box-shadow:0 2px 8px rgba(0,40,100,.06);}
+.st-card:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,40,100,.1);}
+.st-card:active{transform:scale(.97);}
+.st-card.done{border-color:#bfdbfe;background:#f5f9ff;}
+.st-card.pending .st-ico{opacity:.35;filter:grayscale(.6);}
+.st-stamp{position:absolute;top:8px;right:9px;width:18px;height:18px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:800;}
+.st-ico{font-size:28px;margin-bottom:8px;display:block;}
+.st-id{font-size:14px;font-weight:800;color:var(--navy);}
+.st-id.done-col{color:var(--accent);}
+.st-lbl2{font-size:9px;color:var(--sub);margin-top:1px;}
+.st-act{font-size:9px;color:var(--muted);margin-top:4px;line-height:1.4;}
+.st-pts{font-size:11px;color:#bcc8d8;margin-top:5px;}
+.st-pts-done{font-size:11px;font-weight:700;color:var(--accent);background:#eff6ff;border-radius:6px;padding:2px 8px;margin-top:5px;display:inline-block;}
+
+/* Leaderboard */
+.lb-wrap{background:#fff;border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:16px;}
+.lb-item{display:flex;align-items:center;gap:11px;padding:11px 14px;border-bottom:1px solid #f5f7fb;}
+.lb-item:last-child{border-bottom:none;}
+.lb-item.me{background:#f5f9ff;}
+.lb-rank{width:22px;text-align:center;font-size:13px;flex-shrink:0;}
+.lb-name{font-size:13px;font-weight:600;color:var(--navy);flex:1;}
+.lb-dept-s{font-size:10px;color:var(--sub);}
+.lb-score{font-size:14px;font-weight:800;color:var(--navy);}
+.me-tag{font-size:9px;background:#eff6ff;color:var(--accent);border-radius:3px;padding:1px 5px;margin-left:3px;font-weight:700;}
+
+/* Popup */
+.popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);animation:fadeIn .2s;}
+.popup-sheet{background:#fff;border-radius:24px 24px 0 0;padding:24px 20px 44px;width:100%;max-width:440px;animation:slideUp .3s cubic-bezier(.34,1.3,.64,1);}
+.popup-drag{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 18px;}
+.ptags{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:20px;}
+.ptag{border-radius:20px;padding:4px 11px;font-size:11px;font-weight:600;}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+
+/* Station staff page */
+.st-banner{border-radius:16px;padding:20px;text-align:center;margin-bottom:16px;}
+.field-single{background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:12px;}
+.field-single input{width:100%;padding:13px 14px;background:transparent;border:none;outline:none;font-size:15px;color:var(--text);font-family:inherit;}
+.log-row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid #f5f7fb;font-size:13px;}
+.log-row:last-child{border-bottom:none;}
+
+/* Admin */
+.tabs{display:flex;gap:8px;margin-bottom:14px;}
+.tab{flex:1;padding:11px;border-radius:12px;border:1px solid var(--border);cursor:pointer;font-weight:600;font-size:13px;background:transparent;color:var(--sub);font-family:inherit;transition:.2s;}
+.tab.active{background:var(--navy);color:#fff;border-color:transparent;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.stat-box{background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center;}
+.member-row{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid #f5f7fb;}
+.member-row:last-child{border-bottom:none;}
+.av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;}
+.chip{display:inline-block;font-size:10px;padding:2px 6px;border-radius:5px;font-weight:700;margin-right:3px;}
+.pts-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.pts-row input[type=number]{width:68px;text-align:center;padding:8px;background:#fff;border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:inherit;font-size:14px;outline:none;}
+</style>
+</head>
+<body>
+
+<div id="loading"><div class="spin"></div><div style="font-size:13px;color:var(--sub)">กำลังโหลด...</div></div>
+
+<div class="wrap">
+
+<!-- COMING SOON -->
+<div id="pg-coming" class="page">
+  <div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 0;">
+    <div class="smpc-logo" style="width:80px;height:46px;margin:0 auto 28px;">
+      <img src="https://www.smpcplc.com/wp-content/uploads/2020/01/Group@3x.png" alt="SMPC"
+        onerror="this.style.display='none'" style="width:100%;height:100%;object-fit:contain;mix-blend-mode:multiply;">
+    </div>
+    <div style="font-size:48px;margin-bottom:16px;">⏳</div>
+    <div style="font-size:11px;font-weight:700;color:var(--accent);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;">Engineering Synergy 2026</div>
+    <div style="font-size:26px;font-weight:800;color:var(--navy);letter-spacing:-.5px;margin-bottom:8px;">Coming Soon</div>
+    <div style="font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:28px;">ระบบลงทะเบียนจะเปิดให้บริการในวันงาน<br>วันศุกร์ที่ 10 กรกฎาคม 2569 เวลา 08:00 น.</div>
+    <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:18px 24px;width:100%;max-width:300px;">
+      <div style="font-size:11px;font-weight:600;color:var(--sub);letter-spacing:.5px;text-transform:uppercase;margin-bottom:12px;">เปิดระบบในอีก</div>
+      <div style="display:flex;justify-content:center;gap:12px;" id="countdown-display">
+        <div style="text-align:center;">
+          <div style="font-size:28px;font-weight:800;color:var(--navy);" id="cd-days">--</div>
+          <div style="font-size:10px;color:var(--sub);">วัน</div>
+        </div>
+        <div style="font-size:24px;font-weight:300;color:var(--border);padding-top:4px;">:</div>
+        <div style="text-align:center;">
+          <div style="font-size:28px;font-weight:800;color:var(--navy);" id="cd-hours">--</div>
+          <div style="font-size:10px;color:var(--sub);">ชั่วโมง</div>
+        </div>
+        <div style="font-size:24px;font-weight:300;color:var(--border);padding-top:4px;">:</div>
+        <div style="text-align:center;">
+          <div style="font-size:28px;font-weight:800;color:var(--navy);" id="cd-mins">--</div>
+          <div style="font-size:10px;color:var(--sub);">นาที</div>
+        </div>
+        <div style="font-size:24px;font-weight:300;color:var(--border);padding-top:4px;">:</div>
+        <div style="text-align:center;">
+          <div style="font-size:28px;font-weight:800;color:var(--accent);" id="cd-secs">--</div>
+          <div style="font-size:10px;color:var(--sub);">วินาที</div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:20px;">
+      <div class="ev-chips">
+        <span class="ec ec-n">Precision</span>
+        <span class="ec ec-b">Prevention</span>
+        <span class="ec ec-t">Innovation</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PREVIEW -->
+<div id="pg-preview" class="page">
+  <!-- Top bar with logo -->
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 0 0;">
+    <div style="width:64px;height:36px;">
+      <img src="https://www.smpcplc.com/wp-content/uploads/2020/01/Group@3x.png" alt="SMPC"
+        onerror="this.style.display='none'" style="width:100%;height:100%;object-fit:contain;mix-blend-mode:multiply;">
+    </div>
+    <div style="font-size:11px;font-weight:600;color:var(--sub);">Engineering Synergy 2026</div>
+    <div style="width:64px;"></div>
+  </div>
+
+  <!-- Hero banner — navy bg -->
+  <div style="background:var(--navy);border-radius:20px;padding:32px 24px;margin:16px 0;text-align:center;">
+    <div style="font-size:12px;font-weight:600;color:rgba(255,255,255,.5);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;">The Core of Future Industry</div>
+    <div style="font-size:30px;font-weight:800;color:#fff;letter-spacing:-.8px;line-height:1.15;margin-bottom:6px;">Engineering<br><span style="color:#60a5fa;">Synergy</span> 2026</div>
+    <div style="font-size:12px;color:rgba(255,255,255,.45);margin-top:10px;">วันศุกร์ที่ 10 กรกฎาคม 2569</div>
+    <div style="display:flex;justify-content:center;gap:7px;margin-top:14px;">
+      <span style="font-size:9px;font-weight:700;padding:3px 9px;border-radius:20px;background:rgba(255,255,255,.12);color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.15);">Precision</span>
+      <span style="font-size:9px;font-weight:700;padding:3px 9px;border-radius:20px;background:rgba(255,255,255,.12);color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.15);">Prevention</span>
+      <span style="font-size:9px;font-weight:700;padding:3px 9px;border-radius:20px;background:rgba(255,255,255,.12);color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.15);">Innovation</span>
+    </div>
+  </div>
+
+  <!-- Event info — 3 cards horizontal -->
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:24px;">
+    <div class="ev-card" style="padding:12px 8px;">
+      <div class="ev-ico" style="font-size:18px;">📅</div>
+      <div class="ev-lbl">วันที่</div>
+      <div class="ev-val" style="font-size:11px;">10 ก.ค. 2569</div>
+    </div>
+    <div class="ev-card" style="padding:12px 8px;">
+      <div class="ev-ico" style="font-size:18px;">🕘</div>
+      <div class="ev-lbl">เวลา</div>
+      <div class="ev-val" style="font-size:11px;">09:00–12:00</div>
+    </div>
+    <div class="ev-card" style="padding:12px 8px;">
+      <div class="ev-ico" style="font-size:18px;">🏢</div>
+      <div class="ev-lbl">สถานที่</div>
+      <div class="ev-val" style="font-size:11px;">อาคารวิศวกรรม</div>
+    </div>
+  </div>
+
+  <!-- Countdown + CTA -->
+  <div class="cd-wrap">
+    <div class="cd-ring">
+      <svg width="52" height="52" viewBox="0 0 52 52">
+        <circle cx="26" cy="26" r="18"/>
+        <circle class="cd-prog" id="cdProg" cx="26" cy="26" r="18"/>
+      </svg>
+      <div class="cd-num" id="cdNum">5</div>
+    </div>
+    <div class="cd-lbl" id="cdLbl">กำลังโหลด...</div>
+  </div>
+  <button class="btn-preview" id="btnPreview" onclick="go('register')">ลงทะเบียนเข้าร่วมกิจกรรม →</button>
+  <div class="preview-link">ลงทะเบียนแล้ว? <button onclick="go('login')">เข้าสู่ระบบ →</button></div>
+  <div style="height:20px;"></div>
+</div>
+
+<!-- REGISTER FORM -->
+<div id="pg-register" class="page">
+  <div class="reg-header">
+    <div class="reg-back" onclick="go('preview')">←</div>
+    <div class="reg-logo">
+      <img src="https://www.smpcplc.com/wp-content/uploads/2020/01/Group@3x.png" alt="SMPC"
+        onerror="this.style.display='none'">
+    </div>
+    <div class="reg-titles">
+      <div class="reg-title">Engineering Synergy 2026</div>
+      <div class="reg-sub">ลงทะเบียนเข้าร่วมกิจกรรม</div>
+    </div>
+  </div>
+  <div class="step-row">
+    <div class="step done">1</div>
+    <div class="step-lbl">Preview</div>
+    <div class="step-line"></div>
+    <div class="step active">2</div>
+    <div class="step-lbl active">ลงทะเบียน</div>
+  </div>
+  <div id="reg-err" class="err"></div>
+  <div class="form-lbl">ชื่อจริง – นามสกุล</div>
+  <div class="suggest-wrap">
+    <div class="field-group">
+      <div class="field-row">
+        <input id="reg-fname" class="fi" placeholder="ชื่อจริง" autocomplete="off" oninput="onNameInput()" onkeydown="onNameKey(event)" style="border-right:1px solid var(--border);flex:1">
+        <input id="reg-lname" class="fi" placeholder="นามสกุล" autocomplete="off" oninput="onNameInput()" style="flex:1">
+      </div>
+    </div>
+    <div id="name-suggest" class="suggest-list" style="display:none"></div>
+  </div>
+  <div id="dept-pill-wrap" style="display:none" class="dept-pill">
+    <div class="dp-dot"></div>
+    <span class="dp-lbl">พบข้อมูลในระบบ · ฝ่าย</span>
+    <span class="dp-val" id="dept-val">—</span>
+  </div>
+  <button class="btn btn-navy" onclick="doRegister()">ลงทะเบียน</button>
+  <div style="margin-top:12px;text-align:center;font-size:12px;color:var(--sub)">
+    ลงทะเบียนแล้ว? <button style="background:none;border:none;color:var(--accent);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit" onclick="go('login')">เข้าสู่ระบบ →</button>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div id="pg-login" class="page">
+  <div class="reg-header">
+    <div class="reg-back" onclick="go('preview')">←</div>
+    <div class="reg-logo"><img src="https://www.smpcplc.com/wp-content/uploads/2020/01/Group@3x.png" alt="SMPC" onerror="this.style.display='none'"></div>
+    <div class="reg-titles"><div class="reg-title">Engineering Synergy 2026</div><div class="reg-sub">เข้าสู่ระบบ</div></div>
+  </div>
+  <div id="login-err" class="err"></div>
+  <div class="form-lbl">ชื่อจริง – นามสกุล</div>
+  <div class="field-group" style="margin-bottom:16px">
+    <div class="field-row">
+      <input id="login-fname" class="fi" placeholder="ชื่อจริง" style="border-right:1px solid var(--border);flex:1">
+      <input id="login-lname" class="fi" placeholder="นามสกุล" style="flex:1">
+    </div>
+  </div>
+  <button class="btn btn-navy" onclick="doLogin()">เข้าสู่ระบบ</button>
+  <div style="margin-top:12px;text-align:center">
+    <button style="background:none;border:none;color:var(--sub);font-size:12px;cursor:pointer;font-family:inherit" onclick="go('preview')">← กลับ</button>
+  </div>
+</div>
+
+
+
+<!-- HOME -->
+<div id="pg-home" class="page">
+  <div id="st-popup" style="display:none">
+    <div class="popup-overlay" onclick="closePopup(event)">
+      <div class="popup-sheet" onclick="event.stopPropagation()">
+        <div class="popup-drag"></div>
+        <div id="popup-icon" style="font-size:40px;margin-bottom:10px"></div>
+        <div id="popup-title" style="font-size:18px;font-weight:700;color:var(--navy);letter-spacing:-.3px;margin-bottom:3px"></div>
+        <div id="popup-sub" style="font-size:12px;color:var(--sub);margin-bottom:14px"></div>
+        <div id="popup-body" style="font-size:14px;line-height:1.75;color:var(--muted);margin-bottom:16px"></div>
+        <div id="popup-tags" class="ptags"></div>
+        <button id="popup-btn" class="btn btn-navy" onclick="dismissPopup()">ถัดไป →</button>
+      </div>
+    </div>
+  </div>
+  <div class="home-header">
+    <div>
+      <div class="h-greet">สวัสดี 👋</div>
+      <div class="h-name" id="home-name">—</div>
+      <div class="h-dept" id="home-dept">—</div>
+    </div>
+  </div>
+  <div class="rank-card">
+    <div class="rc-circle"><div class="rc-lbl">RANK</div><div class="rc-num" id="home-rank">—</div></div>
+    <div class="rc-info">
+      <div class="rc-sl">คะแนนสะสม</div>
+      <div class="rc-score" id="home-score">0</div>
+      <div class="rc-sub" id="home-rank-sub">จาก — คน</div>
+    </div>
+    <button class="rc-refresh" onclick="loadHome()">↻</button>
+  </div>
+  <div class="tl-bar">
+    <div class="tl-dot"></div>
+    <div class="tl-txt" id="tl-txt">Booth Rotation กำลังดำเนินการ</div>
+    <div class="tl-time">09:45–11:30</div>
+  </div>
+  <div class="sec-lbl">ฐานกิจกรรม</div>
+  <div class="st-grid" id="home-stations"></div>
+  <div class="sec-lbl">Leaderboard</div>
+  <div id="home-lb" style="margin-bottom:20px"></div>
+  <button class="btn-admin" onclick="go('admin')">⚙️ Admin</button>
+  <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
+    <div class="btn-logout-wrap">
+      <button class="btn-logout" onclick="doLogout()">↩ ออกจากระบบ</button>
+    </div>
+  </div>
+</div>
+
+<!-- STATION -->
+<div id="pg-station" class="page">
+  <button class="back-btn" onclick="stopQR();go('admin')">← Admin</button>
+  <div id="st-banner" class="st-banner">
+    <div id="st-icon" style="font-size:38px;margin-bottom:8px"></div>
+    <div id="st-title" style="font-size:20px;font-weight:700;color:#fff;letter-spacing:-.3px"></div>
+  </div>
+  <div id="st-err" class="err"></div>
+  <div id="st-ok" class="ok-box"></div>
+  <div id="qr-reader" style="margin-bottom:12px"></div>
+  <div style="font-size:12px;color:var(--sub);margin-bottom:6px;font-weight:500">หรือกรอก UID เอง</div>
+  <div class="field-single"><input id="st-uid" placeholder="กรอก UID" onkeydown="if(event.key==='Enter')doGiveScore()"></div>
+  <button id="st-btn" class="btn btn-navy" onclick="doGiveScore()">ให้คะแนน</button>
+  <div id="st-log-wrap" style="display:none;margin-top:20px">
+    <div class="sec-lbl">บันทึกล่าสุด</div>
+    <div id="st-log"></div>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div id="pg-admin" class="page">
+  <button class="back-btn" onclick="goHome()">← กลับหน้าหลัก</button>
+  <div style="margin-bottom:20px">
+    <div style="font-size:20px;font-weight:800;color:var(--navy);letter-spacing:-.4px">Admin Dashboard</div>
+    <div style="font-size:12px;color:var(--sub);margin-top:2px">Engineering Synergy 2026</div>
+  </div>
+  <div class="grid2" style="margin-bottom:14px">
+    <div class="stat-box"><div style="font-size:22px;margin-bottom:4px">👥</div><div id="stat-count" style="font-size:26px;font-weight:800;color:var(--accent)">0</div><div style="font-size:11px;color:var(--sub)">ผู้ลงทะเบียน</div></div>
+    <div class="stat-box"><div style="font-size:22px;margin-bottom:4px">🏆</div><div id="stat-top" style="font-size:26px;font-weight:800;color:var(--navy)">0</div><div style="font-size:11px;color:var(--sub)">คะแนนสูงสุด</div></div>
+  </div>
+  <div class="card" style="margin-bottom:14px">
+    <div class="sec-lbl" style="margin-bottom:10px">เปิดหน้าประจำฐาน</div>
+    <div class="grid2">
+      <button class="btn btn-ghost" style="font-size:13px;padding:11px" onclick="go('station','EE')">⚡ EE</button>
+      <button class="btn btn-ghost" style="font-size:13px;padding:11px" onclick="go('station','ME')">⚙️ ME</button>
+      <button class="btn btn-ghost" style="font-size:13px;padding:11px;margin-top:0" onclick="go('station','TO')">🔬 TO</button>
+      <button class="btn btn-ghost" style="font-size:13px;padding:11px;margin-top:0" onclick="go('station','PM')">📳 PM</button>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab active" id="tab-members" onclick="switchTab('members')">สมาชิก</button>
+    <button class="tab" id="tab-settings" onclick="switchTab('settings')">ตั้งค่าคะแนน</button>
+  </div>
+  <div id="panel-members">
+    <div id="admin-list" class="card"><div style="text-align:center;color:var(--sub);padding:24px;font-size:13px">กำลังโหลด...</div></div>
+    <div id="clear-wrap" style="display:none;margin-top:10px">
+      <button class="btn" style="background:#fef2f2;border:1px solid #fecaca;color:var(--red);font-size:13px" onclick="doClear()">ล้างข้อมูลทั้งหมด</button>
+    </div>
+  </div>
+  <div id="panel-settings" class="card" style="display:none">
+    <div id="admin-ok" class="ok-box"></div>
+    <div class="pts-row"><label style="margin:0;font-size:13px;font-weight:700;color:var(--navy)">⚡ EE</label><input type="number" id="pts-EE" min="1" max="100" value="10"></div>
+    <div class="pts-row"><label style="margin:0;font-size:13px;font-weight:700;color:var(--navy)">⚙️ ME</label><input type="number" id="pts-ME" min="1" max="100" value="10"></div>
+    <div class="pts-row"><label style="margin:0;font-size:13px;font-weight:700;color:var(--navy)">🔬 TO</label><input type="number" id="pts-TO" min="1" max="100" value="10"></div>
+    <div class="pts-row" style="margin-bottom:0"><label style="margin:0;font-size:13px;font-weight:700;color:var(--navy)">📳 PM</label><input type="number" id="pts-PM" min="1" max="100" value="10"></div>
+    <button class="btn btn-navy" style="margin-top:18px" onclick="doSaveSettings()">บันทึกการตั้งค่า</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+var API='https://script.google.com/macros/s/AKfycbyKA8qicNe7nAdRyTEEoI6bGDwFd9pYvylcYdCtrDdigLinDX9fKasV2aPBomhM107y/exec';
+var STATIONS=[
+  {id:'EE',icon:'⚡',label:'Electrical Eng.',activity:'Logic Master',color:'#1e40af',accent:'#3b82f6'},
+  {id:'ME',icon:'⚙️',label:'Mechanical Eng.',activity:'Force & Flow',color:'#065f46',accent:'#10b981'},
+  {id:'TO',icon:'🔬',label:'Tooling Eng.',activity:'Micrometer Pro',color:'#92400e',accent:'#f59e0b'},
+  {id:'PM',icon:'📳',label:'Preventive Maint.',activity:'Diagnostic Challenge',color:'#4c1d95',accent:'#8b5cf6'},
+];
+var STATION_INFO={
+  EE:{title:'Electrical Engineering',sub:'วิศวกรรมไฟฟ้าและระบบควบคุม',body:'ฝ่าย EE ดูแลระบบไฟฟ้ากำลัง วงจรควบคุม และระบบอัตโนมัติ ครอบคลุมการออกแบบวงจร ติดตั้ง PLC และบำรุงรักษาระบบ Drive และ Inverter',tags:['PLC / SCADA','ระบบไฟฟ้ากำลัง','Automation','Inverter & Drive'],accent:'#3b82f6',color:'#1e40af'},
+  ME:{title:'Mechanical Engineering',sub:'วิศวกรรมเครื่องกลและเครื่องจักร',body:'ฝ่าย ME รับผิดชอบระบบเครื่องจักรกล ไฮดรอลิกส์ นิวแมติกส์ และระบบ HVAC ทั่วโรงงาน ดูแลการติดตั้ง ปรับแต่ง และซ่อมบำรุงเครื่องจักร',tags:['Hydraulics','Pneumatics','HVAC','Mechanical System'],accent:'#10b981',color:'#065f46'},
+  TO:{title:'Tooling Engineering',sub:'วิศวกรรมแม่พิมพ์และการวัดละเอียด',body:'ฝ่าย TO เชี่ยวชาญด้านการออกแบบและซ่อมบำรุงแม่พิมพ์ งานกลึง CNC และการวัดละเอียดด้วยเครื่องมือความแม่นยำสูง',tags:['CNC Machining','Mold & Die','CMM Measurement','Surface Roughness'],accent:'#f59e0b',color:'#92400e'},
+  PM:{title:'Preventive Maintenance',sub:'งานซ่อมบำรุงเชิงป้องกัน',body:'ฝ่าย PM วางแผนและดำเนินการบำรุงรักษาเครื่องจักรเชิงป้องกัน ด้วยการวิเคราะห์ข้อมูล ตรวจสอบตามรอบ และใช้เทคโนโลยี Predictive Maintenance',tags:['PM Schedule','Predictive Maintenance','Downtime Reduction','Condition Monitoring'],accent:'#8b5cf6',color:'#4c1d95'},
+};
+var currentStation=null,currentUid=null,employeeDB=[],settingsCache={EE:10,ME:10,TO:10,PM:10};
+var seenPopup={},suggestIdx=-1,selectedEmp=null,qrScanner=null,stLog={EE:[],ME:[],TO:[],PM:[]};
+
+function genId(){return Math.random().toString(36).slice(2,8).toUpperCase();}
+
+// ── Coming Soon countdown ──
+function updateComingSoon(){
+  var target=new Date('2026-07-10T08:00:00+07:00');
+  var diff=target-new Date();
+  if(diff<=0){
+    document.getElementById('cd-days').textContent='0';
+    document.getElementById('cd-hours').textContent='00';
+    document.getElementById('cd-mins').textContent='00';
+    document.getElementById('cd-secs').textContent='00';
+    return;
+  }
+  var days=Math.floor(diff/86400000);
+  var hours=Math.floor((diff%86400000)/3600000);
+  var mins=Math.floor((diff%3600000)/60000);
+  var secs=Math.floor((diff%60000)/1000);
+  document.getElementById('cd-days').textContent=days;
+  document.getElementById('cd-hours').textContent=String(hours).padStart(2,'0');
+  document.getElementById('cd-mins').textContent=String(mins).padStart(2,'0');
+  document.getElementById('cd-secs').textContent=String(secs).padStart(2,'0');
+}
+
+// ── Countdown (preview) ──
+(function(){
+  var secs=5,c=2*Math.PI*18;
+  var prog=document.getElementById('cdProg');
+  var num=document.getElementById('cdNum');
+  var lbl=document.getElementById('cdLbl');
+  var btn=document.getElementById('btnPreview');
+  prog.style.strokeDashoffset=c;
+  function tick(){
+    secs--;
+    num.textContent=secs;
+    prog.style.strokeDashoffset=c*(secs/5);
+    if(secs<=0){
+      num.textContent='✓';
+      prog.style.stroke='var(--accent)';
+      lbl.textContent='พร้อมลงทะเบียน';
+      btn.classList.add('show');
+    } else setTimeout(tick,1000);
+  }
+  setTimeout(tick,1000);
+})();
+
+// ── API ──
+function apiGet(action,cb){fetch(API+'?action='+action+'&t='+Date.now()).then(function(r){return r.json();}).then(cb).catch(function(e){cb({error:e.message});});}
+function apiPost(body,cb){fetch(API,{method:'POST',body:JSON.stringify(body)}).then(function(r){return r.json();}).then(cb).catch(function(e){cb({error:e.message});});}
+function showLoad(){document.getElementById('loading').classList.add('show');}
+function hideLoad(){document.getElementById('loading').classList.remove('show');}
+
+// ── Nav ──
+function go(page,param){
+  stopQR();
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  if(page==='station'){currentStation=param;loadStation(param);document.getElementById('pg-station').classList.add('active');}
+  else if(page==='admin'){loadAdmin();document.getElementById('pg-admin').classList.add('active');}
+  else{document.getElementById('pg-'+page).classList.add('active');}
+  window.scrollTo(0,0);
+}
+function goHome(){loadHome();go('home');}
+
+// ── Session ──
+function saveSession(uid){try{localStorage.setItem('eoh_uid',uid);}catch(e){}}
+function loadSession(){try{return localStorage.getItem('eoh_uid');}catch(e){return null;}}
+
+// ── Fuzzy ──
+function lev(a,b){var m=a.length,n=b.length,dp=[];for(var i=0;i<=m;i++){dp[i]=[i];}for(var j=0;j<=n;j++){dp[0][j]=j;}for(var i=1;i<=m;i++)for(var j=1;j<=n;j++)dp[i][j]=a[i-1]===b[j-1]?dp[i-1][j-1]:1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);return dp[m][n];}
+function sim(a,b){a=a.trim();b=b.trim();if(!a||!b)return 0;if(b.includes(a)||a.includes(b))return .9;var d=lev(a,b),ml=Math.max(a.length,b.length);return ml===0?1:1-d/ml;}
+function searchEmp(fq,lq){if(!fq)return[];return employeeDB.map(function(e){var fs=sim(fq,e.firstName),ls=lq?sim(lq,e.lastName):0,sc=lq?(fs*.5+ls*.5):fs;if(e.firstName.startsWith(fq))sc=Math.max(sc,.85);return{e:e,s:sc};}).filter(function(x){return x.s>.35;}).sort(function(a,b){return b.s-a.s;}).slice(0,5).map(function(x){return x.e;});}
+
+function onNameInput(){
+  var fq=document.getElementById('reg-fname').value.trim();
+  var lq=document.getElementById('reg-lname').value.trim();
+  var res=searchEmp(fq,lq);
+  var box=document.getElementById('name-suggest');
+  suggestIdx=-1;
+  if(!res.length){box.style.display='none';return;}
+  box.innerHTML=res.map(function(e,i){return'<div class="sug-item" onclick="selectEmp('+i+')">'+'<span class="sug-name">'+e.firstName+' '+e.lastName+'</span>'+'<span class="sug-dept">'+e.dept+'</span></div>';}).join('');
+  box._res=res;box.style.display='block';
+}
+function selectEmp(i){
+  var box=document.getElementById('name-suggest');
+  var e=box._res[i];
+  selectedEmp=e;
+  document.getElementById('reg-fname').value=e.firstName;
+  document.getElementById('reg-lname').value=e.lastName;
+  document.getElementById('dept-val').textContent=e.dept;
+  document.getElementById('dept-pill-wrap').style.display='flex';
+  box.style.display='none';
+}
+function onNameKey(ev){
+  var box=document.getElementById('name-suggest');
+  if(box.style.display==='none')return;
+  var items=box.querySelectorAll('.sug-item');
+  if(ev.key==='ArrowDown'){ev.preventDefault();suggestIdx=Math.min(suggestIdx+1,items.length-1);items.forEach(function(el,i){el.classList.toggle('sel',i===suggestIdx);});}
+  else if(ev.key==='ArrowUp'){ev.preventDefault();suggestIdx=Math.max(suggestIdx-1,0);items.forEach(function(el,i){el.classList.toggle('sel',i===suggestIdx);});}
+  else if(ev.key==='Enter'&&suggestIdx>=0){ev.preventDefault();selectEmp(suggestIdx);}
+  else if(ev.key==='Escape'){box.style.display='none';}
+}
+document.addEventListener('click',function(e){if(!e.target.closest('.suggest-wrap'))document.getElementById('name-suggest').style.display='none';});
+
+// ── Register ──
+function doRegister(){
+  var fn=document.getElementById('reg-fname').value.trim();
+  var ln=document.getElementById('reg-lname').value.trim();
+  var errEl=document.getElementById('reg-err');
+  errEl.style.display='none';
+  if(!fn||!ln){showErr(errEl,'กรุณากรอกชื่อจริงและนามสกุล');return;}
+  var dept=selectedEmp?selectedEmp.dept:'—';
+  showLoad();
+  apiPost({action:'register',full_name:fn+' '+ln,department:dept},function(res){
+    hideLoad();
+    if(res.error){showErr(errEl,res.error);return;}
+    currentUid=res.uid;saveSession(res.uid);
+    document.getElementById('reg-fname').value='';
+    document.getElementById('reg-lname').value='';
+    document.getElementById('dept-pill-wrap').style.display='none';
+    selectedEmp=null;
+    afterRegDone();
+  });
+}
+
+// ── Login ──
+function doLogin(){
+  var fn=document.getElementById('login-fname').value.trim();
+  var ln=document.getElementById('login-lname').value.trim();
+  var errEl=document.getElementById('login-err');
+  errEl.style.display='none';
+  if(!fn||!ln){showErr(errEl,'กรุณากรอกชื่อและนามสกุล');return;}
+  showLoad();
+  apiGet('getMembers',function(res){
+    hideLoad();
+    if(res.error){showErr(errEl,'เกิดข้อผิดพลาด');return;}
+    var m=res.members.find(function(x){return x.full_name===fn+' '+ln;});
+    if(!m){showErr(errEl,'ไม่พบชื่อนี้ในระบบ กรุณาลงทะเบียนก่อน');return;}
+    currentUid=m.uid;saveSession(m.uid);
+    document.getElementById('login-fname').value='';document.getElementById('login-lname').value='';
+    goHome();
+  });
+}
+
+// ── Home ──
+function loadHome(){
+  renderStations(null);
+  showLoad();
+  apiGet('getMembers',function(res){
+    hideLoad();
+    if(res.error)return;
+    var members=res.members;
+    var m=currentUid?members.find(function(x){return x.uid===currentUid;}):null;
+    var sorted=members.slice().sort(function(a,b){return b.total_score-a.total_score;});
+    var rank=m?sorted.findIndex(function(x){return x.uid===m.uid;})+1:'—';
+    document.getElementById('home-name').textContent=m?m.full_name.split(' ')[0]:'—';
+    document.getElementById('home-dept').textContent=m?m.department:'—';
+    document.getElementById('home-rank').textContent=rank;
+    document.getElementById('home-score').textContent=m?m.total_score:0;
+    document.getElementById('home-rank-sub').textContent='จาก '+members.length+' คน';
+    renderStations(m);
+    var lbEl=document.getElementById('home-lb');
+    if(!sorted.length){lbEl.innerHTML='<div class="lb-wrap" style="text-align:center;color:var(--sub);padding:20px;font-size:13px">ยังไม่มีผู้ลงทะเบียน</div>';return;}
+    var medals=['🥇','🥈','🥉'];
+    lbEl.innerHTML='<div class="lb-wrap">'+sorted.slice(0,10).map(function(mem,i){var isMe=mem.uid===currentUid;return'<div class="lb-item'+(isMe?' me':'')+'">'+'<div class="lb-rank">'+(medals[i]||(i+1))+'</div>'+'<div style="flex:1"><div class="lb-name">'+mem.full_name+(isMe?'<span class="me-tag">คุณ</span>':'')+'</div><div class="lb-dept-s">'+mem.department+' · '+Object.keys(mem.scores).length+'/4 ฐาน</div></div>'+'<div class="lb-score">'+mem.total_score+'</div></div>';}).join('')+'</div>';
+  });
+}
+
+function renderStations(m){
+  document.getElementById('home-stations').innerHTML=STATIONS.map(function(s){
+    var done=m&&!!m.scores[s.id],pts=settingsCache[s.id]||10;
+    return'<div class="st-card '+(done?'done':'pending')+'" style="'+(done?'border-color:'+s.accent+'55;background:#fafcff':'')+'" onclick="onStationClick(\''+s.id+'\')">'+(done?'<div class="st-stamp">✓</div>':'')+'<span class="st-ico">'+s.icon+'</span><div class="st-id'+(done?' done-col':'')+'" style="'+(done?'color:'+s.accent:'')+'">'+s.id+'</div><div class="st-lbl2">'+s.label+'</div><div class="st-act">'+s.activity+'</div>'+(done?'<div class="st-pts-done" style="color:'+s.accent+';background:'+s.accent+'15">+'+m.scores[s.id]+' pts</div>':'<div class="st-pts">+'+pts+' pts</div>')+'</div>';
+  }).join('');
+}
+
+// ── Popup ──
+function onStationClick(id){
+  if(seenPopup[id])return;
+  var info=STATION_INFO[id],st=STATIONS.find(function(s){return s.id===id;});
+  document.getElementById('popup-icon').textContent=st.icon;
+  document.getElementById('popup-title').textContent=info.title;
+  document.getElementById('popup-sub').textContent=info.sub;
+  document.getElementById('popup-body').textContent=info.body;
+  document.getElementById('popup-tags').innerHTML=info.tags.map(function(t){return'<span class="ptag" style="background:'+info.accent+'18;color:'+info.accent+';border:1px solid '+info.accent+'33">'+t+'</span>';}).join('');
+  document.getElementById('popup-btn').style.background=info.color;
+  document.getElementById('popup-btn').dataset.stId=id;
+  document.getElementById('st-popup').style.display='block';
+}
+function dismissPopup(){seenPopup[document.getElementById('popup-btn').dataset.stId]=true;document.getElementById('st-popup').style.display='none';}
+function closePopup(e){if(e.target===e.currentTarget)dismissPopup();}
+
+// ── Station ──
+function loadStation(id){
+  var s=STATIONS.find(function(x){return x.id===id;});
+  var b=document.getElementById('st-banner');
+  b.style.background='linear-gradient(135deg,'+s.color+','+s.accent+')';
+  b.style.border='none';
+  document.getElementById('st-icon').textContent=s.icon;
+  document.getElementById('st-title').textContent='ฐาน '+s.id+' — '+s.label;
+  document.getElementById('st-btn').style.background=s.color;
+  document.getElementById('st-uid').value='';
+  document.getElementById('st-err').style.display='none';
+  document.getElementById('st-ok').style.display='none';
+  renderLog(id);startQR();
+}
+function startQR(){
+  if(qrScanner)return;
+  try{
+    qrScanner=new Html5Qrcode('qr-reader');
+    qrScanner.start({facingMode:'environment'},{fps:10,qrbox:{width:200,height:200}},function(decoded){
+      document.getElementById('st-uid').value=decoded;doGiveScore();
+    },function(){}).catch(function(){qrScanner=null;});
+  }catch(e){qrScanner=null;}
+}
+function stopQR(){if(qrScanner){try{qrScanner.stop().then(function(){qrScanner=null;});}catch(e){qrScanner=null;}}}
+function doGiveScore(){
+  var uid=document.getElementById('st-uid').value.trim().toUpperCase();
+  var errEl=document.getElementById('st-err'),okEl=document.getElementById('st-ok');
+  errEl.style.display='none';okEl.style.display='none';
+  if(!uid){showErr(errEl,'กรุณากรอก UID');return;}
+  showLoad();
+  apiPost({action:'giveScore',uid:uid,station:currentStation},function(res){
+    hideLoad();
+    if(res.error){showErr(errEl,res.error);return;}
+    okEl.textContent='✅ '+res.full_name+' +'+res.pts+' pts · รวม '+res.total_score+' pts';
+    okEl.style.display='block';
+    stLog[currentStation].unshift({name:res.full_name,pts:res.pts,time:new Date().toLocaleTimeString('th-TH')});
+    if(stLog[currentStation].length>5)stLog[currentStation].pop();
+    document.getElementById('st-uid').value='';renderLog(currentStation);
+  });
+}
+function renderLog(id){
+  var logs=stLog[id],wrap=document.getElementById('st-log-wrap');
+  if(!logs.length){wrap.style.display='none';return;}
+  wrap.style.display='block';
+  document.getElementById('st-log').innerHTML=logs.map(function(l){return'<div class="log-row"><span style="font-weight:500">'+l.name+'</span><span style="color:var(--green);font-weight:700">+'+l.pts+' · '+l.time+'</span></div>';}).join('');
+}
+
+// ── Admin ──
+function loadAdmin(){
+  showLoad();
+  apiGet('getMembers',function(res){
+    hideLoad();
+    var sorted=(res.members||[]).slice().sort(function(a,b){return b.total_score-a.total_score;});
+    document.getElementById('stat-count').textContent=sorted.length;
+    document.getElementById('stat-top').textContent=sorted.length?sorted[0].total_score:0;
+    var medals=['#ffd700','#c0c0c0','#cd7f32'];
+    var listEl=document.getElementById('admin-list');
+    if(!sorted.length){listEl.innerHTML='<div style="text-align:center;color:var(--sub);padding:24px;font-size:13px">ยังไม่มีผู้ลงทะเบียน</div>';document.getElementById('clear-wrap').style.display='none';return;}
+    listEl.innerHTML=sorted.map(function(m,i){return'<div class="member-row"><div style="display:flex;gap:10px;align-items:center"><div class="av" style="background:'+(medals[i]||'#eef1f8')+';color:'+(i<3?'#000':'var(--navy)')+'">'+( i+1)+'</div><div><div style="font-weight:600;font-size:14px">'+m.full_name+'</div><div style="font-size:11px;color:var(--sub)">'+m.department+'</div><div style="margin-top:3px">'+STATIONS.map(function(s){return'<span class="chip" style="background:'+(m.scores[s.id]?s.color+'22':'#f1f5f9')+';color:'+(m.scores[s.id]?s.accent:'var(--sub)')+';border:1px solid '+(m.scores[s.id]?s.accent+'44':'var(--border)')+'">'+s.id+'</span>';}).join('')+'</div></div></div><div style="font-weight:800;font-size:18px;color:var(--navy)">'+m.total_score+'</div></div>';}).join('');
+    document.getElementById('clear-wrap').style.display='block';
+  });
+  apiGet('getSettings',function(res){
+    if(res.settings){settingsCache=res.settings;['EE','ME','TO','PM'].forEach(function(id){var el=document.getElementById('pts-'+id);if(el)el.value=res.settings[id]||10;});}
+  });
+}
+function switchTab(t){
+  document.getElementById('panel-members').style.display=t==='members'?'block':'none';
+  document.getElementById('panel-settings').style.display=t==='settings'?'block':'none';
+  document.getElementById('tab-members').classList.toggle('active',t==='members');
+  document.getElementById('tab-settings').classList.toggle('active',t==='settings');
+  if(t==='members')loadAdmin();
+}
+function doSaveSettings(){
+  var s={};['EE','ME','TO','PM'].forEach(function(id){s[id]=parseInt(document.getElementById('pts-'+id).value)||10;});
+  showLoad();
+  apiPost({action:'saveSettings',settings:s},function(res){
+    hideLoad();
+    if(res.success){settingsCache=s;var ok=document.getElementById('admin-ok');ok.textContent='✅ บันทึกแล้ว';ok.style.display='block';setTimeout(function(){ok.style.display='none';},2000);}
+  });
+}
+function doClear(){
+  if(!confirm('ลบข้อมูลสมาชิกทั้งหมด?'))return;
+  showLoad();
+  apiPost({action:'clearAll'},function(res){
+    hideLoad();
+    if(res.success){stLog={EE:[],ME:[],TO:[],PM:[]};currentUid=null;try{localStorage.removeItem('eoh_uid');}catch(e){}loadAdmin();}
+  });
+}
+
+// ── หลังลงทะเบียนเสร็จ เช็คเวลาก่อนไปหน้าไหน ──
+function afterRegDone(){
+  var eventOpen=new Date('2026-07-10T08:00:00+07:00');
+  if(new Date()<eventOpen){
+    go('coming');
+  } else {
+    goHome();
+  }
+}
+
+// ── Logout ──
+function doLogout(){
+  if(!confirm('ต้องการออกจากระบบใช่หรือไม่?\nข้อมูลคะแนนของคุณยังถูกบันทึกไว้'))return;
+  currentUid=null;try{localStorage.removeItem('eoh_uid');}catch(e){}
+  go('preview');
+}
+
+function showErr(el,msg){el.textContent=msg;el.style.display='block';}
+
+// ── Init ──
+window.addEventListener('load',function(){
+  apiGet('getEmployees',function(res){if(res.employees)employeeDB=res.employees;});
+  apiGet('getSettings',function(res){if(res.settings)settingsCache=res.settings;});
+
+  var eventOpen=new Date('2026-07-10T08:00:00+07:00');
+  var now=new Date();
+  var isBeforeEvent=now<eventOpen;
+
+  // ถ้าก่อนเวลางาน และไม่มี session → แสดง preview (ลงทะเบียนได้)
+  // ถ้าก่อนเวลางาน และมี session → แสดง coming soon
+  // ถ้าถึงเวลางานแล้ว → เข้าปกติ
+  if(isBeforeEvent){
+    updateComingSoon();
+    setInterval(updateComingSoon,1000);
+  }
+
+  var uid=loadSession();
+  if(uid){
+    showLoad();
+    apiGet('getMembers',function(res){
+      hideLoad();
+      if(res.members&&res.members.find(function(m){return m.uid===uid;})){
+        currentUid=uid;
+        if(isBeforeEvent){
+          // ลงทะเบียนแล้ว แต่ยังไม่ถึงเวลา → coming soon
+          go('coming');
+        } else {
+          goHome();
+        }
+      } else {
+        document.getElementById('pg-preview').classList.add('active');
+      }
+    });
+  } else {
+    document.getElementById('pg-preview').classList.add('active');
+  }
+});
+</script>
+</body>
+</html>
