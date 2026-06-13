@@ -18,18 +18,12 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;}
 body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;background:var(--navy3);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;}
-
-/* ── Layout ── */
 .wrap{max-width:440px;margin:0 auto;padding:0 22px 80px;position:relative;}
 .page{display:none;}.page.active{display:block;}
-
-/* ── Loading overlay ── */
 #loading{position:fixed;inset:0;background:rgba(248,249,251,.94);z-index:900;display:none;align-items:center;justify-content:center;flex-direction:column;gap:12px;}
 #loading.show{display:flex;}
 .spin{width:30px;height:30px;border:2.5px solid var(--border);border-top-color:var(--navy);border-radius:50%;animation:_spin .7s linear infinite;}
 @keyframes _spin{to{transform:rotate(360deg)}}
-
-/* ── Splash ── */
 #pg-splash{position:fixed;inset:0;background:#fff;z-index:800;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;transition:opacity .6s ease;}
 #pg-splash.hide{opacity:0;pointer-events:none;}
 .splash-logo{width:110px;height:64px;object-fit:contain;mix-blend-mode:multiply;animation:logoIn .8s cubic-bezier(.34,1.4,.64,1) forwards;}
@@ -37,42 +31,30 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,'Helvetic
 .splash-bar{width:48px;height:2px;background:var(--border);border-radius:2px;margin-top:28px;overflow:hidden;}
 .splash-prog{height:100%;background:var(--navy);border-radius:2px;animation:barFill 1.6s ease forwards;}
 @keyframes barFill{from{width:0}to{width:100%}}
-
-/* ── Buttons ── */
 .btn{width:100%;padding:14px;border:none;border-radius:14px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;transition:.18s;text-align:center;display:block;letter-spacing:.1px;}
 .btn+.btn{margin-top:10px;}
 .btn-navy{background:var(--navy);color:#fff;}
 .btn-navy:active{background:var(--navy2);}
 .btn-ghost{background:#eef2fa;border:1px solid var(--border);color:var(--muted);}
 .btn-danger{background:#fff0f0;border:1px solid #fecaca;color:var(--red);}
-.btn-sm{padding:9px 20px;width:auto;font-size:13px;border-radius:10px;}
-
-/* ── Inputs ── */
 .field-box{background:#fff;border:1.5px solid var(--border);border-radius:14px;overflow:hidden;transition:.18s;}
 .field-box:focus-within{border-color:var(--accent);}
 .fi{width:100%;padding:14px 16px;background:transparent;border:none;outline:none;font-size:15px;color:var(--text);font-family:inherit;}
 .fi::placeholder{color:#bcc8d8;}
 .lbl{font-size:12px;font-weight:600;color:var(--muted);margin-bottom:7px;display:block;}
-
-/* ── Suggest ── */
 .suggest-wrap{position:relative;}
-.suggest-list{position:absolute;top:calc(100%+6px);left:0;right:0;background:#fff;border:1.5px solid var(--border);border-radius:14px;overflow:hidden;z-index:200;box-shadow:0 8px 28px rgba(0,40,100,.1);}
+.suggest-list{position:absolute;top:calc(100% + 6px);left:0;right:0;background:#fff;border:1.5px solid var(--border);border-radius:14px;overflow:hidden;z-index:200;box-shadow:0 8px 28px rgba(0,40,100,.1);}
 .sug-item{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;cursor:pointer;border-bottom:1px solid #f3f4f8;transition:.1s;}
 .sug-item:last-child{border-bottom:none;}
 .sug-item:hover,.sug-item.sel{background:#f0f5ff;}
 .sug-name{font-size:14px;font-weight:500;}
 .sug-dept{font-size:10px;font-weight:700;color:var(--accent);background:#eff6ff;padding:2px 9px;border-radius:8px;border:1px solid #bfdbfe;}
-
-/* ── Alerts ── */
 .err-box{background:#fff0f0;border:1px solid #fecaca;border-radius:10px;padding:10px 14px;color:var(--red);font-size:13px;margin-bottom:12px;display:none;}
 .ok-box{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:10px 14px;color:#15803d;font-size:13px;margin-bottom:12px;display:none;}
-
-/* ── Section label ── */
 .sec-lbl{font-size:10px;font-weight:700;color:var(--sub);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;}
 .back-btn{background:none;border:none;color:var(--accent);font-size:14px;font-weight:600;cursor:pointer;padding:0 0 16px;display:flex;align-items:center;gap:5px;font-family:inherit;}
 .divider{height:1px;background:var(--border);margin:20px 0;}
-
-/* ══════════ COMING SOON ══════════ */
+/* COMING SOON */
 #pg-coming{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 22px;}
 .cs-eyebrow{font-size:10px;font-weight:700;color:var(--accent);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px;}
 .cs-title{font-size:28px;font-weight:700;color:var(--navy);letter-spacing:-.6px;margin-bottom:8px;}
@@ -85,9 +67,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,'Helvetic
 .cd-num.accent{color:var(--accent);}
 .cd-lbl2{font-size:9px;color:var(--sub);margin-top:3px;font-weight:500;}
 .cd-sep{font-size:24px;font-weight:300;color:var(--border);padding-top:2px;line-height:1;}
-
-/* ══════════ PREVIEW ══════════ */
-#pg-preview{padding-top:0;}
+/* PREVIEW */
 .prev-topbar{display:flex;align-items:center;justify-content:center;padding:24px 0 0;margin-bottom:20px;}
 .prev-topbar img{height:36px;object-fit:contain;mix-blend-mode:multiply;}
 .hero-banner{background:var(--navy);border-radius:22px;padding:32px 24px 28px;text-align:center;margin-bottom:16px;}
@@ -112,27 +92,19 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,'Helvetic
 .btn-show.on{opacity:1;pointer-events:auto;}
 .link-row{margin-top:14px;text-align:center;font-size:12px;color:var(--sub);}
 .link-row button{background:none;border:none;color:var(--accent);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;}
-
-/* ══════════ SIGN UP ══════════ */
-#pg-register .page-header{padding:28px 0 24px;}
+/* REGISTER */
 .ph-title{font-size:26px;font-weight:700;color:var(--navy);letter-spacing:-.6px;line-height:1.2;margin-bottom:6px;}
 .ph-title em{font-style:normal;color:var(--accent);}
 .ph-sub{font-size:13px;color:var(--muted);}
-.dept-found{display:flex;align-items:center;gap:8px;padding:10px 14px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;margin-top:8px;margin-bottom:16px;display:none;}
+.dept-found{display:none;align-items:center;gap:8px;padding:10px 14px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;margin-top:8px;margin-bottom:16px;}
 .dept-found .dot{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0;}
 .dept-found .txt{font-size:13px;color:#166534;}
 .dept-found .val{font-size:13px;font-weight:700;color:#15803d;margin-left:auto;}
 .admin-link{text-align:center;margin-top:10px;}
 .admin-link button{background:none;border:none;color:var(--sub);font-size:12px;cursor:pointer;font-family:inherit;}
-
-/* ══════════ LOGIN (normal) ══════════ */
-#pg-login .page-header{padding:28px 0 24px;}
-
-/* ══════════ ADMIN LOGIN ══════════ */
-#pg-admin-login .page-header{padding:28px 0 24px;}
+/* ADMIN */
 .admin-badge{display:inline-flex;align-items:center;gap:6px;background:#eef2fa;border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;color:var(--navy);margin-bottom:16px;}
-
-/* ══════════ HOME ══════════ */
+/* HOME */
 .home-header{padding:28px 0 16px;}
 .h-greet{font-size:13px;color:var(--sub);margin-bottom:3px;}
 .h-name{font-size:24px;font-weight:700;color:var(--navy);letter-spacing:-.5px;}
@@ -177,8 +149,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,'Helvetic
 .btn-admin-sm{width:100%;padding:10px;background:#f1f4f9;border:1px solid var(--border);border-radius:10px;color:#94a3b8;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;}
 .logout-wrap{display:flex;justify-content:center;padding-top:8px;}
 .btn-logout{padding:8px 22px;background:#fff;border:1px solid #fecaca;border-radius:10px;color:var(--red);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;}
-
-/* ══════════ POPUP ══════════ */
+/* POPUP */
 .popup-overlay{position:fixed;inset:0;background:rgba(15,25,50,.55);z-index:300;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);animation:_fi .2s;}
 .popup-sheet{background:#fff;border-radius:24px 24px 0 0;padding:24px 22px 44px;width:100%;max-width:440px;animation:_su .28s cubic-bezier(.34,1.3,.64,1);}
 .popup-drag{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 18px;}
@@ -186,16 +157,14 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,'Helvetic
 .ptag{border-radius:20px;padding:4px 11px;font-size:11px;font-weight:600;}
 @keyframes _fi{from{opacity:0}to{opacity:1}}
 @keyframes _su{from{transform:translateY(100%)}to{transform:translateY(0)}}
-
-/* ══════════ STATION ══════════ */
+/* STATION */
 .st-banner{border-radius:18px;padding:22px 20px;text-align:center;margin-bottom:16px;position:relative;overflow:hidden;}
 .st-banner::before{content:'';position:absolute;inset:0;opacity:.08;background:repeating-linear-gradient(45deg,#fff 0,#fff 1px,transparent 1px,transparent 10px);}
 .field-single{background:#fff;border:1.5px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:12px;}
 .field-single input{width:100%;padding:13px 16px;background:transparent;border:none;outline:none;font-size:15px;color:var(--text);font-family:inherit;}
 .log-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f3f4f8;font-size:13px;}
 .log-row:last-child{border-bottom:none;}
-
-/* ══════════ ADMIN DASH ══════════ */
+/* ADMIN DASH */
 .tabs{display:flex;gap:8px;margin-bottom:14px;}
 .tab{flex:1;padding:11px;border-radius:12px;border:1px solid var(--border);cursor:pointer;font-weight:600;font-size:13px;background:transparent;color:var(--sub);font-family:inherit;transition:.18s;}
 .tab.active{background:var(--navy);color:#fff;border-color:transparent;}
@@ -210,22 +179,16 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,'Helvetic
 </style>
 </head>
 <body>
-
-<!-- LOADING -->
 <div id="loading"><div class="spin"></div></div>
-
-<!-- SPLASH -->
 <div id="pg-splash">
-  <img class="splash-logo" src="https://www.smpcplc.com/wp-content/uploads/2020/01/Group@3x.png" alt="SMPC"
-    onerror="this.src='';this.style.display='none'">
+  <img class="splash-logo" src="https://www.smpcplc.com/wp-content/uploads/2020/01/Group@3x.png" alt="SMPC" onerror="this.src='';this.style.display='none'">
   <div class="splash-bar"><div class="splash-prog"></div></div>
 </div>
-
 <div class="wrap">
 
 <!-- COMING SOON -->
 <div id="pg-coming" class="page">
-  <div id="pg-coming-inner" style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;">
+  <div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;">
     <div class="cs-eyebrow">Engineering Synergy 2026</div>
     <div class="cs-title">Coming Soon</div>
     <div class="cs-sub">ระบบจะเปิดในวันงาน<br>ศุกร์ที่ 10 กรกฎาคม 2569 เวลา 09:00 น.</div>
@@ -283,7 +246,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,'Helvetic
 
 <!-- SIGN UP -->
 <div id="pg-register" class="page">
-  <div class="page-header">
+  <div style="padding:28px 0 24px;">
     <button class="back-btn" onclick="go('preview')">← กลับ</button>
     <div class="ph-title">Engineering<br><em>Synergy</em> 2026</div>
     <div class="ph-sub" style="margin-top:6px">กรอกชื่อเพื่อลงทะเบียน</div>
@@ -304,15 +267,13 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,'Helvetic
   </div>
   <button class="btn btn-navy" id="reg-submit" onclick="doRegister()" disabled style="opacity:.4">ลงทะเบียน</button>
   <div class="divider"></div>
-  <div class="admin-link">
-    <button onclick="go('admin-login')">🔐 เข้าสู่ระบบสำหรับ Admin</button>
-  </div>
+  <div class="admin-link"><button onclick="go('admin-login')">🔐 เข้าสู่ระบบสำหรับ Admin</button></div>
   <div class="link-row" style="margin-top:8px">ลงทะเบียนแล้ว? <button onclick="go('login')">เข้าสู่ระบบ →</button></div>
 </div>
 
 <!-- LOGIN -->
 <div id="pg-login" class="page">
-  <div class="page-header">
+  <div style="padding:28px 0 24px;">
     <button class="back-btn" onclick="go('preview')">← กลับ</button>
     <div class="ph-title">เข้าสู่ระบบ</div>
     <div class="ph-sub" style="margin-top:6px">กรอกชื่อ-นามสกุลที่ลงทะเบียนไว้</div>
@@ -330,7 +291,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,'Helvetic
 
 <!-- ADMIN LOGIN -->
 <div id="pg-admin-login" class="page">
-  <div class="page-header">
+  <div style="padding:28px 0 24px;">
     <button class="back-btn" onclick="go('register')">← กลับ</button>
     <div class="admin-badge">🔐 Admin Access</div>
     <div class="ph-title">Admin Login</div>
@@ -339,8 +300,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,'Helvetic
   <div id="admin-login-err" class="err-box"></div>
   <div class="lbl">รหัสผ่าน</div>
   <div class="field-box" style="margin-bottom:16px">
-    <input id="admin-pw" class="fi" type="password" placeholder="••••••••••"
-      onkeydown="if(event.key==='Enter')doAdminLogin()">
+    <input id="admin-pw" class="fi" type="password" placeholder="••••••••••" onkeydown="if(event.key==='Enter')doAdminLogin()">
   </div>
   <button class="btn btn-navy" onclick="doAdminLogin()">เข้าสู่ระบบ Admin</button>
   <div style="margin-top:14px;text-align:center">
@@ -350,7 +310,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,'Helvetic
 
 <!-- ADMIN RESET -->
 <div id="pg-admin-reset" class="page">
-  <div class="page-header">
+  <div style="padding:28px 0 24px;">
     <button class="back-btn" onclick="go('admin-login')">← กลับ</button>
     <div class="ph-title">รีเซ็ตรหัสผ่าน</div>
     <div class="ph-sub" style="margin-top:6px">ตอบคำถามด้านความปลอดภัย</div>
@@ -470,14 +430,12 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,'Helvetic
   </div>
 </div>
 
-</div><!-- /wrap -->
-
+</div>
 <script>
 var API='https://script.google.com/macros/s/AKfycbyKA8qicNe7nAdRyTEEoI6bGDwFd9pYvylcYdCtrDdigLinDX9fKasV2aPBomhM107y/exec';
 var ADMIN_PW='engineer_1997';
 var RESET_ANS='ราษฎร์เจริญ';
 var EVENT_OPEN=new Date('2026-07-10T09:00:00+07:00');
-
 var STATIONS=[
   {id:'EE',icon:'⚡',label:'Electrical Eng.',activity:'Logic Master',color:'#1e40af',accent:'#3b82f6'},
   {id:'ME',icon:'⚙️',label:'Mechanical Eng.',activity:'Force & Flow',color:'#065f46',accent:'#10b981'},
@@ -490,16 +448,15 @@ var STATION_INFO={
   TO:{title:'Tooling Engineering',sub:'วิศวกรรมแม่พิมพ์และการวัดละเอียด',body:'ฝ่าย TO เชี่ยวชาญการออกแบบแม่พิมพ์ งานกลึง CNC และการวัดละเอียดด้วยเครื่องมือความแม่นยำสูง',tags:['CNC Machining','Mold & Die','CMM Measurement','Surface Roughness'],accent:'#f59e0b',color:'#92400e'},
   PM:{title:'Preventive Maintenance',sub:'งานซ่อมบำรุงเชิงป้องกัน',body:'ฝ่าย PM วางแผนและดำเนินการบำรุงรักษาเครื่องจักรเชิงป้องกัน ด้วยการวิเคราะห์ข้อมูลและเทคโนโลยี Predictive Maintenance',tags:['PM Schedule','Predictive Maintenance','Downtime Reduction','Condition Monitoring'],accent:'#8b5cf6',color:'#4c1d95'},
 };
-
 var currentStation=null,currentUid=null,employeeDB=[],settingsCache={EE:10,ME:10,TO:10,PM:10};
 var seenPopup={},suggestIdx=-1,selectedEmp=null,qrScanner=null,stLog={EE:[],ME:[],TO:[],PM:[]};
 
 // ── Splash ──
 window.addEventListener('load',function(){
   setTimeout(function(){
-    var splash=document.getElementById('pg-splash');
-    splash.classList.add('hide');
-    setTimeout(function(){splash.style.display='none';},650);
+    var s=document.getElementById('pg-splash');
+    s.classList.add('hide');
+    setTimeout(function(){s.style.display='none';},650);
   },1800);
   initApp();
 });
@@ -518,10 +475,7 @@ function updateCS(){
 // ── Preview countdown ──
 (function(){
   var secs=5,c=2*Math.PI*18;
-  var prog=document.getElementById('cdProg');
-  var num=document.getElementById('cdNum');
-  var hint=document.getElementById('cdHint');
-  var btn=document.getElementById('btnPreview');
+  var prog=document.getElementById('cdProg'),num=document.getElementById('cdNum'),hint=document.getElementById('cdHint'),btn=document.getElementById('btnPreview');
   prog.style.strokeDashoffset=c;
   function tick(){secs--;num.textContent=secs;prog.style.strokeDashoffset=c*(secs/5);
     if(secs<=0){num.textContent='✓';prog.style.stroke='var(--accent)';hint.textContent='พร้อมลงทะเบียน';btn.classList.add('on');}
@@ -550,25 +504,17 @@ function goHome(){loadHome();go('home');}
 function saveSession(uid){try{localStorage.setItem('eoh_uid',uid);}catch(e){}}
 function loadSession(){try{return localStorage.getItem('eoh_uid');}catch(e){return null;}}
 
-// ── Init ──
+// ── Init — ไปหน้า preview เสมอเมื่อ refresh ──
 function initApp(){
   apiGet('getEmployees',function(res){if(res.employees)employeeDB=res.employees;});
   apiGet('getSettings',function(res){if(res.settings)settingsCache=res.settings;});
   var isBeforeEvent=new Date()<EVENT_OPEN;
   if(isBeforeEvent){updateCS();setInterval(updateCS,1000);}
-  var uid=loadSession();
-  if(uid){
-    showLoad();
-    apiGet('getMembers',function(res){
-      hideLoad();
-      var found=res.members&&res.members.find(function(m){return m.uid===uid;});
-      if(found){currentUid=uid;isBeforeEvent?go('coming'):goHome();}
-      else{go('preview');}
-    });
-  } else {go('preview');}
+  // ไปหน้า preview เสมอ ไม่ว่าจะมี session หรือไม่
+  go('preview');
 }
 
-// ── Fuzzy search ──
+// ── Fuzzy ──
 function lev(a,b){var m=a.length,n=b.length,dp=[];for(var i=0;i<=m;i++){dp[i]=[i];}for(var j=0;j<=n;j++){dp[0][j]=j;}for(var i=1;i<=m;i++)for(var j=1;j<=n;j++)dp[i][j]=a[i-1]===b[j-1]?dp[i-1][j-1]:1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);return dp[m][n];}
 function sim(a,b){a=a.trim();b=b.trim();if(!a||!b)return 0;if(b.includes(a)||a.includes(b))return .9;var d=lev(a,b),ml=Math.max(a.length,b.length);return ml===0?1:1-d/ml;}
 function searchEmp(q){
@@ -580,20 +526,13 @@ function searchEmp(q){
     return{e:e,s:sc};
   }).filter(function(x){return x.s>.38;}).sort(function(a,b){return b.s-a.s;}).slice(0,4).map(function(x){return x.e;});
 }
-
 function onNameInput(){
   var q=document.getElementById('reg-name').value.trim();
-  var res=searchEmp(q);
-  var box=document.getElementById('name-suggest');
+  var res=searchEmp(q),box=document.getElementById('name-suggest');
   suggestIdx=-1;
   if(!res.length){box.style.display='none';selectedEmp=null;updateRegBtn();return;}
-  box.innerHTML=res.map(function(e,i){
-    return'<div class="sug-item" onclick="selectEmp('+i+')">'
-      +'<span class="sug-name">'+e.firstName+' '+e.lastName+'</span>'
-      +'<span class="sug-dept">'+e.dept+'</span></div>';
-  }).join('');
-  box._res=res;box.style.display='block';
-  selectedEmp=null;updateRegBtn();
+  box.innerHTML=res.map(function(e,i){return'<div class="sug-item" onclick="selectEmp('+i+')">'+'<span class="sug-name">'+e.firstName+' '+e.lastName+'</span>'+'<span class="sug-dept">'+e.dept+'</span></div>';}).join('');
+  box._res=res;box.style.display='block';selectedEmp=null;updateRegBtn();
 }
 function selectEmp(i){
   var e=document.getElementById('name-suggest')._res[i];
@@ -613,21 +552,15 @@ function onNameKey(ev){
   else if(ev.key==='Enter'&&suggestIdx>=0){ev.preventDefault();selectEmp(suggestIdx);}
   else if(ev.key==='Escape'){box.style.display='none';}
 }
-function updateRegBtn(){
-  var btn=document.getElementById('reg-submit');
-  var ok=!!selectedEmp;
-  btn.disabled=!ok;btn.style.opacity=ok?'1':'.4';
-}
+function updateRegBtn(){var btn=document.getElementById('reg-submit'),ok=!!selectedEmp;btn.disabled=!ok;btn.style.opacity=ok?'1':'.4';}
 document.addEventListener('click',function(e){if(!e.target.closest('.suggest-wrap'))document.getElementById('name-suggest').style.display='none';});
 
 // ── Register ──
 function doRegister(){
   if(!selectedEmp){showErr(document.getElementById('reg-err'),'กรุณาเลือกชื่อจากรายการ');return;}
   var errEl=document.getElementById('reg-err');errEl.style.display='none';
-  var fullName=selectedEmp.firstName+' '+selectedEmp.lastName;
-  var dept=selectedEmp.dept;
   showLoad();
-  apiPost({action:'register',full_name:fullName,department:dept},function(res){
+  apiPost({action:'register',full_name:selectedEmp.firstName+' '+selectedEmp.lastName,department:selectedEmp.dept},function(res){
     hideLoad();
     if(res.error){showErr(errEl,res.error);return;}
     currentUid=res.uid;saveSession(res.uid);
@@ -655,33 +588,25 @@ function doLogin(){
   });
 }
 
-// ── Admin login ──
+// ── Admin ──
 function doAdminLogin(){
-  var pw=document.getElementById('admin-pw').value;
-  var errEl=document.getElementById('admin-login-err');errEl.style.display='none';
+  var pw=document.getElementById('admin-pw').value,errEl=document.getElementById('admin-login-err');errEl.style.display='none';
   if(pw===ADMIN_PW){document.getElementById('admin-pw').value='';go('admin');}
-  else{showErr(errEl,'รหัสผ่านไม่ถูกต้อง');}
+  else showErr(errEl,'รหัสผ่านไม่ถูกต้อง');
 }
 function doAdminReset(){
-  var ans=document.getElementById('reset-ans').value.trim();
-  var errEl=document.getElementById('reset-err');
-  var okEl=document.getElementById('reset-ok');
+  var ans=document.getElementById('reset-ans').value.trim(),errEl=document.getElementById('reset-err'),okEl=document.getElementById('reset-ok');
   errEl.style.display='none';okEl.style.display='none';
-  if(ans===RESET_ANS){
-    okEl.textContent='✅ รหัสผ่าน Admin คือ: '+ADMIN_PW;
-    okEl.style.display='block';
-    document.getElementById('reset-ans').value='';
-  } else {showErr(errEl,'คำตอบไม่ถูกต้อง');}
+  if(ans===RESET_ANS){okEl.textContent='✅ รหัสผ่าน Admin คือ: '+ADMIN_PW;okEl.style.display='block';document.getElementById('reset-ans').value='';}
+  else showErr(errEl,'คำตอบไม่ถูกต้อง');
 }
 
 // ── Home ──
 function loadHome(){
-  renderStations(null);
-  showLoad();
+  renderStations(null);showLoad();
   apiGet('getMembers',function(res){
     hideLoad();if(res.error)return;
-    var members=res.members;
-    var m=currentUid?members.find(function(x){return x.uid===currentUid;}):null;
+    var members=res.members,m=currentUid?members.find(function(x){return x.uid===currentUid;}):null;
     var sorted=members.slice().sort(function(a,b){return b.total_score-a.total_score;});
     var rank=m?sorted.findIndex(function(x){return x.uid===m.uid;})+1:'—';
     document.getElementById('home-name').textContent=m?m.full_name.split(' ')[0]:'—';
@@ -693,28 +618,13 @@ function loadHome(){
     var lbEl=document.getElementById('home-lb');
     if(!sorted.length){lbEl.innerHTML='<div class="lb-wrap" style="text-align:center;color:var(--sub);padding:20px;font-size:13px">ยังไม่มีผู้ลงทะเบียน</div>';return;}
     var medals=['🥇','🥈','🥉'];
-    lbEl.innerHTML='<div class="lb-wrap">'+sorted.slice(0,10).map(function(mem,i){
-      var isMe=mem.uid===currentUid;
-      return'<div class="lb-item'+(isMe?' me':'')+'">'
-        +'<div class="lb-rank">'+(medals[i]||(i+1))+'</div>'
-        +'<div style="flex:1"><div class="lb-name">'+mem.full_name+(isMe?'<span class="me-tag">คุณ</span>':'')+'</div>'
-        +'<div class="lb-sub">'+mem.department+' · '+Object.keys(mem.scores).length+'/4 ฐาน</div></div>'
-        +'<div class="lb-score">'+mem.total_score+'</div></div>';
-    }).join('')+'</div>';
+    lbEl.innerHTML='<div class="lb-wrap">'+sorted.slice(0,10).map(function(mem,i){var isMe=mem.uid===currentUid;return'<div class="lb-item'+(isMe?' me':'')+'">'+'<div class="lb-rank">'+(medals[i]||(i+1))+'</div>'+'<div style="flex:1"><div class="lb-name">'+mem.full_name+(isMe?'<span class="me-tag">คุณ</span>':'')+'</div><div class="lb-sub">'+mem.department+' · '+Object.keys(mem.scores).length+'/4 ฐาน</div></div>'+'<div class="lb-score">'+mem.total_score+'</div></div>';}).join('')+'</div>';
   });
 }
 function renderStations(m){
   document.getElementById('home-stations').innerHTML=STATIONS.map(function(s){
     var done=m&&!!m.scores[s.id],pts=settingsCache[s.id]||10;
-    return'<div class="st-card '+(done?'done':'pending')+'" style="'+(done?'border-color:'+s.accent+'55;background:#fafcff':'')+'" onclick="onStationClick(\''+s.id+'\')">'
-      +(done?'<div class="st-stamp">✓</div>':'')
-      +'<span class="st-ico">'+s.icon+'</span>'
-      +'<div class="st-id'+(done?' dc':'')+'" style="'+(done?'color:'+s.accent:'')+'">'+s.id+'</div>'
-      +'<div class="st-lbl2">'+s.label+'</div>'
-      +'<div class="st-act">'+s.activity+'</div>'
-      +(done?'<div class="st-pts-done" style="color:'+s.accent+';background:'+s.accent+'15">+'+m.scores[s.id]+' pts</div>'
-            :'<div class="st-pts">+'+pts+' pts</div>')
-      +'</div>';
+    return'<div class="st-card '+(done?'done':'pending')+'" style="'+(done?'border-color:'+s.accent+'55;background:#fafcff':'')+'" onclick="onStationClick(\''+s.id+'\')">'+(done?'<div class="st-stamp">✓</div>':'')+'<span class="st-ico">'+s.icon+'</span><div class="st-id'+(done?' dc':'')+'" style="'+(done?'color:'+s.accent:'')+'">'+s.id+'</div><div class="st-lbl2">'+s.label+'</div><div class="st-act">'+s.activity+'</div>'+(done?'<div class="st-pts-done" style="color:'+s.accent+';background:'+s.accent+'15">+'+m.scores[s.id]+' pts</div>':'<div class="st-pts">+'+pts+' pts</div>')+'</div>';
   }).join('');
 }
 
@@ -726,9 +636,7 @@ function onStationClick(id){
   document.getElementById('popup-title').textContent=info.title;
   document.getElementById('popup-sub').textContent=info.sub;
   document.getElementById('popup-body').textContent=info.body;
-  document.getElementById('popup-tags').innerHTML=info.tags.map(function(t){
-    return'<span class="ptag" style="background:'+info.accent+'15;color:'+info.accent+';border:1px solid '+info.accent+'30">'+t+'</span>';
-  }).join('');
+  document.getElementById('popup-tags').innerHTML=info.tags.map(function(t){return'<span class="ptag" style="background:'+info.accent+'15;color:'+info.accent+';border:1px solid '+info.accent+'30">'+t+'</span>';}).join('');
   document.getElementById('popup-btn').style.background=info.color;
   document.getElementById('popup-btn').dataset.stId=id;
   document.getElementById('st-popup').style.display='block';
@@ -738,8 +646,7 @@ function closePopup(e){if(e.target===e.currentTarget)dismissPopup();}
 
 // ── Station ──
 function loadStation(id){
-  var s=STATIONS.find(function(x){return x.id===id;});
-  var b=document.getElementById('st-banner');
+  var s=STATIONS.find(function(x){return x.id===id;}),b=document.getElementById('st-banner');
   b.style.background='linear-gradient(135deg,'+s.color+','+s.accent+')';
   document.getElementById('st-icon').textContent=s.icon;
   document.getElementById('st-title').textContent='ฐาน '+s.id+' — '+s.label;
@@ -751,17 +658,12 @@ function loadStation(id){
 }
 function startQR(){
   if(qrScanner)return;
-  try{
-    qrScanner=new Html5Qrcode('qr-reader');
-    qrScanner.start({facingMode:'environment'},{fps:10,qrbox:{width:200,height:200}},
-      function(decoded){document.getElementById('st-uid').value=decoded;doGiveScore();},
-      function(){}).catch(function(){qrScanner=null;});
-  }catch(e){qrScanner=null;}
+  try{qrScanner=new Html5Qrcode('qr-reader');qrScanner.start({facingMode:'environment'},{fps:10,qrbox:{width:200,height:200}},function(decoded){document.getElementById('st-uid').value=decoded;doGiveScore();},function(){}).catch(function(){qrScanner=null;});}
+  catch(e){qrScanner=null;}
 }
 function stopQR(){if(qrScanner){try{qrScanner.stop().then(function(){qrScanner=null;});}catch(e){qrScanner=null;}}}
 function doGiveScore(){
-  var uid=document.getElementById('st-uid').value.trim().toUpperCase();
-  var errEl=document.getElementById('st-err'),okEl=document.getElementById('st-ok');
+  var uid=document.getElementById('st-uid').value.trim().toUpperCase(),errEl=document.getElementById('st-err'),okEl=document.getElementById('st-ok');
   errEl.style.display='none';okEl.style.display='none';
   if(!uid){showErr(errEl,'กรุณากรอก UID');return;}
   showLoad();
@@ -779,12 +681,10 @@ function renderLog(id){
   var logs=stLog[id],wrap=document.getElementById('st-log-wrap');
   if(!logs.length){wrap.style.display='none';return;}
   wrap.style.display='block';
-  document.getElementById('st-log').innerHTML=logs.map(function(l){
-    return'<div class="log-row"><span style="font-weight:500">'+l.name+'</span><span style="color:var(--green);font-weight:600">+'+l.pts+' · '+l.time+'</span></div>';
-  }).join('');
+  document.getElementById('st-log').innerHTML=logs.map(function(l){return'<div class="log-row"><span style="font-weight:500">'+l.name+'</span><span style="color:var(--green);font-weight:600">+'+l.pts+' · '+l.time+'</span></div>';}).join('');
 }
 
-// ── Admin ──
+// ── Admin Dash ──
 function loadAdmin(){
   showLoad();
   apiGet('getMembers',function(res){
@@ -792,25 +692,12 @@ function loadAdmin(){
     var sorted=(res.members||[]).slice().sort(function(a,b){return b.total_score-a.total_score;});
     document.getElementById('stat-count').textContent=sorted.length;
     document.getElementById('stat-top').textContent=sorted.length?sorted[0].total_score:0;
-    var medals=['#ffd700','#c0c0c0','#cd7f32'];
-    var listEl=document.getElementById('admin-list');
+    var medals=['#ffd700','#c0c0c0','#cd7f32'],listEl=document.getElementById('admin-list');
     if(!sorted.length){listEl.innerHTML='<div style="text-align:center;color:var(--sub);padding:24px;font-size:13px">ยังไม่มีผู้ลงทะเบียน</div>';document.getElementById('clear-wrap').style.display='none';return;}
-    listEl.innerHTML=sorted.map(function(m,i){
-      return'<div class="member-row">'
-        +'<div style="display:flex;gap:10px;align-items:center">'
-        +'<div class="av" style="background:'+(medals[i]||'#eef2fa')+';color:'+(i<3?'#000':'var(--navy)')+'">'+( i+1)+'</div>'
-        +'<div><div style="font-weight:600;font-size:14px">'+m.full_name+'</div>'
-        +'<div style="font-size:11px;color:var(--sub)">'+m.department+'</div>'
-        +'<div style="margin-top:3px">'+STATIONS.map(function(s){
-          return'<span class="chip" style="background:'+(m.scores[s.id]?s.color+'22':'#f3f4f8')+';color:'+(m.scores[s.id]?s.accent:'var(--sub)')+';border:1px solid '+(m.scores[s.id]?s.accent+'44':'var(--border)')+'">'+s.id+'</span>';
-        }).join('')+'</div></div></div>'
-        +'<div style="font-weight:700;font-size:18px;color:var(--navy)">'+m.total_score+'</div></div>';
-    }).join('');
+    listEl.innerHTML=sorted.map(function(m,i){return'<div class="member-row"><div style="display:flex;gap:10px;align-items:center"><div class="av" style="background:'+(medals[i]||'#eef2fa')+';color:'+(i<3?'#000':'var(--navy)')+'">'+( i+1)+'</div><div><div style="font-weight:600;font-size:14px">'+m.full_name+'</div><div style="font-size:11px;color:var(--sub)">'+m.department+'</div><div style="margin-top:3px">'+STATIONS.map(function(s){return'<span class="chip" style="background:'+(m.scores[s.id]?s.color+'22':'#f3f4f8')+';color:'+(m.scores[s.id]?s.accent:'var(--sub)')+';border:1px solid '+(m.scores[s.id]?s.accent+'44':'var(--border)')+'">'+s.id+'</span>';}).join('')+'</div></div></div><div style="font-weight:700;font-size:18px;color:var(--navy)">'+m.total_score+'</div></div>';}).join('');
     document.getElementById('clear-wrap').style.display='block';
   });
-  apiGet('getSettings',function(res){
-    if(res.settings){settingsCache=res.settings;['EE','ME','TO','PM'].forEach(function(id){var el=document.getElementById('pts-'+id);if(el)el.value=res.settings[id]||10;});}
-  });
+  apiGet('getSettings',function(res){if(res.settings){settingsCache=res.settings;['EE','ME','TO','PM'].forEach(function(id){var el=document.getElementById('pts-'+id);if(el)el.value=res.settings[id]||10;});}});
 }
 function switchTab(t){
   document.getElementById('panel-members').style.display=t==='members'?'block':'none';
@@ -822,18 +709,12 @@ function switchTab(t){
 function doSaveSettings(){
   var s={};['EE','ME','TO','PM'].forEach(function(id){s[id]=parseInt(document.getElementById('pts-'+id).value)||10;});
   showLoad();
-  apiPost({action:'saveSettings',settings:s},function(res){
-    hideLoad();
-    if(res.success){settingsCache=s;var ok=document.getElementById('admin-ok');ok.textContent='✅ บันทึกแล้ว';ok.style.display='block';setTimeout(function(){ok.style.display='none';},2000);}
-  });
+  apiPost({action:'saveSettings',settings:s},function(res){hideLoad();if(res.success){settingsCache=s;var ok=document.getElementById('admin-ok');ok.textContent='✅ บันทึกแล้ว';ok.style.display='block';setTimeout(function(){ok.style.display='none';},2000);}});
 }
 function doClear(){
   if(!confirm('ลบข้อมูลสมาชิกทั้งหมด?'))return;
   showLoad();
-  apiPost({action:'clearAll'},function(res){
-    hideLoad();
-    if(res.success){stLog={EE:[],ME:[],TO:[],PM:[]};currentUid=null;try{localStorage.removeItem('eoh_uid');}catch(e){}loadAdmin();}
-  });
+  apiPost({action:'clearAll'},function(res){hideLoad();if(res.success){stLog={EE:[],ME:[],TO:[],PM:[]};currentUid=null;try{localStorage.removeItem('eoh_uid');}catch(e){}loadAdmin();}});
 }
 
 // ── Logout ──
@@ -841,7 +722,6 @@ function doLogout(){
   if(!confirm('ออกจากระบบใช่หรือไม่?\nข้อมูลคะแนนยังถูกบันทึกไว้'))return;
   currentUid=null;try{localStorage.removeItem('eoh_uid');}catch(e){}go('preview');
 }
-
 function showErr(el,msg){el.textContent=msg;el.style.display='block';}
 </script>
 </body>
