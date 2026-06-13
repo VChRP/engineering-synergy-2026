@@ -542,7 +542,7 @@ function showErr(el,msg){el.textContent=msg;el.style.display='block';}
 // ── Nav ──
 function go(page,param){
   stopQR();
-  document.querySelectorAll('#pg-splash,div.page').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
   if(page==='station'){currentStation=param;loadStation(param);document.getElementById('pg-station').classList.add('active');}
   else if(page==='admin'){loadAdmin();document.getElementById('pg-admin').classList.add('active');}
   else{var el=document.getElementById('pg-'+page);if(el)el.classList.add('active');}
@@ -942,7 +942,7 @@ window.addEventListener('load',function(){
       splash.style.display='none';
       initApp();
     },600);
-  },2000);
+  },2200);
 
   // Countdown ring (preview 5s)
   var secs=5,c=2*Math.PI*18;
