@@ -963,8 +963,7 @@ window.addEventListener('load',function(){
 });
 
 function initApp(){
-    var employees=res.employees||[];
-    employeeDB=employees.map(function(e){return{firstName:e.firstName,lastName:e.lastName,dept:e.dept,position:e.position||''};});
+
   apiGet('getSettings',function(res){if(res.settings)settingsCache=res.settings;});
 
   // เปิด preview เสมอ (refresh → preview)
