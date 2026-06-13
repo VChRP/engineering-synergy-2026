@@ -230,7 +230,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
 <div class="wrap">
 
 <!-- PREVIEW -->
-<div id="pg-preview" class="page">
+<div id="pg-preview" class="page active">
   <div class="hero-banner">
     <div class="hero-eyebrow">The Core of Future Industry</div>
     <div class="hero-title">Engineering<br><em>Synergy</em> 2026</div>
@@ -936,6 +936,8 @@ window.addEventListener('load',function(){
   // Splash 2 วินาที แล้วค่อยเริ่ม
   var splash=document.getElementById('pg-splash');
   splash.style.display='flex';
+  // ซ่อน preview ก่อนระหว่าง splash แสดง
+  document.getElementById('pg-preview').classList.remove('active');
   setTimeout(function(){
     splash.classList.add('hide');
     setTimeout(function(){
