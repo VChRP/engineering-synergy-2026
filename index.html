@@ -940,6 +940,7 @@ function doKickSession(uid,name){
     if(res.success){loadAdmin();}
   });
 }
+function switchTab(t){
   ['members','settings','qr'].forEach(function(n){
     document.getElementById('panel-'+n).style.display=n===t?'block':'none';
     document.getElementById('tab-'+n).classList.toggle('active',n===t);
