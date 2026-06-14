@@ -668,15 +668,6 @@ function go(page,param){
   document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
   if(page==='preview'){
     document.getElementById('pg-preview').classList.add('active');
-    // reset entry panel state แล้วเปิดขึ้นมาทันที
-    var ep=document.getElementById('entry-panel');
-    var n=document.getElementById('reg-name');
-    var btn=document.getElementById('reg-submit');
-    if(n){n.value='';}
-    if(document.getElementById('reg-dept-pill')) document.getElementById('reg-dept-pill').style.display='none';
-    if(document.getElementById('reg-suggest')) document.getElementById('reg-suggest').style.display='none';
-    if(btn){btn.style.opacity='0';btn.style.transform='translateY(8px)';btn.style.pointerEvents='none';btn.textContent='เข้าร่วมกิจกรรม →';btn.dataset.isAdmin='0';}
-    if(ep) setTimeout(function(){ep.style.transform='translateY(0)';},100);
   }
   else if(page==='station'){currentStation=param;loadStation(param);document.getElementById('pg-station').classList.add('active');}
   else if(page==='admin'){loadAdmin();document.getElementById('pg-admin').classList.add('active');}
@@ -1048,9 +1039,9 @@ function confirmAdminExit(){
   goPreview();
 }
 function goPreview(){
-  // reset entry panel ทุกครั้งที่กลับมาหน้า preview
+  // ซ่อน entry-panel ก่อน แล้วค่อยให้ ring เรียก openEntryPanel เอง
   var ep=document.getElementById('entry-panel');
-  if(ep) ep.style.transform='translateY(0)';
+  if(ep) ep.style.transform='translateY(100%)';
   var n=document.getElementById('reg-name');
   if(n) n.value='';
   var pill=document.getElementById('reg-dept-pill');
@@ -1059,8 +1050,16 @@ function goPreview(){
   if(btn){btn.style.opacity='0';btn.style.transform='translateY(8px)';btn.style.pointerEvents='none';btn.textContent='เข้าร่วมกิจกรรม →';btn.dataset.isAdmin='0';}
   var adm=document.getElementById('admin-entry-panel');
   if(adm){adm.style.opacity='0';adm.style.pointerEvents='none';}
+  // reset ring
+  var wrap=document.getElementById('pv-ring-wrap');
+  var prog=document.getElementById('pvRingProg');
+  var lbl=document.getElementById('pvRingLbl');
+  if(wrap){wrap.style.opacity='1';wrap.style.transform='translateY(0)';}
+  if(prog){prog.style.stroke='var(--navy)';prog.style.strokeDashoffset=String(2*Math.PI*18);}
+  if(lbl) lbl.textContent='กำลังโหลด...';
   selectedReg=null;
   go('preview');
+  startPreviewRing(3);
 }
 function doKickSession(uid,name){
   if(!confirm('Kick session ของ '+name+'?\nคนนี้จะถูกออกจากระบบและเข้าใหม่ได้'))return;
@@ -1402,7 +1401,10 @@ function initApp(){
     });
   }
   go('preview');
-  // โหลด employees แล้ว slide entry-panel ขึ้นหลัง 5 วินาที
+  // ซ่อน entry-panel ก่อนให้ ring เริ่ม
+  var ep=document.getElementById('entry-panel');
+  if(ep) ep.style.transform='translateY(100%)';
+  // โหลด employees
   apiGet('getEmployees',function(res){
     var employees=(res&&res.employees)||[];
     employeeDB=employees.map(function(e){return{firstName:e.firstName,lastName:e.lastName,dept:e.dept,position:e.position||''};});
