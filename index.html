@@ -49,6 +49,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
 .btn+.btn{margin-top:10px;}
 .btn-navy{background:var(--navy);color:#fff;}
 .btn-navy:active{background:var(--navy2);}
+.btn-navy:disabled{background:var(--navy) !important;color:#fff !important;-webkit-text-fill-color:#fff;}
 .btn-outline{background:transparent;border:1.5px solid var(--border2);color:var(--sub);font-size:14px;}
 .btn-outline:active{border-color:var(--navy);color:var(--navy);}
 .btn-ghost-sm{background:none;border:none;color:var(--accent);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;padding:0;}
@@ -292,54 +293,14 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
 
 <div class="wrap">
 
-<!-- PREVIEW -->
-<div id="pg-preview" class="page active">
-  <div style="min-height:100vh;display:flex;flex-direction:column;justify-content:space-between;padding:48px 0 40px;">
 
-    <!-- Title block -->
-    <div style="text-align:center;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;">
-      <div style="font-size:54px;font-weight:700;color:var(--navy);letter-spacing:-2px;line-height:1.05;">Engineering</div>
-      <div style="font-size:54px;font-weight:700;color:var(--accent);letter-spacing:-2px;line-height:1.05;margin-bottom:16px;">Synergy</div>
-      <div style="font-size:15px;color:var(--sub);margin-bottom:6px;">The Core of Future Industry</div>
-      <div style="font-size:13px;color:var(--muted);">2026</div>
-    </div>
+<!-- PREVIEW + REGISTER (รวมเป็นหน้าเดียว) -->
+<div id="pg-preview" class="page active" style="min-height:100vh;position:relative;overflow:hidden;">
 
-    <!-- Countdown ring -->
-    <div class="cd-wrap" style="margin-bottom:28px;">
-      <div class="cd-ring">
-        <svg width="52" height="52" viewBox="0 0 52 52">
-          <circle cx="26" cy="26" r="18"/>
-          <circle class="cd-prog" id="cdProg" cx="26" cy="26" r="18"/>
-        </svg>
-        <div class="cd-num" id="cdNum">5</div>
-      </div>
-      <div class="cd-lbl" id="cdLbl">กำลังโหลด...</div>
-    </div>
-
-    <!-- Buttons -->
-    <div>
-      <button class="btn-preview" id="btnPreview" onclick="go('register')">ลงทะเบียนเข้าร่วมกิจกรรม →</button>
-      <div style="margin-top:16px;text-align:center;">
-        <span style="font-size:13px;color:var(--muted)">มีบัญชีแล้ว? </span>
-        <button class="btn-ghost-sm" onclick="go('login')">เข้าสู่ระบบ</button>
-      </div>
-      <div style="margin-top:12px;text-align:center;">
-        <button class="btn-ghost-sm" style="color:var(--muted);font-size:12px;background:var(--bg2);border:1px solid var(--border);padding:8px 20px;border-radius:10px;" onclick="go('admin-login')">• • •</button>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-
-<!-- ENTER (รวม register + login เป็นหน้าเดียว) -->
-<div id="pg-register" class="page">
-
-  <!-- Popup: ยืนยันตัวตน -->
+  <!-- Confirm popup -->
   <div id="confirm-popup" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:400;align-items:flex-end;justify-content:center;">
     <div style="background:var(--bg);border-radius:24px 24px 0 0;padding:24px 24px 48px;width:100%;max-width:420px;">
       <div style="width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px;"></div>
-      <!-- กรณีปกติ -->
       <div id="cp-normal">
         <div style="font-size:32px;margin-bottom:10px;">🙋</div>
         <div style="font-size:18px;font-weight:700;color:var(--navy);margin-bottom:4px;">ใช่คุณใช่ไหม?</div>
@@ -348,7 +309,6 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
         <button class="btn btn-navy" onclick="confirmEnter()">ใช่ เข้าร่วมเลย →</button>
         <button class="btn btn-outline" style="margin-top:10px;" onclick="closeConfirm()">ไม่ใช่ ค้นหาใหม่</button>
       </div>
-      <!-- กรณี session ซ้อน -->
       <div id="cp-blocked" style="display:none;">
         <div style="font-size:32px;margin-bottom:10px;">🔒</div>
         <div style="font-size:18px;font-weight:700;color:var(--navy);margin-bottom:4px;">มีผู้ใช้งานอยู่แล้ว</div>
@@ -359,13 +319,19 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
     </div>
   </div>
 
-  <div class="pg-header">
-    <div class="back-ico" onclick="go('preview')">←</div>
-    <div class="pg-titles"><div class="ptitle">เข้าร่วมกิจกรรม</div><div class="psub">Engineering Synergy 2026</div></div>
+  <!-- Title -->
+  <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center;padding:0 24px;">
+    <div style="font-size:54px;font-weight:700;color:var(--navy);letter-spacing:-2px;line-height:1.05;">Engineering</div>
+    <div style="font-size:54px;font-weight:700;color:var(--accent);letter-spacing:-2px;line-height:1.05;margin-bottom:14px;">Synergy</div>
+    <div style="font-size:15px;color:var(--sub);">The Core of Future Industry</div>
+    <div style="font-size:13px;color:var(--muted);margin-top:4px;">2026</div>
   </div>
-  <div style="padding-top:24px;">
-    <div style="font-size:22px;font-weight:700;color:var(--navy);letter-spacing:-.4px;margin-bottom:6px;">สวัสดี 👋</div>
-    <div style="font-size:14px;color:var(--sub);margin-bottom:28px;line-height:1.6;">พิมพ์ชื่อของคุณ — ระบบจะพาเข้ากิจกรรมให้อัตโนมัติ</div>
+
+  <!-- Input slide-up panel -->
+  <div id="entry-panel" style="position:absolute;bottom:0;left:0;right:0;background:#fff;border-radius:22px 22px 0 0;padding:20px 24px 44px;border-top:0.5px solid var(--border);transform:translateY(100%);transition:transform .45s cubic-bezier(.34,1.1,.64,1);">
+    <div style="width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 18px;"></div>
+    <div style="font-size:17px;font-weight:700;color:var(--navy);margin-bottom:3px;">สวัสดี 👋</div>
+    <div style="font-size:13px;color:var(--sub);margin-bottom:16px;">พิมพ์ชื่อเพื่อเข้าร่วมกิจกรรม</div>
     <div id="reg-err" class="err"></div>
     <div class="lbl">ชื่อ – นามสกุล</div>
     <div class="sug-wrap">
@@ -375,31 +341,46 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
     <div id="reg-dept-pill" class="dept-pill" style="display:none">
       <div class="dp-dot"></div><span class="dp-txt">พบในระบบ · ฝ่าย</span><span class="dp-val" id="reg-dept-val">—</span>
     </div>
-    <button class="btn btn-navy" id="reg-submit" onclick="showConfirmPopup()" disabled style="opacity:.4;">เข้าร่วมกิจกรรม →</button>
+    <button id="reg-submit" onclick="showConfirmPopup()" style="width:100%;padding:15px;background:#1e3a5f;border:none;border-radius:14px;color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;opacity:0;transform:translateY(8px);transition:opacity .35s,transform .35s;pointer-events:none;">เข้าร่วมกิจกรรม →</button>
   </div>
+
+  <!-- Admin password slide-up panel -->
+  <div id="admin-entry-panel" style="position:absolute;inset:0;background:#fff;display:flex;flex-direction:column;justify-content:center;padding:40px 28px;transform:translateY(100%);transition:transform .4s cubic-bezier(.34,1.1,.64,1);">
+    <div style="font-size:12px;font-weight:600;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">Admin</div>
+    <div style="font-size:22px;font-weight:700;color:var(--navy);margin-bottom:4px;">เข้าสู่ระบบ</div>
+    <div style="font-size:13px;color:var(--sub);margin-bottom:28px;">Engineering Synergy 2026</div>
+    <div id="al-err" class="err"></div>
+    <div class="lbl">รหัสผ่าน</div>
+    <div class="input-box" style="margin-bottom:16px;">
+      <input id="al-pass" class="fi" type="password" placeholder="กรอกรหัสผ่าน Admin" onkeydown="if(event.key==='Enter')doAdminLogin()">
+    </div>
+    <button class="btn btn-navy" onclick="doAdminLogin()" style="background:#1e3a5f;margin-bottom:10px;">เข้าสู่ระบบ Admin</button>
+    <button class="btn btn-outline" onclick="closeAdminEntry()">← กลับ</button>
+    <div style="margin-top:14px;text-align:center;">
+      <button class="btn-ghost-sm" style="color:var(--muted);font-size:12px" onclick="go('reset-pass')">ลืมรหัสผ่าน?</button>
+    </div>
+  </div>
+
 </div>
 
-<!-- LOGIN (ยังคงไว้เพื่อ backward compat แต่ redirect มาที่ register) -->
-<div id="pg-login" class="page">
-  <div class="pg-header">
-    <div class="back-ico" onclick="go('preview')">←</div>
-    <div class="pg-titles"><div class="ptitle">เข้าร่วมกิจกรรม</div><div class="psub">Engineering Synergy 2026</div></div>
-  </div>
-</div>
+<!-- REGISTER (stub สำหรับ backward compat) -->
+<div id="pg-register" class="page"></div>
 
+<!-- LOGIN (stub) -->
+<div id="pg-login" class="page"></div>
 
-<!-- ADMIN LOGIN -->
+<!-- ADMIN LOGIN (เดิม — ยังคงไว้สำหรับ go('admin-login') จากที่อื่น) -->
 <div id="pg-admin-login" class="page">
   <div class="pg-header">
     <div class="back-ico" onclick="go('preview')">←</div>
     <div class="pg-titles"><div class="ptitle">Admin Login</div><div class="psub">Engineering Synergy 2026</div></div>
   </div>
-  <div id="al-err" class="err"></div>
+  <div id="al-err2" class="err"></div>
   <div class="lbl">รหัสผ่าน Admin</div>
   <div class="input-box" style="margin-bottom:16px">
-    <input id="al-pass" class="fi" type="password" placeholder="กรอกรหัสผ่าน" onkeydown="if(event.key==='Enter')doAdminLogin()">
+    <input id="al-pass2" class="fi" type="password" placeholder="กรอกรหัสผ่าน" onkeydown="if(event.key==='Enter')doAdminLogin2()">
   </div>
-  <button class="btn btn-navy" onclick="doAdminLogin()">เข้าสู่ระบบ Admin</button>
+  <button class="btn btn-navy" onclick="doAdminLogin2()">เข้าสู่ระบบ Admin</button>
   <div style="margin-top:14px;text-align:center">
     <button class="btn-ghost-sm" style="color:var(--muted);font-size:12px" onclick="go('reset-pass')">ลืมรหัสผ่าน?</button>
   </div>
@@ -421,6 +402,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
   </div>
   <button class="btn btn-navy" onclick="doResetPass()">ยืนยัน</button>
 </div>
+
 
 <!-- COMING SOON -->
 <div id="pg-coming" class="page">
@@ -702,16 +684,46 @@ function lev(a,b){var m=a.length,n=b.length,dp=[];for(var i=0;i<=m;i++){dp[i]=[i
 function scoreEmp(e,q){var full=(e.firstName+' '+e.lastName).toLowerCase();var fq=q.toLowerCase();if(full===fq)return 1;if(full.startsWith(fq)||e.firstName.toLowerCase().startsWith(fq))return 0.92;if(full.includes(fq))return 0.85;var d=lev(fq,full.slice(0,fq.length+2));return Math.max(0,1-d/Math.max(fq.length,3));}
 function searchEmp(q){if(q.trim().length<1)return[];var scored=employeeDB.map(function(e){return{e:e,s:scoreEmp(e,q)};}).filter(function(x){return x.s>0.4;}).sort(function(a,b){return b.s-a.s;});return scored.length?[scored[0].e]:[];}
 
-/* ── Entry suggest (unified) ── */
+/* ── Entry panel (preview page) ── */
+function openEntryPanel(){
+  var p=document.getElementById('entry-panel');
+  if(p) p.style.transform='translateY(0)';
+  setTimeout(function(){
+    var n=document.getElementById('reg-name');
+    if(n) n.focus();
+  },450);
+}
+function closeAdminEntry(){
+  document.getElementById('admin-entry-panel').style.transform='translateY(100%)';
+  var n=document.getElementById('reg-name');
+  if(n){n.value='';n.focus();}
+  document.getElementById('reg-dept-pill').style.display='none';
+  var btn=document.getElementById('reg-submit');
+  if(btn){btn.style.opacity='0';btn.style.pointerEvents='none';}
+}
+function doAdminLogin2(){
+  var pass=document.getElementById('al-pass2').value;
+  var correct=adminPassOverride||ADMIN_PASS;
+  if(pass===correct){document.getElementById('al-pass2').value='';document.getElementById('al-err2').style.display='none';go('admin');}
+  else{showErr(document.getElementById('al-err2'),'รหัสผ่านไม่ถูกต้อง');}
+}
 var regSugIdx=-1,regSugResults=[];
 function onRegInput(){
   var q=document.getElementById('reg-name').value;
+  if(q.trim().toLowerCase()==='admin'){
+    document.getElementById('entry-panel').style.transform='translateY(100%)';
+    setTimeout(function(){
+      document.getElementById('admin-entry-panel').style.transform='translateY(0)';
+      var p=document.getElementById('al-pass');if(p)p.focus();
+    },100);
+    return;
+  }
   var res=searchEmp(q);
   var box=document.getElementById('reg-suggest');
   regSugIdx=-1;regSugResults=res;selectedReg=null;
   document.getElementById('reg-dept-pill').style.display='none';
-  document.getElementById('reg-submit').disabled=true;
-  document.getElementById('reg-submit').style.opacity='.4';
+  var btn=document.getElementById('reg-submit');
+  btn.style.opacity='0';btn.style.transform='translateY(8px)';btn.style.pointerEvents='none';
   if(!res.length){box.style.display='none';return;}
   box.innerHTML=res.map(function(e,i){
     return'<div class="sug-item" onclick="selectReg('+i+')"><span class="sug-name">'+e.firstName+' '+e.lastName+'</span><span class="sug-dept">'+e.dept+'</span></div>';
@@ -724,9 +736,11 @@ function selectReg(i){
   document.getElementById('reg-name').value=e.firstName+' '+e.lastName;
   document.getElementById('reg-dept-val').textContent=e.position||e.dept;
   document.getElementById('reg-dept-pill').style.display='flex';
-  document.getElementById('reg-submit').disabled=false;
-  document.getElementById('reg-submit').style.opacity='1';
   document.getElementById('reg-suggest').style.display='none';
+  setTimeout(function(){
+    var btn=document.getElementById('reg-submit');
+    btn.style.opacity='1';btn.style.transform='translateY(0)';btn.style.pointerEvents='auto';
+  },50);
 }
 function onRegKey(ev){
   var box=document.getElementById('reg-suggest');if(box.style.display==='none')return;
@@ -792,10 +806,19 @@ function afterAuth(){
 
 /* ── Admin Login ── */
 function doAdminLogin(){
-  var pass=document.getElementById('al-pass').value;
+  var passEl=document.getElementById('al-pass');
+  var errEl=document.getElementById('al-err');
+  if(!passEl||!errEl) return;
+  var pass=passEl.value;
   var correct=adminPassOverride||ADMIN_PASS;
-  if(pass===correct){document.getElementById('al-pass').value='';document.getElementById('al-err').style.display='none';go('admin');}
-  else{showErr(document.getElementById('al-err'),'รหัสผ่านไม่ถูกต้อง');}
+  if(pass===correct){
+    passEl.value='';
+    errEl.style.display='none';
+    document.getElementById('admin-entry-panel').style.transform='translateY(100%)';
+    go('admin');
+  } else {
+    showErr(errEl,'รหัสผ่านไม่ถูกต้อง');
+  }
 }
 
 /* ── Reset Password ── */
@@ -1263,12 +1286,6 @@ window.addEventListener('load',function(){
     splash.classList.add('hide');
     setTimeout(function(){splash.style.display='none';initApp();},600);
   },2200);
-  // Countdown ring (preview 5s)
-  var secs=5,c=2*Math.PI*18;
-  var prog=document.getElementById('cdProg'),num=document.getElementById('cdNum'),lbl=document.getElementById('cdLbl'),btn=document.getElementById('btnPreview');
-  prog.style.strokeDashoffset=c;
-  function tick(){secs--;num.textContent=secs;prog.style.strokeDashoffset=c*(secs/5);if(secs<=0){num.textContent='✓';prog.style.stroke='var(--accent)';lbl.textContent='พร้อมลงทะเบียน';btn.classList.add('show');}else setTimeout(tick,1000);}
-  setTimeout(tick,1000);
 });
 
 function initApp(){
@@ -1283,6 +1300,12 @@ function initApp(){
     });
   }
   go('preview');
+  // โหลด employees แล้ว slide entry-panel ขึ้นหลัง 5 วินาที
+  apiGet('getEmployees',function(res){
+    var employees=(res&&res.employees)||[];
+    employeeDB=employees.map(function(e){return{firstName:e.firstName,lastName:e.lastName,dept:e.dept,position:e.position||''};});
+  });
+  setTimeout(function(){openEntryPanel();},2000);
 }
 </script>
 </body>
