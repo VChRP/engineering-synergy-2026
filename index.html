@@ -418,9 +418,9 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
   <div class="coming-wrap">
     <div style="font-size:13px;font-weight:600;color:var(--accent);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;">Engineering Synergy 2026</div>
     <div style="font-size:28px;font-weight:700;color:var(--navy);letter-spacing:-.5px;margin-bottom:8px;">Coming Soon</div>
-    <div style="font-size:14px;color:var(--muted);line-height:1.75;margin-bottom:28px;">ระบบจะเปิดใช้งานในวันงาน<br>วันศุกร์ที่ 10 กรกฎาคม 2569 เวลา 09:00 น.</div>
+    <div style="font-size:14px;color:var(--muted);line-height:1.85;margin-bottom:20px;">แล้วพบกัน<br>วันศุกร์ที่ 10 กรกฎาคม 2569 เวลา 09:00 น.<br>ณ Shop floor ฝ่ายวิศวกรรม</div>
     <div class="cd-box">
-      <div style="font-size:10px;font-weight:600;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;margin-bottom:16px;">เปิดในอีก</div>
+      <div style="font-size:10px;font-weight:600;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;margin-bottom:16px;">เหลือเวลา</div>
       <div class="cd-row">
         <div class="cd-unit"><div class="cd-unit-num" id="cd-days">--</div><div class="cd-unit-lbl">วัน</div></div>
         <div class="cd-sep">:</div>
@@ -431,7 +431,8 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
         <div class="cd-unit"><div class="cd-unit-num accent" id="cd-secs">--</div><div class="cd-unit-lbl">วินาที</div></div>
       </div>
     </div>
-    <button class="btn-outline" style="max-width:240px;margin:0 auto;" onclick="go('preview')">← กลับหน้าหลัก</button>
+    <button onclick="addToCalendar()" style="width:100%;max-width:240px;padding:13px;background:var(--navy);border:none;border-radius:13px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:8px;">📅 บันทึกเข้าปฏิทิน</button>
+    <button class="btn-outline" style="max-width:240px;margin:0 auto;" onclick="goPreview()">← กลับหน้าหลัก</button>
   </div>
 </div>
 
@@ -1388,6 +1389,31 @@ window.addEventListener('load',function(){
     setTimeout(function(){splash.style.display='none';initApp();},600);
   },2200);
 });
+
+function addToCalendar(){
+  var ics=[
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Engineering Synergy 2026//TH',
+    'BEGIN:VEVENT',
+    'UID:engineering-synergy-2026@smpc',
+    'DTSTAMP:20260614T000000Z',
+    'DTSTART:20260710T020000Z',
+    'DTEND:20260710T050000Z',
+    'SUMMARY:Engineering Synergy 2026',
+    'DESCRIPTION:กิจกรรม Engineer for a Day — ฝ่ายวิศวกรรม',
+    'LOCATION:Shop floor ฝ่ายวิศวกรรม',
+    'END:VEVENT',
+    'END:VCALENDAR'
+  ].join('\r\n');
+  var blob=new Blob([ics],{type:'text/calendar;charset=utf-8'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url;a.download='engineering-synergy-2026.ics';
+  document.body.appendChild(a);a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
 
 function initApp(){
   apiGet('getSettings',function(res){if(res.settings)settingsCache=res.settings;});
