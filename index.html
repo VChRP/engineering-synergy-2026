@@ -728,14 +728,14 @@ function openEntryPanel(){
 }
 function closeAdminEntry(){
   document.getElementById('admin-entry-panel').style.transform='translateY(100%)';
-  var n=document.getElementById('reg-name');
-  if(n){n.value='';n.focus();}
-  document.getElementById('reg-dept-pill').style.display='none';
-  var btn=document.getElementById('reg-submit');
-  if(btn){btn.style.opacity='0';btn.style.transform='translateY(8px)';btn.style.pointerEvents='none';btn.textContent='เข้าร่วมกิจกรรม →';}
   setTimeout(function(){
+    var n=document.getElementById('reg-name');
+    if(n){n.value='';n.focus();}
+    document.getElementById('reg-dept-pill').style.display='none';
+    var btn=document.getElementById('reg-submit');
+    if(btn){btn.style.opacity='0';btn.style.transform='translateY(8px)';btn.style.pointerEvents='none';btn.textContent='เข้าร่วมกิจกรรม →';btn.dataset.isAdmin='0';}
     document.getElementById('entry-panel').style.transform='translateY(0)';
-  },50);
+  },300);
 }
 function doAdminLogin2(){
   var pass=document.getElementById('al-pass2').value;
@@ -751,7 +751,7 @@ function onRegSubmit(){
     setTimeout(function(){
       document.getElementById('admin-entry-panel').style.transform='translateY(0)';
       var p=document.getElementById('al-pass');if(p)p.focus();
-    },50);
+    },300);
   } else {
     showConfirmPopup();
   }
