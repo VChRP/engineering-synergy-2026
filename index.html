@@ -294,35 +294,40 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
 
 <!-- PREVIEW -->
 <div id="pg-preview" class="page active">
-  <div class="hero-banner">
-    <div class="hero-eyebrow">The Core of Future Industry</div>
-    <div class="hero-title">Engineering<br><em>Synergy</em> 2026</div>
-    <div class="hero-chips">
-      <span class="hc">Precision</span><span class="hc">Prevention</span><span class="hc">Innovation</span>
+  <div style="min-height:100vh;display:flex;flex-direction:column;justify-content:space-between;padding:48px 0 40px;">
+
+    <!-- Title block -->
+    <div style="text-align:center;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+      <div style="font-size:54px;font-weight:700;color:var(--navy);letter-spacing:-2px;line-height:1.05;">Engineering</div>
+      <div style="font-size:54px;font-weight:700;color:var(--accent);letter-spacing:-2px;line-height:1.05;margin-bottom:16px;">Synergy</div>
+      <div style="font-size:15px;color:var(--sub);margin-bottom:6px;">The Core of Future Industry</div>
+      <div style="font-size:13px;color:var(--muted);">2026</div>
     </div>
-  </div>
-  <div class="ev-grid">
-    <div class="ev-card"><div class="ev-ico">📅</div><div class="ev-lbl">วันที่</div><div class="ev-val">10 ก.ค. 2569</div></div>
-    <div class="ev-card"><div class="ev-ico">🕘</div><div class="ev-lbl">เวลา</div><div class="ev-val">09:00–12:00</div></div>
-    <div class="ev-card"><div class="ev-ico">🏢</div><div class="ev-lbl">สถานที่</div><div class="ev-val">อาคารวิศวกรรม</div></div>
-  </div>
-  <div class="cd-wrap">
-    <div class="cd-ring">
-      <svg width="52" height="52" viewBox="0 0 52 52">
-        <circle cx="26" cy="26" r="18"/>
-        <circle class="cd-prog" id="cdProg" cx="26" cy="26" r="18"/>
-      </svg>
-      <div class="cd-num" id="cdNum">5</div>
+
+    <!-- Countdown ring -->
+    <div class="cd-wrap" style="margin-bottom:28px;">
+      <div class="cd-ring">
+        <svg width="52" height="52" viewBox="0 0 52 52">
+          <circle cx="26" cy="26" r="18"/>
+          <circle class="cd-prog" id="cdProg" cx="26" cy="26" r="18"/>
+        </svg>
+        <div class="cd-num" id="cdNum">5</div>
+      </div>
+      <div class="cd-lbl" id="cdLbl">กำลังโหลด...</div>
     </div>
-    <div class="cd-lbl" id="cdLbl">กำลังโหลด...</div>
-  </div>
-  <button class="btn-preview" id="btnPreview" onclick="go('register')">ลงทะเบียนเข้าร่วมกิจกรรม →</button>
-  <div style="margin-top:14px;text-align:center">
-    <span style="font-size:13px;color:var(--muted)">มีบัญชีแล้ว? </span>
-    <button class="btn-ghost-sm" onclick="go('login')">เข้าสู่ระบบ</button>
-  </div>
-  <div style="margin-top:10px;text-align:center">
-    <button class="btn-ghost-sm" style="color:var(--muted);font-size:12px" onclick="go('admin-login')">Admin</button>
+
+    <!-- Buttons -->
+    <div>
+      <button class="btn-preview" id="btnPreview" onclick="go('register')">ลงทะเบียนเข้าร่วมกิจกรรม →</button>
+      <div style="margin-top:16px;text-align:center;">
+        <span style="font-size:13px;color:var(--muted)">มีบัญชีแล้ว? </span>
+        <button class="btn-ghost-sm" onclick="go('login')">เข้าสู่ระบบ</button>
+      </div>
+      <div style="margin-top:12px;text-align:center;">
+        <button class="btn-ghost-sm" style="color:var(--muted);font-size:12px;background:var(--bg2);border:1px solid var(--border);padding:8px 20px;border-radius:10px;" onclick="go('admin-login')">• • •</button>
+      </div>
+    </div>
+
   </div>
 </div>
 
