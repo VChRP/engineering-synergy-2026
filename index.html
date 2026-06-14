@@ -293,7 +293,6 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
 
 <div class="wrap">
 
-
 <!-- PREVIEW + REGISTER (รวมเป็นหน้าเดียว) -->
 <div id="pg-preview" class="page active" style="min-height:100vh;position:relative;overflow:hidden;">
 
@@ -319,12 +318,21 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
     </div>
   </div>
 
-  <!-- Title -->
+  <!-- Title + countdown ring -->
   <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center;padding:0 24px;">
     <div style="font-size:54px;font-weight:700;color:var(--navy);letter-spacing:-2px;line-height:1.05;">Engineering</div>
     <div style="font-size:54px;font-weight:700;color:var(--accent);letter-spacing:-2px;line-height:1.05;margin-bottom:14px;">Synergy</div>
     <div style="font-size:15px;color:var(--sub);">The Core of Future Industry</div>
     <div style="font-size:13px;color:var(--muted);margin-top:4px;">2026</div>
+    <div id="pv-ring-wrap" style="margin-top:32px;display:flex;flex-direction:column;align-items:center;gap:8px;transition:opacity .4s;">
+      <svg width="48" height="48" viewBox="0 0 48 48" style="transform:rotate(-90deg);">
+        <circle cx="24" cy="24" r="18" fill="none" stroke="var(--border)" stroke-width="2.5"/>
+        <circle id="pvRingProg" cx="24" cy="24" r="18" fill="none" stroke="var(--navy)" stroke-width="2.5"
+          stroke-linecap="round" stroke-dasharray="113" stroke-dashoffset="113"
+          style="transition:stroke-dashoffset .9s linear,stroke .3s;"/>
+      </svg>
+      <div id="pvRingLbl" style="font-size:12px;color:var(--muted);">กำลังโหลด...</div>
+    </div>
   </div>
 
   <!-- Input slide-up panel -->
@@ -341,7 +349,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
     <div id="reg-dept-pill" class="dept-pill" style="display:none">
       <div class="dp-dot"></div><span class="dp-txt">พบในระบบ · ฝ่าย</span><span class="dp-val" id="reg-dept-val">—</span>
     </div>
-    <button id="reg-submit" onclick="showConfirmPopup()" style="width:100%;padding:15px;background:#1e3a5f;border:none;border-radius:14px;color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;opacity:0;transform:translateY(8px);transition:opacity .35s,transform .35s;pointer-events:none;">เข้าร่วมกิจกรรม →</button>
+    <button id="reg-submit" onclick="onRegSubmit()" style="width:100%;padding:15px;background:#1e3a5f;border:none;border-radius:14px;color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;opacity:0;transform:translateY(8px);transition:opacity .35s,transform .35s;pointer-events:none;">เข้าร่วมกิจกรรม →</button>
   </div>
 
   <!-- Admin password slide-up panel -->
@@ -362,6 +370,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
   </div>
 
 </div>
+
 
 <!-- REGISTER (stub สำหรับ backward compat) -->
 <div id="pg-register" class="page"></div>
@@ -685,6 +694,30 @@ function scoreEmp(e,q){var full=(e.firstName+' '+e.lastName).toLowerCase();var f
 function searchEmp(q){if(q.trim().length<1)return[];var scored=employeeDB.map(function(e){return{e:e,s:scoreEmp(e,q)};}).filter(function(x){return x.s>0.4;}).sort(function(a,b){return b.s-a.s;});return scored.length?[scored[0].e]:[];}
 
 /* ── Entry panel (preview page) ── */
+function startPreviewRing(totalSecs){
+  var circ=2*Math.PI*18;
+  var prog=document.getElementById('pvRingProg');
+  var lbl=document.getElementById('pvRingLbl');
+  var wrap=document.getElementById('pv-ring-wrap');
+  if(!prog) return;
+  var secs=totalSecs;
+  prog.style.strokeDashoffset=circ;
+  function tick(){
+    prog.style.strokeDashoffset=circ*(secs/totalSecs);
+    lbl.textContent=secs>0?secs+' วินาที...':'พร้อมแล้ว';
+    if(secs<=0){
+      prog.style.stroke='var(--accent)';
+      setTimeout(function(){
+        wrap.style.opacity='0';
+        openEntryPanel();
+      },400);
+      return;
+    }
+    secs--;
+    setTimeout(tick,1000);
+  }
+  setTimeout(tick,500);
+}
 function openEntryPanel(){
   var p=document.getElementById('entry-panel');
   if(p) p.style.transform='translateY(0)';
@@ -699,7 +732,10 @@ function closeAdminEntry(){
   if(n){n.value='';n.focus();}
   document.getElementById('reg-dept-pill').style.display='none';
   var btn=document.getElementById('reg-submit');
-  if(btn){btn.style.opacity='0';btn.style.pointerEvents='none';}
+  if(btn){btn.style.opacity='0';btn.style.transform='translateY(8px)';btn.style.pointerEvents='none';btn.textContent='เข้าร่วมกิจกรรม →';}
+  setTimeout(function(){
+    document.getElementById('entry-panel').style.transform='translateY(0)';
+  },50);
 }
 function doAdminLogin2(){
   var pass=document.getElementById('al-pass2').value;
@@ -707,22 +743,37 @@ function doAdminLogin2(){
   if(pass===correct){document.getElementById('al-pass2').value='';document.getElementById('al-err2').style.display='none';go('admin');}
   else{showErr(document.getElementById('al-err2'),'รหัสผ่านไม่ถูกต้อง');}
 }
-var regSugIdx=-1,regSugResults=[];
-function onRegInput(){
-  var q=document.getElementById('reg-name').value;
-  if(q.trim().toLowerCase()==='admin'){
+/* ปุ่ม reg-submit รองรับทั้ง admin และ user ปกติ */
+function onRegSubmit(){
+  var btn=document.getElementById('reg-submit');
+  if(btn&&btn.dataset.isAdmin==='1'){
     document.getElementById('entry-panel').style.transform='translateY(100%)';
     setTimeout(function(){
       document.getElementById('admin-entry-panel').style.transform='translateY(0)';
       var p=document.getElementById('al-pass');if(p)p.focus();
-    },100);
+    },50);
+  } else {
+    showConfirmPopup();
+  }
+}
+var regSugIdx=-1,regSugResults=[];
+function onRegInput(){
+  var q=document.getElementById('reg-name').value;
+  var btn=document.getElementById('reg-submit');
+  if(q.trim().toLowerCase()==='admin'){
+    document.getElementById('reg-suggest').style.display='none';
+    document.getElementById('reg-dept-pill').style.display='none';
+    btn.textContent='เข้าสู่ระบบ Admin →';
+    btn.dataset.isAdmin='1';
+    btn.style.opacity='1';btn.style.transform='translateY(0)';btn.style.pointerEvents='auto';
     return;
   }
+  btn.dataset.isAdmin='0';
+  btn.textContent='เข้าร่วมกิจกรรม →';
   var res=searchEmp(q);
   var box=document.getElementById('reg-suggest');
   regSugIdx=-1;regSugResults=res;selectedReg=null;
   document.getElementById('reg-dept-pill').style.display='none';
-  var btn=document.getElementById('reg-submit');
   btn.style.opacity='0';btn.style.transform='translateY(8px)';btn.style.pointerEvents='none';
   if(!res.length){box.style.display='none';return;}
   box.innerHTML=res.map(function(e,i){
@@ -1305,7 +1356,7 @@ function initApp(){
     var employees=(res&&res.employees)||[];
     employeeDB=employees.map(function(e){return{firstName:e.firstName,lastName:e.lastName,dept:e.dept,position:e.position||''};});
   });
-  setTimeout(function(){openEntryPanel();},2000);
+  startPreviewRing(5);
 }
 </script>
 </body>
