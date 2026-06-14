@@ -666,7 +666,19 @@ function go(page,param){
   stopQR();
   stopBonusScanner();
   document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
-  if(page==='station'){currentStation=param;loadStation(param);document.getElementById('pg-station').classList.add('active');}
+  if(page==='preview'){
+    document.getElementById('pg-preview').classList.add('active');
+    // reset entry panel state แล้วเปิดขึ้นมาทันที
+    var ep=document.getElementById('entry-panel');
+    var n=document.getElementById('reg-name');
+    var btn=document.getElementById('reg-submit');
+    if(n){n.value='';}
+    if(document.getElementById('reg-dept-pill')) document.getElementById('reg-dept-pill').style.display='none';
+    if(document.getElementById('reg-suggest')) document.getElementById('reg-suggest').style.display='none';
+    if(btn){btn.style.opacity='0';btn.style.transform='translateY(8px)';btn.style.pointerEvents='none';btn.textContent='เข้าร่วมกิจกรรม →';btn.dataset.isAdmin='0';}
+    if(ep) setTimeout(function(){ep.style.transform='translateY(0)';},100);
+  }
+  else if(page==='station'){currentStation=param;loadStation(param);document.getElementById('pg-station').classList.add('active');}
   else if(page==='admin'){loadAdmin();document.getElementById('pg-admin').classList.add('active');}
   else if(page==='register'||page==='login'){
     if(employeeDB.length===0){
@@ -1028,6 +1040,21 @@ function loadAdmin(){
 }
 function confirmAdminExit(){
   document.getElementById('admin-exit-overlay').style.display='none';
+  goPreview();
+}
+function goPreview(){
+  // reset entry panel ทุกครั้งที่กลับมาหน้า preview
+  var ep=document.getElementById('entry-panel');
+  if(ep) ep.style.transform='translateY(0)';
+  var n=document.getElementById('reg-name');
+  if(n) n.value='';
+  var pill=document.getElementById('reg-dept-pill');
+  if(pill) pill.style.display='none';
+  var btn=document.getElementById('reg-submit');
+  if(btn){btn.style.opacity='0';btn.style.transform='translateY(8px)';btn.style.pointerEvents='none';btn.textContent='เข้าร่วมกิจกรรม →';btn.dataset.isAdmin='0';}
+  var adm=document.getElementById('admin-entry-panel');
+  if(adm){adm.style.opacity='0';adm.style.pointerEvents='none';}
+  selectedReg=null;
   go('preview');
 }
 function doKickSession(uid,name){
@@ -1107,7 +1134,7 @@ function doLogout(){
   if(currentUid&&currentToken){
     apiPost({action:'logoutSession',uid:currentUid,token:currentToken},function(){});
   }
-  currentUid=null;currentToken=null;clearSession();go('preview');
+  currentUid=null;currentToken=null;clearSession();goPreview();
 }
 
 /* ═══════════════════════════════════════════
@@ -1375,7 +1402,7 @@ function initApp(){
     var employees=(res&&res.employees)||[];
     employeeDB=employees.map(function(e){return{firstName:e.firstName,lastName:e.lastName,dept:e.dept,position:e.position||''};});
   });
-  startPreviewRing(2);
+  startPreviewRing(3);
 }
 </script>
 </body>
