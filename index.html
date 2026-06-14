@@ -545,6 +545,18 @@ function go(page,param){
   document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
   if(page==='station'){currentStation=param;loadStation(param);document.getElementById('pg-station').classList.add('active');}
   else if(page==='admin'){loadAdmin();document.getElementById('pg-admin').classList.add('active');}
+  else if(page==='register'||page==='login'){
+    // โหลด employees ใหม่ทุกครั้งที่เข้าหน้า register/login
+    if(employeeDB.length===0){
+      apiGet('getEmployees',function(res){
+        var employees=(res&&res.employees)||[];
+        employeeDB=employees.map(function(e){
+          return{firstName:e.firstName,lastName:e.lastName,dept:e.dept,position:e.position||''};
+        });
+      });
+    }
+    document.getElementById('pg-'+page).classList.add('active');
+  }
   else{var el=document.getElementById('pg-'+page);if(el)el.classList.add('active');}
   window.scrollTo(0,0);
 }
