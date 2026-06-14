@@ -326,54 +326,62 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
   </div>
 </div>
 
-<!-- REGISTER -->
+
+<!-- ENTER (รวม register + login เป็นหน้าเดียว) -->
 <div id="pg-register" class="page">
+
+  <!-- Popup: ยืนยันตัวตน -->
+  <div id="confirm-popup" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:400;align-items:flex-end;justify-content:center;">
+    <div style="background:var(--bg);border-radius:24px 24px 0 0;padding:24px 24px 48px;width:100%;max-width:420px;">
+      <div style="width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px;"></div>
+      <!-- กรณีปกติ -->
+      <div id="cp-normal">
+        <div style="font-size:32px;margin-bottom:10px;">🙋</div>
+        <div style="font-size:18px;font-weight:700;color:var(--navy);margin-bottom:4px;">ใช่คุณใช่ไหม?</div>
+        <div id="cp-name" style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:3px;"></div>
+        <div id="cp-pos" style="font-size:12px;color:var(--muted);margin-bottom:20px;"></div>
+        <button class="btn btn-navy" onclick="confirmEnter()">ใช่ เข้าร่วมเลย →</button>
+        <button class="btn btn-outline" style="margin-top:10px;" onclick="closeConfirm()">ไม่ใช่ ค้นหาใหม่</button>
+      </div>
+      <!-- กรณี session ซ้อน -->
+      <div id="cp-blocked" style="display:none;">
+        <div style="font-size:32px;margin-bottom:10px;">🔒</div>
+        <div style="font-size:18px;font-weight:700;color:var(--navy);margin-bottom:4px;">มีผู้ใช้งานอยู่แล้ว</div>
+        <div id="cp-blocked-name" style="font-size:14px;color:var(--sub);margin-bottom:4px;"></div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:20px;">ชื่อนี้มีคนเข้าสู่ระบบไว้แล้ว<br>หากเป็นคุณ กรุณาติดต่อ Admin เพื่อขอ reset</div>
+        <button class="btn btn-outline" onclick="closeConfirm()">รับทราบ</button>
+      </div>
+    </div>
+  </div>
+
   <div class="pg-header">
     <div class="back-ico" onclick="go('preview')">←</div>
-    <div class="pg-titles"><div class="ptitle">ลงทะเบียน</div><div class="psub">Engineering Synergy 2026</div></div>
+    <div class="pg-titles"><div class="ptitle">เข้าร่วมกิจกรรม</div><div class="psub">Engineering Synergy 2026</div></div>
   </div>
-  <div class="step-row">
-    <div class="step done">1</div><div class="step-lbl">Preview</div>
-    <div class="step-line"></div>
-    <div class="step active">2</div><div class="step-lbl active">ลงทะเบียน</div>
-  </div>
-  <div id="reg-err" class="err"></div>
-  <div class="lbl">ชื่อ – นามสกุล</div>
-  <div class="sug-wrap">
-    <div class="input-box"><input id="reg-name" class="fi" placeholder="พิมพ์ชื่อเพื่อค้นหา..." autocomplete="off" oninput="onRegInput()" onkeydown="onRegKey(event)"></div>
-    <div id="reg-suggest" class="sug-list" style="display:none"></div>
-  </div>
-  <div id="reg-dept-pill" class="dept-pill" style="display:none">
-    <div class="dp-dot"></div><span class="dp-txt">พบในระบบ · ฝ่าย</span><span class="dp-val" id="reg-dept-val">—</span>
-  </div>
-  <button class="btn btn-navy" id="reg-submit" onclick="doRegister()" disabled style="opacity:.4">ลงทะเบียน</button>
-  <div style="margin-top:14px;text-align:center">
-    <span style="font-size:13px;color:var(--muted)">มีบัญชีแล้ว? </span>
-    <button class="btn-ghost-sm" onclick="go('login')">เข้าสู่ระบบ</button>
+  <div style="padding-top:24px;">
+    <div style="font-size:22px;font-weight:700;color:var(--navy);letter-spacing:-.4px;margin-bottom:6px;">สวัสดี 👋</div>
+    <div style="font-size:14px;color:var(--sub);margin-bottom:28px;line-height:1.6;">พิมพ์ชื่อของคุณ — ระบบจะพาเข้ากิจกรรมให้อัตโนมัติ</div>
+    <div id="reg-err" class="err"></div>
+    <div class="lbl">ชื่อ – นามสกุล</div>
+    <div class="sug-wrap">
+      <div class="input-box"><input id="reg-name" class="fi" placeholder="พิมพ์ชื่อเพื่อค้นหา..." autocomplete="off" oninput="onRegInput()" onkeydown="onRegKey(event)"></div>
+      <div id="reg-suggest" class="sug-list" style="display:none"></div>
+    </div>
+    <div id="reg-dept-pill" class="dept-pill" style="display:none">
+      <div class="dp-dot"></div><span class="dp-txt">พบในระบบ · ฝ่าย</span><span class="dp-val" id="reg-dept-val">—</span>
+    </div>
+    <button class="btn btn-navy" id="reg-submit" onclick="showConfirmPopup()" disabled style="opacity:.4;">เข้าร่วมกิจกรรม →</button>
   </div>
 </div>
 
-<!-- LOGIN -->
+<!-- LOGIN (ยังคงไว้เพื่อ backward compat แต่ redirect มาที่ register) -->
 <div id="pg-login" class="page">
   <div class="pg-header">
     <div class="back-ico" onclick="go('preview')">←</div>
-    <div class="pg-titles"><div class="ptitle">เข้าสู่ระบบ</div><div class="psub">Engineering Synergy 2026</div></div>
-  </div>
-  <div id="login-err" class="err"></div>
-  <div class="lbl">ชื่อ – นามสกุล</div>
-  <div class="sug-wrap">
-    <div class="input-box"><input id="login-name" class="fi" placeholder="พิมพ์ชื่อเพื่อค้นหา..." autocomplete="off" oninput="onLoginInput()" onkeydown="onLoginKey(event)"></div>
-    <div id="login-suggest" class="sug-list" style="display:none"></div>
-  </div>
-  <div id="login-dept-pill" class="dept-pill" style="display:none">
-    <div class="dp-dot"></div><span class="dp-txt">พบในระบบ · ฝ่าย</span><span class="dp-val" id="login-dept-val">—</span>
-  </div>
-  <button class="btn btn-navy" id="login-submit" onclick="doLogin()" disabled style="opacity:.4">เข้าสู่ระบบ</button>
-  <div style="margin-top:14px;text-align:center">
-    <span style="font-size:13px;color:var(--muted)">ยังไม่มีบัญชี? </span>
-    <button class="btn-ghost-sm" onclick="go('register')">ลงทะเบียน</button>
+    <div class="pg-titles"><div class="ptitle">เข้าร่วมกิจกรรม</div><div class="psub">Engineering Synergy 2026</div></div>
   </div>
 </div>
+
 
 <!-- ADMIN LOGIN -->
 <div id="pg-admin-login" class="page">
@@ -632,9 +640,9 @@ var STATION_INFO={
   PM:{title:'Preventive Maintenance',sub:'งานซ่อมบำรุงเชิงป้องกัน',body:'ฝ่าย PM วางแผนและดำเนินการบำรุงรักษาเครื่องจักรเชิงป้องกัน ด้วยการวิเคราะห์ข้อมูล ตรวจสอบตามรอบ และใช้เทคโนโลยี Predictive Maintenance',tags:['PM Schedule','Predictive Maintenance','Downtime Reduction','Condition Monitoring'],accent:'#8b5cf6',color:'#4c1d95'},
 };
 
-var currentStation=null,currentUid=null,employeeDB=[],settingsCache={};
+var currentStation=null,currentUid=null,currentToken=null,employeeDB=[],settingsCache={};
 var seenPopup={},qrScanner=null,stLog={EE:[],ME:[],TO:[],PM:[]};
-var selectedReg=null,selectedLogin=null;
+var selectedReg=null;
 var EVENT_OPEN=new Date('2026-07-10T09:00:00+07:00');
 
 /* ── API helpers ── */
@@ -658,7 +666,7 @@ function go(page,param){
         employeeDB=employees.map(function(e){return{firstName:e.firstName,lastName:e.lastName,dept:e.dept,position:e.position||''};});
       });
     }
-    document.getElementById('pg-'+page).classList.add('active');
+    document.getElementById('pg-register').classList.add('active');
   }
   else if(page==='quiz'){renderQuizIntro();document.getElementById('pg-quiz').classList.add('active');}
   else if(page==='scan-bonus'){enterScanBonus();document.getElementById('pg-scan-bonus').classList.add('active');}
@@ -667,9 +675,11 @@ function go(page,param){
 }
 function goHome(){loadHome();go('home');}
 
-/* ── Session ── */
-function saveSession(uid){try{localStorage.setItem('eoh_uid',uid);}catch(e){}}
-function loadSession(){try{return localStorage.getItem('eoh_uid');}catch(e){return null;}}
+/* ── Session storage ── */
+function saveSession(uid,token){try{localStorage.setItem('eoh_uid',uid);localStorage.setItem('eoh_token',token);}catch(e){}}
+function loadSessionUid(){try{return localStorage.getItem('eoh_uid');}catch(e){return null;}}
+function loadSessionToken(){try{return localStorage.getItem('eoh_token');}catch(e){return null;}}
+function clearSession(){try{localStorage.removeItem('eoh_uid');localStorage.removeItem('eoh_token');}catch(e){}}
 
 /* ── Countdown (coming soon) ── */
 function updateCountdown(){
@@ -687,45 +697,86 @@ function lev(a,b){var m=a.length,n=b.length,dp=[];for(var i=0;i<=m;i++){dp[i]=[i
 function scoreEmp(e,q){var full=(e.firstName+' '+e.lastName).toLowerCase();var fq=q.toLowerCase();if(full===fq)return 1;if(full.startsWith(fq)||e.firstName.toLowerCase().startsWith(fq))return 0.92;if(full.includes(fq))return 0.85;var d=lev(fq,full.slice(0,fq.length+2));return Math.max(0,1-d/Math.max(fq.length,3));}
 function searchEmp(q){if(q.trim().length<1)return[];var scored=employeeDB.map(function(e){return{e:e,s:scoreEmp(e,q)};}).filter(function(x){return x.s>0.4;}).sort(function(a,b){return b.s-a.s;});return scored.length?[scored[0].e]:[];}
 
-/* ── Register suggest ── */
+/* ── Entry suggest (unified) ── */
 var regSugIdx=-1,regSugResults=[];
-function onRegInput(){var q=document.getElementById('reg-name').value;var res=searchEmp(q);var box=document.getElementById('reg-suggest');regSugIdx=-1;regSugResults=res;selectedReg=null;document.getElementById('reg-dept-pill').style.display='none';document.getElementById('reg-submit').disabled=true;document.getElementById('reg-submit').style.opacity='.4';if(!res.length){box.style.display='none';return;}box.innerHTML=res.map(function(e,i){return'<div class="sug-item" onclick="selectReg('+i+')"><span class="sug-name">'+e.firstName+' '+e.lastName+'</span><span class="sug-dept">'+e.dept+'</span></div>';}).join('');box.style.display='block';}
-function selectReg(i){var e=regSugResults[i];if(!e)return;selectedReg=e;document.getElementById('reg-name').value=e.firstName+' '+e.lastName;document.getElementById('reg-dept-val').textContent=e.position||e.dept;document.getElementById('reg-dept-pill').style.display='flex';document.getElementById('reg-submit').disabled=false;document.getElementById('reg-submit').style.opacity='1';document.getElementById('reg-suggest').style.display='none';}
-function onRegKey(ev){var box=document.getElementById('reg-suggest');if(box.style.display==='none')return;if(ev.key==='ArrowDown'){ev.preventDefault();regSugIdx=Math.min(regSugIdx+1,regSugResults.length-1);box.querySelectorAll('.sug-item').forEach(function(el,i){el.classList.toggle('sel',i===regSugIdx);});}else if(ev.key==='ArrowUp'){ev.preventDefault();regSugIdx=Math.max(regSugIdx-1,0);box.querySelectorAll('.sug-item').forEach(function(el,i){el.classList.toggle('sel',i===regSugIdx);});}else if(ev.key==='Enter'&&regSugIdx>=0){ev.preventDefault();selectReg(regSugIdx);}else if(ev.key==='Escape'){box.style.display='none';}}
+function onRegInput(){
+  var q=document.getElementById('reg-name').value;
+  var res=searchEmp(q);
+  var box=document.getElementById('reg-suggest');
+  regSugIdx=-1;regSugResults=res;selectedReg=null;
+  document.getElementById('reg-dept-pill').style.display='none';
+  document.getElementById('reg-submit').disabled=true;
+  document.getElementById('reg-submit').style.opacity='.4';
+  if(!res.length){box.style.display='none';return;}
+  box.innerHTML=res.map(function(e,i){
+    return'<div class="sug-item" onclick="selectReg('+i+')"><span class="sug-name">'+e.firstName+' '+e.lastName+'</span><span class="sug-dept">'+e.dept+'</span></div>';
+  }).join('');
+  box.style.display='block';
+}
+function selectReg(i){
+  var e=regSugResults[i];if(!e)return;
+  selectedReg=e;
+  document.getElementById('reg-name').value=e.firstName+' '+e.lastName;
+  document.getElementById('reg-dept-val').textContent=e.position||e.dept;
+  document.getElementById('reg-dept-pill').style.display='flex';
+  document.getElementById('reg-submit').disabled=false;
+  document.getElementById('reg-submit').style.opacity='1';
+  document.getElementById('reg-suggest').style.display='none';
+}
+function onRegKey(ev){
+  var box=document.getElementById('reg-suggest');if(box.style.display==='none')return;
+  if(ev.key==='ArrowDown'){ev.preventDefault();regSugIdx=Math.min(regSugIdx+1,regSugResults.length-1);box.querySelectorAll('.sug-item').forEach(function(el,i){el.classList.toggle('sel',i===regSugIdx);});}
+  else if(ev.key==='ArrowUp'){ev.preventDefault();regSugIdx=Math.max(regSugIdx-1,0);box.querySelectorAll('.sug-item').forEach(function(el,i){el.classList.toggle('sel',i===regSugIdx);});}
+  else if(ev.key==='Enter'&&regSugIdx>=0){ev.preventDefault();selectReg(regSugIdx);}
+  else if(ev.key==='Escape'){box.style.display='none';}
+}
+document.addEventListener('click',function(e){if(!e.target.closest('.sug-wrap')){var b=document.getElementById('reg-suggest');if(b)b.style.display='none';}});
 
-/* ── Login suggest ── */
-var loginSugIdx=-1,loginSugResults=[];
-function onLoginInput(){var q=document.getElementById('login-name').value;var res=searchEmp(q);var box=document.getElementById('login-suggest');loginSugIdx=-1;loginSugResults=res;selectedLogin=null;document.getElementById('login-dept-pill').style.display='none';document.getElementById('login-submit').disabled=true;document.getElementById('login-submit').style.opacity='.4';if(!res.length){box.style.display='none';return;}box.innerHTML=res.map(function(e,i){return'<div class="sug-item" onclick="selectLogin('+i+')"><span class="sug-name">'+e.firstName+' '+e.lastName+'</span><span class="sug-dept">'+e.dept+'</span></div>';}).join('');box.style.display='block';}
-function selectLogin(i){var e=loginSugResults[i];if(!e)return;selectedLogin=e;document.getElementById('login-name').value=e.firstName+' '+e.lastName;document.getElementById('login-dept-val').textContent=e.position||e.dept;document.getElementById('login-dept-pill').style.display='flex';document.getElementById('login-submit').disabled=false;document.getElementById('login-submit').style.opacity='1';document.getElementById('login-suggest').style.display='none';}
-function onLoginKey(ev){var box=document.getElementById('login-suggest');if(box.style.display==='none')return;if(ev.key==='ArrowDown'){ev.preventDefault();loginSugIdx=Math.min(loginSugIdx+1,loginSugResults.length-1);box.querySelectorAll('.sug-item').forEach(function(el,i){el.classList.toggle('sel',i===loginSugIdx);});}else if(ev.key==='ArrowUp'){ev.preventDefault();loginSugIdx=Math.max(loginSugIdx-1,0);box.querySelectorAll('.sug-item').forEach(function(el,i){el.classList.toggle('sel',i===loginSugIdx);});}else if(ev.key==='Enter'&&loginSugIdx>=0){ev.preventDefault();selectLogin(loginSugIdx);}else if(ev.key==='Escape'){box.style.display='none';}}
-document.addEventListener('click',function(e){if(!e.target.closest('.sug-wrap')){document.getElementById('reg-suggest').style.display='none';document.getElementById('login-suggest').style.display='none';}});
-
-/* ── Register ── */
-function doRegister(){
+/* ── Confirm popup ── */
+function showConfirmPopup(){
   if(!selectedReg)return;
-  var fn=selectedReg.firstName,ln=selectedReg.lastName,dept=selectedReg.dept;
-  var errEl=document.getElementById('reg-err');errEl.style.display='none';showLoad();
-  apiPost({action:'register',full_name:fn+' '+ln,department:dept},function(res){
-    hideLoad();
-    if(res.error){showErr(errEl,res.error);return;}
-    currentUid=res.uid;saveSession(res.uid);
-    document.getElementById('reg-name').value='';document.getElementById('reg-dept-pill').style.display='none';selectedReg=null;
-    afterAuth();
-  });
+  var popup=document.getElementById('confirm-popup');
+  document.getElementById('cp-normal').style.display='block';
+  document.getElementById('cp-blocked').style.display='none';
+  document.getElementById('cp-name').textContent=selectedReg.firstName+' '+selectedReg.lastName;
+  document.getElementById('cp-pos').textContent=(selectedReg.position||'')+' · ฝ่าย '+selectedReg.dept;
+  popup.style.display='flex';
+}
+function closeConfirm(){
+  document.getElementById('confirm-popup').style.display='none';
+  document.getElementById('reg-name').value='';
+  document.getElementById('reg-dept-pill').style.display='none';
+  document.getElementById('reg-submit').disabled=true;
+  document.getElementById('reg-submit').style.opacity='.4';
+  selectedReg=null;
+}
+function showBlockedPopup(name,dept){
+  var popup=document.getElementById('confirm-popup');
+  document.getElementById('cp-normal').style.display='none';
+  document.getElementById('cp-blocked').style.display='block';
+  document.getElementById('cp-blocked-name').textContent=name+' · ฝ่าย '+(dept||'');
+  popup.style.display='flex';
 }
 
-/* ── Login ── */
-function doLogin(){
-  if(!selectedLogin)return;
-  var fullName=selectedLogin.firstName+' '+selectedLogin.lastName;
-  var errEl=document.getElementById('login-err');errEl.style.display='none';showLoad();
-  apiGet('getMembers',function(res){
+/* ── Confirm → enterSession ── */
+function confirmEnter(){
+  if(!selectedReg)return;
+  document.getElementById('confirm-popup').style.display='none';
+  var fullName=selectedReg.firstName+' '+selectedReg.lastName;
+  var dept=selectedReg.dept;
+  var errEl=document.getElementById('reg-err');
+  errEl.style.display='none';showLoad();
+  apiPost({action:'enterSession',full_name:fullName,department:dept},function(res){
     hideLoad();
-    if(res.error){showErr(errEl,'เกิดข้อผิดพลาด กรุณาลองใหม่');return;}
-    var m=res.members.find(function(x){return x.full_name===fullName;});
-    if(!m){showErr(errEl,'ไม่พบชื่อนี้ในระบบ กรุณาลงทะเบียนก่อน');return;}
-    currentUid=m.uid;saveSession(m.uid);
-    document.getElementById('login-name').value='';document.getElementById('login-dept-pill').style.display='none';selectedLogin=null;
+    if(res.error==='session_active'){
+      showBlockedPopup(res.full_name,res.department);return;
+    }
+    if(res.error){showErr(errEl,res.error);return;}
+    currentUid=res.uid;currentToken=res.token;
+    saveSession(res.uid,res.token);
+    document.getElementById('reg-name').value='';
+    document.getElementById('reg-dept-pill').style.display='none';
+    selectedReg=null;
     afterAuth();
   });
 }
@@ -849,15 +900,22 @@ function loadAdmin(){
     var listEl=document.getElementById('admin-list');
     if(!sorted.length){listEl.innerHTML='<div style="text-align:center;color:var(--muted);padding:28px;font-size:13px">ยังไม่มีผู้ลงทะเบียน</div>';document.getElementById('clear-wrap').style.display='none';return;}
     listEl.innerHTML=sorted.map(function(m,i){
+      var hasSession=m.has_session;
       return'<div class="member-row">'
-        +'<div style="display:flex;gap:10px;align-items:center">'
+        +'<div style="display:flex;gap:10px;align-items:center;flex:1;">'
         +'<div class="av" style="background:'+(medals[i]||'#eef1f8')+';color:'+(i<3?'#000':'var(--navy)')+'">'+( i+1)+'</div>'
-        +'<div><div style="font-weight:600;font-size:14px">'+m.full_name+'</div>'
+        +'<div style="flex:1;"><div style="display:flex;align-items:center;gap:6px;">'
+        +'<span style="font-weight:600;font-size:14px">'+m.full_name+'</span>'
+        +(hasSession?'<span style="font-size:9px;font-weight:700;color:#16a34a;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:20px;padding:1px 7px;">● ออนไลน์</span>':'')
+        +'</div>'
         +'<div style="font-size:11px;color:var(--muted)">'+m.department+'</div>'
         +'<div style="margin-top:4px">'+STATIONS.map(function(s){
           return'<span class="chip" style="background:'+(m.scores[s.id]?s.color+'22':'var(--bg3)')+';color:'+(m.scores[s.id]?s.accent:'var(--muted)')+';border:1px solid '+(m.scores[s.id]?s.accent+'44':'var(--border)')+'">'+s.id+'</span>';
         }).join('')+'</div></div></div>'
-        +'<div style="font-weight:700;font-size:18px;color:var(--navy)">'+m.total_score+'</div></div>';
+        +'<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">'
+        +'<div style="font-weight:700;font-size:18px;color:var(--navy)">'+m.total_score+'</div>'
+        +(hasSession?'<button onclick="doKickSession(\''+m.uid+'\',\''+m.full_name+'\')" style="font-size:10px;font-weight:600;color:var(--red);background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:3px 10px;cursor:pointer;font-family:inherit;">Kick</button>':'')
+        +'</div></div>';
     }).join('');
     document.getElementById('clear-wrap').style.display='block';
   });
@@ -874,7 +932,14 @@ function loadAdmin(){
     }
   });
 }
-function switchTab(t){
+function doKickSession(uid,name){
+  if(!confirm('Kick session ของ '+name+'?\nคนนี้จะถูกออกจากระบบและเข้าใหม่ได้'))return;
+  showLoad();
+  apiPost({action:'kickSession',uid:uid},function(res){
+    hideLoad();
+    if(res.success){loadAdmin();}
+  });
+}
   ['members','settings','qr'].forEach(function(n){
     document.getElementById('panel-'+n).style.display=n===t?'block':'none';
     document.getElementById('tab-'+n).classList.toggle('active',n===t);
@@ -933,14 +998,17 @@ function doClear(){
   showLoad();
   apiPost({action:'clearAll'},function(res){
     hideLoad();
-    if(res.success){stLog={EE:[],ME:[],TO:[],PM:[]};currentUid=null;try{localStorage.removeItem('eoh_uid');}catch(e){}loadAdmin();}
+    if(res.success){stLog={EE:[],ME:[],TO:[],PM:[]};currentUid=null;currentToken=null;clearSession();loadAdmin();}
   });
 }
 
 /* ── Logout ── */
 function doLogout(){
   if(!confirm('ออกจากระบบ?\nข้อมูลคะแนนของคุณจะยังถูกบันทึกไว้'))return;
-  currentUid=null;try{localStorage.removeItem('eoh_uid');}catch(e){}go('preview');
+  if(currentUid&&currentToken){
+    apiPost({action:'logoutSession',uid:currentUid,token:currentToken},function(){});
+  }
+  currentUid=null;currentToken=null;clearSession();go('preview');
 }
 
 /* ═══════════════════════════════════════════
@@ -1199,8 +1267,15 @@ window.addEventListener('load',function(){
 
 function initApp(){
   apiGet('getSettings',function(res){if(res.settings)settingsCache=res.settings;});
-  var uid=loadSession();
-  if(uid){apiGet('getMembers',function(res){if(res.members&&res.members.find(function(m){return m.uid===uid;})){currentUid=uid;}});}
+  var uid=loadSessionUid();
+  var token=loadSessionToken();
+  if(uid&&token){
+    apiGet('getMembers',function(res){
+      if(res.members&&res.members.find(function(m){return m.uid===uid;})){
+        currentUid=uid;currentToken=token;
+      }
+    });
+  }
   go('preview');
 }
 </script>
