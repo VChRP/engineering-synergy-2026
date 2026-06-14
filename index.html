@@ -587,11 +587,12 @@ function searchEmp(q){
 
 // ── Register suggest ──
 var regSugIdx=-1;
+var regSugResults=[];
 function onRegInput(){
   var q=document.getElementById('reg-name').value;
   var res=searchEmp(q);
   var box=document.getElementById('reg-suggest');
-  regSugIdx=-1;selectedReg=null;
+  regSugIdx=-1; regSugResults=res; selectedReg=null;
   document.getElementById('reg-dept-pill').style.display='none';
   document.getElementById('reg-submit').disabled=true;
   document.getElementById('reg-submit').style.opacity='.4';
@@ -599,36 +600,36 @@ function onRegInput(){
   box.innerHTML=res.map(function(e,i){
     return'<div class="sug-item" onclick="selectReg('+i+')"><span class="sug-name">'+e.firstName+' '+e.lastName+'</span><span class="sug-dept">'+e.dept+'</span></div>';
   }).join('');
-  box._res=res; box.style.display='block';
+  box.style.display='block';
 }
 function selectReg(i){
-  var box=document.getElementById('reg-suggest');
-  var e=box._res[i];
+  var e=regSugResults[i];
+  if(!e) return;
   selectedReg=e;
   document.getElementById('reg-name').value=e.firstName+' '+e.lastName;
   document.getElementById('reg-dept-val').textContent=e.position||e.dept;
   document.getElementById('reg-dept-pill').style.display='flex';
   document.getElementById('reg-submit').disabled=false;
   document.getElementById('reg-submit').style.opacity='1';
-  box.style.display='none';
+  document.getElementById('reg-suggest').style.display='none';
 }
 function onRegKey(ev){
   var box=document.getElementById('reg-suggest');
   if(box.style.display==='none') return;
-  var items=box.querySelectorAll('.sug-item');
-  if(ev.key==='ArrowDown'){ev.preventDefault();regSugIdx=Math.min(regSugIdx+1,items.length-1);items.forEach(function(el,i){el.classList.toggle('sel',i===regSugIdx);});}
-  else if(ev.key==='ArrowUp'){ev.preventDefault();regSugIdx=Math.max(regSugIdx-1,0);items.forEach(function(el,i){el.classList.toggle('sel',i===regSugIdx);});}
+  if(ev.key==='ArrowDown'){ev.preventDefault();regSugIdx=Math.min(regSugIdx+1,regSugResults.length-1);box.querySelectorAll('.sug-item').forEach(function(el,i){el.classList.toggle('sel',i===regSugIdx);});}
+  else if(ev.key==='ArrowUp'){ev.preventDefault();regSugIdx=Math.max(regSugIdx-1,0);box.querySelectorAll('.sug-item').forEach(function(el,i){el.classList.toggle('sel',i===regSugIdx);});}
   else if(ev.key==='Enter'&&regSugIdx>=0){ev.preventDefault();selectReg(regSugIdx);}
   else if(ev.key==='Escape'){box.style.display='none';}
 }
 
 // ── Login suggest ──
 var loginSugIdx=-1;
+var loginSugResults=[];
 function onLoginInput(){
   var q=document.getElementById('login-name').value;
   var res=searchEmp(q);
   var box=document.getElementById('login-suggest');
-  loginSugIdx=-1;selectedLogin=null;
+  loginSugIdx=-1; loginSugResults=res; selectedLogin=null;
   document.getElementById('login-dept-pill').style.display='none';
   document.getElementById('login-submit').disabled=true;
   document.getElementById('login-submit').style.opacity='.4';
@@ -636,25 +637,24 @@ function onLoginInput(){
   box.innerHTML=res.map(function(e,i){
     return'<div class="sug-item" onclick="selectLogin('+i+')"><span class="sug-name">'+e.firstName+' '+e.lastName+'</span><span class="sug-dept">'+e.dept+'</span></div>';
   }).join('');
-  box._res=res; box.style.display='block';
+  box.style.display='block';
 }
 function selectLogin(i){
-  var box=document.getElementById('login-suggest');
-  var e=box._res[i];
+  var e=loginSugResults[i];
+  if(!e) return;
   selectedLogin=e;
   document.getElementById('login-name').value=e.firstName+' '+e.lastName;
   document.getElementById('login-dept-val').textContent=e.position||e.dept;
   document.getElementById('login-dept-pill').style.display='flex';
   document.getElementById('login-submit').disabled=false;
   document.getElementById('login-submit').style.opacity='1';
-  box.style.display='none';
+  document.getElementById('login-suggest').style.display='none';
 }
 function onLoginKey(ev){
   var box=document.getElementById('login-suggest');
   if(box.style.display==='none') return;
-  var items=box.querySelectorAll('.sug-item');
-  if(ev.key==='ArrowDown'){ev.preventDefault();loginSugIdx=Math.min(loginSugIdx+1,items.length-1);items.forEach(function(el,i){el.classList.toggle('sel',i===loginSugIdx);});}
-  else if(ev.key==='ArrowUp'){ev.preventDefault();loginSugIdx=Math.max(loginSugIdx-1,0);items.forEach(function(el,i){el.classList.toggle('sel',i===loginSugIdx);});}
+  if(ev.key==='ArrowDown'){ev.preventDefault();loginSugIdx=Math.min(loginSugIdx+1,loginSugResults.length-1);box.querySelectorAll('.sug-item').forEach(function(el,i){el.classList.toggle('sel',i===loginSugIdx);});}
+  else if(ev.key==='ArrowUp'){ev.preventDefault();loginSugIdx=Math.max(loginSugIdx-1,0);box.querySelectorAll('.sug-item').forEach(function(el,i){el.classList.toggle('sel',i===loginSugIdx);});}
   else if(ev.key==='Enter'&&loginSugIdx>=0){ev.preventDefault();selectLogin(loginSugIdx);}
   else if(ev.key==='Escape'){box.style.display='none';}
 }
