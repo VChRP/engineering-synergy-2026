@@ -324,7 +324,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
     <div style="font-size:54px;font-weight:700;color:var(--accent);letter-spacing:-2px;line-height:1.05;margin-bottom:14px;">Synergy</div>
     <div style="font-size:15px;color:var(--sub);">The Core of Future Industry</div>
     <div style="font-size:13px;color:var(--muted);margin-top:4px;">2026</div>
-    <div id="pv-ring-wrap" style="margin-top:32px;display:flex;flex-direction:column;align-items:center;gap:8px;transition:opacity .4s;">
+    <div id="pv-ring-wrap" style="margin-top:32px;display:flex;flex-direction:column;align-items:center;gap:8px;transition:opacity .5s,transform .5s;">
       <svg width="48" height="48" viewBox="0 0 48 48" style="transform:rotate(-90deg);">
         <circle cx="24" cy="24" r="18" fill="none" stroke="var(--border)" stroke-width="2.5"/>
         <circle id="pvRingProg" cx="24" cy="24" r="18" fill="none" stroke="var(--navy)" stroke-width="2.5"
@@ -729,13 +729,18 @@ function startPreviewRing(totalSecs){
   prog.style.strokeDashoffset=circ;
   function tick(){
     prog.style.strokeDashoffset=circ*(secs/totalSecs);
-    lbl.textContent=secs>0?secs+' วินาที...':'พร้อมแล้ว';
+    lbl.textContent=secs>0?secs+' วินาที...':'พร้อมแล้ว ✓';
     if(secs<=0){
       prog.style.stroke='var(--accent)';
+      // รอแสดง "พร้อมแล้ว ✓" ก่อน 600ms แล้ว fade ring ออก
       setTimeout(function(){
         wrap.style.opacity='0';
-        openEntryPanel();
-      },400);
+        wrap.style.transform='translateY(-6px)';
+        // หลัง ring fade จบ (500ms) ค่อย slide popup ขึ้น
+        setTimeout(function(){
+          openEntryPanel();
+        },500);
+      },600);
       return;
     }
     secs--;
