@@ -792,7 +792,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
       <div style="text-align:center;"><div id="qr-base" style="font-size:22px;font-weight:700;color:var(--navy);">0</div><div style="font-size:11px;color:var(--muted);">ตอบถูก</div></div>
       <div style="text-align:center;"><div id="qr-bonus" style="font-size:22px;font-weight:700;color:#10b981;">0</div><div style="font-size:11px;color:var(--muted);">Bonus ความเร็ว</div></div>
     </div>
-    <button onclick="showQuizSelect()" class="btn btn-navy">← กลับหน้า Quiz</button>
+    <button onclick="backToStationFromQuiz()" class="btn btn-navy">← กลับหน้าฐาน</button>
   </div>
 
 </div>
@@ -1662,6 +1662,16 @@ var qzDoneMap={}; // {TO:true, ME:true, ...}
 
 function calcQzBonus(t){return Math.round((t/QZ_TIME)*QZ_BONUS_MAX*10)/10;}
 
+function backToStationFromQuiz(){
+  var id=qzStation; // ฐานที่เพิ่งทำเสร็จ
+  stopQuizTimer();
+  go('home');
+  loadHome();
+  // กลับไปเปิด detail ของฐานนั้น
+  setTimeout(function(){
+    if(id) openStationDetail(id);
+  },300);
+}
 function showQuizSelect(){
   stopQuizTimer();
   document.getElementById('quiz-select-view').style.display='block';
