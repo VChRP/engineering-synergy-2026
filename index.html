@@ -533,71 +533,216 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
     </div>
   </div>
 
-  <div style="padding-top:24px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center">
+  <div style="padding-top:22px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center">
     <div>
       <div style="font-size:20px;font-weight:700;color:var(--navy);letter-spacing:-.4px">Admin</div>
       <div style="font-size:12px;color:var(--muted);margin-top:2px">Engineering Synergy 2026</div>
     </div>
     <button class="btn-ghost-sm" style="color:var(--muted);font-size:12px" onclick="document.getElementById('admin-exit-overlay').style.display='flex'">← ออก</button>
   </div>
-  <div class="grid2" style="margin-bottom:16px">
-    <div class="stat-box"><div style="font-size:20px;margin-bottom:6px">👥</div><div id="stat-count" style="font-size:26px;font-weight:700;color:var(--accent)">0</div><div style="font-size:11px;color:var(--muted);margin-top:2px">ผู้ลงทะเบียน</div></div>
-    <div class="stat-box"><div style="font-size:20px;margin-bottom:6px">🏆</div><div id="stat-top" style="font-size:26px;font-weight:700;color:var(--navy)">0</div><div style="font-size:11px;color:var(--muted);margin-top:2px">คะแนนสูงสุด</div></div>
+
+  <!-- 4 tabs -->
+  <div style="display:flex;gap:6px;margin-bottom:16px;overflow-x:auto;padding-bottom:2px;">
+    <button class="tab active" id="atab-overview" onclick="switchAdminTab('overview')">📊 ภาพรวม</button>
+    <button class="tab" id="atab-members"  onclick="switchAdminTab('members')">👥 สมาชิก</button>
+    <button class="tab" id="atab-stations" onclick="switchAdminTab('stations')">🏭 ฐาน</button>
+    <button class="tab" id="atab-settings" onclick="switchAdminTab('settings')">⚙️ ตั้งค่า</button>
   </div>
-  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:16px">
-    <div class="sec-lbl" style="margin-bottom:10px">ฐานกิจกรรม</div>
-    <div class="grid2">
+
+  <!-- ── OVERVIEW ── -->
+  <div id="apanel-overview">
+    <div class="sec-lbl">สถิติวันนี้</div>
+    <div class="grid2" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px;">
+      <div class="stat-box"><div style="font-size:18px;margin-bottom:4px;">👥</div><div id="stat-count" style="font-size:22px;font-weight:700;color:var(--accent)">0</div><div style="font-size:10px;color:var(--muted);margin-top:2px">ลงทะเบียน</div></div>
+      <div class="stat-box"><div style="font-size:18px;margin-bottom:4px;">🏆</div><div id="stat-top" style="font-size:22px;font-weight:700;color:var(--navy)">0</div><div style="font-size:10px;color:var(--muted);margin-top:2px">คะแนนสูงสุด</div></div>
+      <div class="stat-box"><div style="font-size:18px;margin-bottom:4px;">🟢</div><div id="stat-online" style="font-size:22px;font-weight:700;color:var(--green)">0</div><div style="font-size:10px;color:var(--muted);margin-top:2px">Online</div></div>
+    </div>
+    <div class="sec-lbl">Leaderboard</div>
+    <div id="admin-lb" style="background:var(--bg);border:1.5px solid var(--border);border-radius:16px;padding:0 16px;">
+      <div style="text-align:center;color:var(--muted);padding:22px;font-size:13px;">กำลังโหลด...</div>
+    </div>
+  </div>
+
+  <!-- ── MEMBERS ── -->
+  <div id="apanel-members" style="display:none;">
+    <div id="admin-list" style="background:var(--bg);border:1.5px solid var(--border);border-radius:16px;padding:0 16px;">
+      <div style="text-align:center;color:var(--muted);padding:28px;font-size:13px;">กำลังโหลด...</div>
+    </div>
+    <div style="margin-top:10px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;">
+      <div style="font-size:12px;color:var(--muted);line-height:1.6;">🔒 การลบข้อมูลสมาชิกทั้งหมดไม่สามารถทำได้จากแอป กรุณาแก้ไขจาก Google Sheet โดยตรง</div>
+    </div>
+  </div>
+
+  <!-- ── STATIONS ── -->
+  <div id="apanel-stations" style="display:none;">
+    <div class="sec-lbl">เปิดฐานสแกน QR (ให้คะแนน)</div>
+    <div class="grid2" style="margin-bottom:20px;">
       <button class="btn btn-outline" style="font-size:13px;padding:11px" onclick="go('station','EE')">⚡ EE</button>
       <button class="btn btn-outline" style="font-size:13px;padding:11px" onclick="go('station','ME')">⚙️ ME</button>
       <button class="btn btn-outline" style="font-size:13px;padding:11px;margin-top:0" onclick="go('station','TO')">🔬 TO</button>
       <button class="btn btn-outline" style="font-size:13px;padding:11px;margin-top:0" onclick="go('station','PM')">📳 PM</button>
     </div>
-  </div>
-  <div class="tabs">
-    <button class="tab active" id="tab-members" onclick="switchTab('members')">สมาชิก</button>
-    <button class="tab" id="tab-settings" onclick="switchTab('settings')">ตั้งค่า</button>
-    <button class="tab" id="tab-qr" onclick="switchTab('qr')">QR Bonus</button>
-  </div>
-  <div id="panel-members">
-    <div id="admin-list" style="background:var(--bg);border:1.5px solid var(--border);border-radius:16px;padding:0 16px">
-      <div style="text-align:center;color:var(--muted);padding:28px;font-size:13px">กำลังโหลด...</div>
-    </div>
-    <div id="clear-wrap" style="display:none;margin-top:12px">
-      <button class="btn" style="background:#fef2f2;border:1.5px solid #fecaca;color:var(--red);font-size:13px" onclick="doClear()">ล้างข้อมูลทั้งหมด</button>
-    </div>
-  </div>
-  <div id="panel-settings" style="display:none;background:var(--bg);border:1.5px solid var(--border);border-radius:16px;padding:18px">
-    <div id="admin-ok" class="ok-box"></div>
-    <div style="font-size:11px;color:var(--muted);margin-bottom:14px;">คะแนน Stamp ต่อฐาน (points) และ Bonus จากการสแกน QR</div>
-    <div style="display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;margin-bottom:8px;">
-      <div style="font-size:11px;font-weight:700;color:var(--muted);">ฐาน</div>
-      <div style="font-size:11px;font-weight:700;color:var(--muted);text-align:center;width:68px;">points</div>
-      <div style="font-size:11px;font-weight:700;color:var(--muted);text-align:center;width:68px;">bonus</div>
-    </div>
-    <div class="pts-row"><label style="margin:0;font-size:13px;font-weight:600;color:var(--navy)">⚡ EE</label><input type="number" id="pts-EE" min="0" max="100" value="10"><input type="number" id="bon-EE" min="0" max="100" value="0"></div>
-    <div class="pts-row"><label style="margin:0;font-size:13px;font-weight:600;color:var(--navy)">⚙️ ME</label><input type="number" id="pts-ME" min="0" max="100" value="10"><input type="number" id="bon-ME" min="0" max="100" value="0"></div>
-    <div class="pts-row"><label style="margin:0;font-size:13px;font-weight:600;color:var(--navy)">🔬 TO</label><input type="number" id="pts-TO" min="0" max="100" value="10"><input type="number" id="bon-TO" min="0" max="100" value="0"></div>
-    <div class="pts-row" style="margin-bottom:0"><label style="margin:0;font-size:13px;font-weight:600;color:var(--navy)">📳 PM</label><input type="number" id="pts-PM" min="0" max="100" value="10"><input type="number" id="bon-PM" min="0" max="100" value="0"></div>
-    <button class="btn btn-navy" style="margin-top:20px" onclick="doSaveSettings()">บันทึกการตั้งค่า</button>
-  </div>
-  <div id="panel-qr" style="display:none;">
-    <div style="font-size:12px;color:var(--muted);background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:10px 14px;margin-bottom:14px;line-height:1.6;">
-      เปิดหน้านี้ไว้ที่เครื่องเจ้าหน้าที่ · ผู้เข้าร่วมเปิดหน้า <strong>สแกน Bonus</strong> ในแอปของตัวเองแล้วสแกน QR ด้านล่าง · รับได้ <strong>1 ครั้ง/ฐาน</strong>
+    <div class="sec-lbl">สถิติประจำฐาน</div>
+    <div id="station-stats"><div style="text-align:center;color:var(--muted);padding:22px;font-size:13px;">กำลังโหลด...</div></div>
+    <div class="sec-lbl" style="margin-top:16px;">QR Bonus ประจำฐาน</div>
+    <div style="font-size:12px;color:var(--muted);background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:10px 14px;margin-bottom:12px;line-height:1.6;">
+      เปิดหน้านี้ไว้ที่เครื่องเจ้าหน้าที่ · ผู้เข้าร่วมสแกนจากแท็บ "สแกน Bonus" ในแอปของตัวเอง · รับได้ <strong>1 ครั้ง/ฐาน</strong>
     </div>
     <div class="qr-grid" id="adminQrGrid"><div style="text-align:center;color:var(--muted);padding:20px;font-size:13px;grid-column:span 2">กำลังโหลด...</div></div>
   </div>
+
+  <!-- ── SETTINGS ── -->
+  <div id="apanel-settings" style="display:none;">
+    <!-- Coming Soon toggle -->
+    <div class="sec-lbl">โหมดระบบ</div>
+    <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:14px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+        <div>
+          <div style="font-size:14px;font-weight:600;color:var(--navy);">Coming Soon Mode</div>
+          <div style="font-size:12px;color:var(--sub);margin-top:3px;line-height:1.55;">เปิด = ทุกคนเห็นหน้า Coming Soon<br>ปิด = เข้า Home ได้เลย</div>
+          <div id="cs-pill" style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;margin-top:6px;background:#fff7ed;color:#c2410c;border:1px solid #fed7aa;">● กำลังแสดง Coming Soon</div>
+        </div>
+        <label style="position:relative;width:44px;height:26px;flex-shrink:0;">
+          <input type="checkbox" id="cs-toggle" style="opacity:0;width:0;height:0;" onchange="onCsToggle()">
+          <span id="cs-track" style="position:absolute;inset:0;background:var(--border);border-radius:13px;cursor:pointer;transition:.3s;">
+            <span id="cs-knob" style="position:absolute;width:20px;height:20px;background:#fff;border-radius:50%;top:3px;left:3px;transition:.3s;box-shadow:0 1px 4px rgba(0,0,0,.15);"></span>
+          </span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Bypass list -->
+    <div class="sec-lbl">Bypass Coming Soon</div>
+    <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:14px;padding:12px 16px;margin-bottom:14px;">
+      <div style="font-size:12px;color:var(--sub);margin-bottom:10px;line-height:1.6;">รายชื่อนี้เข้า Home ได้เลยโดยไม่ติด Coming Soon</div>
+      <div id="bypass-list-wrap">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bg2);">
+          <div style="font-size:13px;font-weight:600;color:var(--navy);">วัชรพล มีดี</div>
+          <span style="font-size:10px;font-weight:700;color:var(--green);background:#f0fdf4;border:1px solid #bbf7d0;border-radius:20px;padding:2px 10px;">Bypass</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Station points/bonus -->
+    <div class="sec-lbl">คะแนนแต่ละฐาน</div>
+    <div id="admin-ok" class="ok-box"></div>
+    <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:16px;padding:14px 16px;margin-bottom:10px;">
+      <div style="display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;margin-bottom:10px;">
+        <div style="font-size:11px;font-weight:700;color:var(--muted);">ฐาน</div>
+        <div style="font-size:11px;font-weight:700;color:var(--muted);text-align:center;width:68px;">points</div>
+        <div style="font-size:11px;font-weight:700;color:var(--muted);text-align:center;width:68px;">bonus QR</div>
+      </div>
+      <div class="pts-row"><label style="margin:0;font-size:13px;font-weight:600;color:var(--navy)">⚡ EE</label><input type="number" id="pts-EE" min="0" max="100" value="1"><input type="number" id="bon-EE" min="0" max="100" value="0"></div>
+      <div class="pts-row"><label style="margin:0;font-size:13px;font-weight:600;color:var(--navy)">⚙️ ME</label><input type="number" id="pts-ME" min="0" max="100" value="1"><input type="number" id="bon-ME" min="0" max="100" value="0"></div>
+      <div class="pts-row"><label style="margin:0;font-size:13px;font-weight:600;color:var(--navy)">🔬 TO</label><input type="number" id="pts-TO" min="0" max="100" value="1"><input type="number" id="bon-TO" min="0" max="100" value="0"></div>
+      <div class="pts-row" style="margin-bottom:0"><label style="margin:0;font-size:13px;font-weight:600;color:var(--navy)">📳 PM</label><input type="number" id="pts-PM" min="0" max="100" value="1"><input type="number" id="bon-PM" min="0" max="100" value="0"></div>
+    </div>
+    <button class="btn btn-navy" onclick="doSaveSettings()">💾 บันทึกการตั้งค่า</button>
+  </div>
+
 </div>
 
+
 <!-- ═══════════════════════════════════════
-     QUIZ (ใหม่)
+     QUIZ — Station Select + Quiz
 ═══════════════════════════════════════ -->
 <div id="pg-quiz" class="page">
-  <div style="padding-top:20px;margin-bottom:4px;display:flex;align-items:center;gap:8px;">
-    <div class="back-ico" onclick="clearInterval(qState.timerInterval);go('home')">←</div>
-    <div class="pg-titles"><div class="ptitle">Quiz</div><div class="psub">ทำแบบทดสอบประจำฐาน</div></div>
+
+  <!-- Quiz flash overlay -->
+  <div id="quiz-flash" style="position:fixed;inset:0;background:rgba(220,38,38,.18);pointer-events:none;opacity:0;z-index:400;"></div>
+
+  <!-- Station select view -->
+  <div id="quiz-select-view">
+    <div style="padding:20px 0 16px;display:flex;align-items:center;gap:10px;">
+      <div class="back-ico" onclick="go('home')">←</div>
+      <div class="pg-titles"><div class="ptitle">Quiz</div><div class="psub">ทำตามลำดับ · 5 ข้อ/ฐาน · ข้อละ 15 วินาที</div></div>
+    </div>
+
+    <!-- overall progress -->
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:18px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;">
+        <span style="font-size:12px;font-weight:600;color:var(--sub);">ความคืบหน้าทั้งหมด</span>
+        <span id="qs-overall-val" style="font-size:12px;font-weight:700;color:var(--accent);">0 / 4 ฐาน</span>
+      </div>
+      <div style="height:5px;background:var(--border);border-radius:3px;overflow:hidden;">
+        <div id="qs-overall-fill" style="height:100%;background:var(--accent);border-radius:3px;transition:.4s;width:0%;"></div>
+      </div>
+    </div>
+
+    <!-- station list -->
+    <div id="qs-list" style="display:flex;flex-direction:column;gap:0;"></div>
   </div>
-  <div id="quizApp" style="padding-top:16px;"></div>
+
+  <!-- Quiz active view (hidden until station selected) -->
+  <div id="quiz-active-view" style="display:none;">
+    <div style="padding:14px 0 10px;display:flex;align-items:center;gap:10px;">
+      <div class="back-ico" onclick="stopQuizTimer();showQuizSelect()">←</div>
+      <div style="flex:1;">
+        <div style="font-size:14px;font-weight:700;color:var(--navy);" id="qa-station-name">—</div>
+        <div style="font-size:10px;color:var(--muted);">Quiz · 5 ข้อ · ข้อละ 15 วินาที</div>
+      </div>
+      <div id="qa-counter" style="font-size:12px;font-weight:700;color:var(--accent);flex-shrink:0;">1 / 5</div>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;margin-bottom:5px;font-size:11px;">
+      <span style="color:var(--sub);">ความคืบหน้า</span>
+      <span id="qa-score" style="color:var(--accent);font-weight:700;">0 คะแนน</span>
+    </div>
+    <div style="height:3px;background:var(--border);border-radius:2px;margin-bottom:12px;overflow:hidden;">
+      <div id="qa-prog" style="height:100%;border-radius:2px;transition:.3s;background:#10b981;width:0%;"></div>
+    </div>
+
+    <!-- timer row compact -->
+    <div id="qa-timer-row" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding:8px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;transition:.3s;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div id="qa-ring" style="position:relative;width:44px;height:44px;flex-shrink:0;">
+          <svg width="44" height="44" viewBox="0 0 44 44" style="transform:rotate(-90deg);">
+            <circle cx="22" cy="22" r="18" fill="none" stroke="var(--border)" stroke-width="3.5"/>
+            <circle id="qa-ring-prog" cx="22" cy="22" r="18" fill="none" stroke="#10b981" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="113" stroke-dashoffset="113" style="transition:stroke-dashoffset .15s linear,stroke .3s;"/>
+          </svg>
+          <div id="qa-ring-num" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:var(--navy);transition:color .3s;">15</div>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--muted);font-weight:600;">เวลาที่เหลือ</div>
+          <div id="qa-timer-lbl" style="font-size:13px;font-weight:700;color:var(--navy);transition:color .3s;">15 วินาที</div>
+        </div>
+      </div>
+      <div id="qa-bonus-pill" style="font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid #86efac;color:#10b981;background:#f0fdf4;transition:.3s;">⚡ +5.0</div>
+    </div>
+
+    <!-- question -->
+    <div id="qa-qcard" style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:13px 14px;margin-bottom:10px;transition:border-color .3s,background .3s;">
+      <div id="qa-qnum" style="font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:5px;">คำถามที่ 1</div>
+      <div id="qa-qtext" style="font-size:14px;font-weight:600;line-height:1.6;color:var(--navy);"></div>
+    </div>
+
+    <!-- choices -->
+    <div id="qa-choices" style="display:flex;flex-direction:column;gap:7px;margin-bottom:10px;"></div>
+
+    <!-- confirm btn -->
+    <button id="qa-confirm" onclick="confirmQuizAnswer()" style="width:100%;padding:12px;background:#2563eb;border:none;border-radius:11px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:10px;display:none;">✓ ยืนยันคำตอบ</button>
+
+    <!-- result -->
+    <div id="qa-result" style="display:none;border-radius:11px;padding:10px 13px;margin-bottom:10px;border:1.5px solid;display:none;align-items:center;gap:9px;font-size:13px;"></div>
+
+    <!-- next btn -->
+    <button id="qa-next" onclick="nextQuizQ()" disabled style="width:100%;padding:12px;background:var(--navy);border:none;border-radius:11px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;opacity:.3;">ข้อถัดไป →</button>
+  </div>
+
+  <!-- Quiz result view -->
+  <div id="quiz-result-view" style="display:none;text-align:center;padding:32px 0;">
+    <div style="font-size:44px;margin-bottom:12px;">🏅</div>
+    <div id="qr-score" style="font-size:34px;font-weight:800;color:var(--navy);line-height:1;"></div>
+    <div id="qr-station" style="font-size:13px;color:var(--muted);margin-top:4px;margin-bottom:20px;"></div>
+    <div style="display:flex;justify-content:center;gap:28px;padding:16px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:22px;">
+      <div style="text-align:center;"><div id="qr-base" style="font-size:22px;font-weight:700;color:var(--navy);">0</div><div style="font-size:11px;color:var(--muted);">ตอบถูก</div></div>
+      <div style="text-align:center;"><div id="qr-bonus" style="font-size:22px;font-weight:700;color:#10b981;">0</div><div style="font-size:11px;color:var(--muted);">Bonus ความเร็ว</div></div>
+    </div>
+    <button onclick="showQuizSelect()" class="btn btn-navy">← กลับหน้า Quiz</button>
+  </div>
+
 </div>
+
 
 <!-- ═══════════════════════════════════════
      SCAN BONUS (ใหม่)
@@ -651,6 +796,7 @@ var STATION_INFO={
 };
 
 var currentStation=null,currentUid=null,currentToken=null,employeeDB=[],settingsCache={};
+var appSettings={coming_soon:true,bypass_list:['วัชรพล มีดี'],quiz_order:['TO','ME','EE','PM']};
 var seenPopup={},qrScanner=null,stLog={EE:[],ME:[],TO:[],PM:[]};
 var selectedReg=null;
 var EVENT_OPEN=new Date('2026-07-10T09:00:00+07:00');
@@ -681,7 +827,7 @@ function go(page,param){
     }
     document.getElementById('pg-register').classList.add('active');
   }
-  else if(page==='quiz'){renderQuizIntro();document.getElementById('pg-quiz').classList.add('active');}
+  else if(page==='quiz'){stopQuizTimer();showQuizSelect();document.getElementById('pg-quiz').classList.add('active');}
   else if(page==='scan-bonus'){enterScanBonus();document.getElementById('pg-scan-bonus').classList.add('active');}
   else{var el=document.getElementById('pg-'+page);if(el)el.classList.add('active');}
   window.scrollTo(0,0);
@@ -874,8 +1020,26 @@ function confirmEnter(){
   });
 }
 function afterAuth(){
-  if(new Date()<EVENT_OPEN){updateCountdown();setInterval(updateCountdown,1000);go('coming');}
-  else{goHome();}
+  // โหลด app settings ก่อนตัดสินใจ
+  apiGet('getAppSettings',function(res){
+    if(res&&!res.error) appSettings=res;
+    var bypassList=appSettings.bypass_list||[];
+    var fullName='';
+    // หาชื่อจาก members
+    apiGet('getMembers',function(mr){
+      var m=(mr.members||[]).find(function(x){return x.uid===currentUid;});
+      if(m) fullName=m.full_name;
+      // เช็ค bypass
+      var isBypass=bypassList.indexOf(fullName)>=0;
+      // เช็ค coming soon
+      var cs=appSettings.coming_soon;
+      if(cs&&!isBypass){
+        updateCountdown();setInterval(updateCountdown,1000);go('coming');
+      } else {
+        goHome();
+      }
+    });
+  });
 }
 
 /* ── Admin Login ── */
@@ -997,30 +1161,44 @@ function loadAdmin(){
   apiGet('getMembers',function(res){
     hideLoad();
     var sorted=(res.members||[]).slice().sort(function(a,b){return b.total_score-a.total_score;});
-    document.getElementById('stat-count').textContent=sorted.length;
-    document.getElementById('stat-top').textContent=sorted.length?sorted[0].total_score:0;
+    var online=sorted.filter(function(m){return m.has_session;}).length;
+    if(document.getElementById('stat-count')) document.getElementById('stat-count').textContent=sorted.length;
+    if(document.getElementById('stat-top')) document.getElementById('stat-top').textContent=sorted.length?sorted[0].total_score:0;
+    if(document.getElementById('stat-online')) document.getElementById('stat-online').textContent=online;
     var medals=['#ffd700','#c0c0c0','#cd7f32'];
+    // Leaderboard (overview)
+    var lbEl=document.getElementById('admin-lb');
+    if(lbEl){
+      if(!sorted.length){lbEl.innerHTML='<div style="text-align:center;color:var(--muted);padding:22px;font-size:13px">ยังไม่มีผู้ลงทะเบียน</div>';}
+      else{lbEl.innerHTML='<div style="padding:0 14px;">'+sorted.slice(0,5).map(function(m,i){
+        return'<div class="member-row">'
+          +'<div class="av" style="background:'+(medals[i]||'#eef1f8')+';color:'+(i<3?'#000':'var(--navy)')+'">'+( i+1)+'</div>'
+          +'<div style="flex:1;padding:0 8px;"><div style="font-size:13px;font-weight:600;">'+m.full_name+'</div><div style="font-size:11px;color:var(--muted);">'+m.department+'</div></div>'
+          +'<div style="font-weight:700;font-size:16px;color:var(--navy);">'+m.total_score+'</div></div>';
+      }).join('')+'</div>';}
+    }
     var listEl=document.getElementById('admin-list');
-    if(!sorted.length){listEl.innerHTML='<div style="text-align:center;color:var(--muted);padding:28px;font-size:13px">ยังไม่มีผู้ลงทะเบียน</div>';document.getElementById('clear-wrap').style.display='none';return;}
-    listEl.innerHTML=sorted.map(function(m,i){
-      var hasSession=m.has_session;
-      return'<div class="member-row">'
-        +'<div style="display:flex;gap:10px;align-items:center;flex:1;">'
-        +'<div class="av" style="background:'+(medals[i]||'#eef1f8')+';color:'+(i<3?'#000':'var(--navy)')+'">'+( i+1)+'</div>'
-        +'<div style="flex:1;"><div style="display:flex;align-items:center;gap:6px;">'
-        +'<span style="font-weight:600;font-size:14px">'+m.full_name+'</span>'
-        +(hasSession?'<span style="font-size:9px;font-weight:700;color:#16a34a;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:20px;padding:1px 7px;">● ออนไลน์</span>':'')
-        +'</div>'
-        +'<div style="font-size:11px;color:var(--muted)">'+m.department+'</div>'
-        +'<div style="margin-top:4px">'+STATIONS.map(function(s){
-          return'<span class="chip" style="background:'+(m.scores[s.id]?s.color+'22':'var(--bg3)')+';color:'+(m.scores[s.id]?s.accent:'var(--muted)')+';border:1px solid '+(m.scores[s.id]?s.accent+'44':'var(--border)')+'">'+s.id+'</span>';
-        }).join('')+'</div></div></div>'
-        +'<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">'
-        +'<div style="font-weight:700;font-size:18px;color:var(--navy)">'+m.total_score+'</div>'
-        +(hasSession?'<button onclick="doKickSession(\''+m.uid+'\',\''+m.full_name+'\')" style="font-size:10px;font-weight:600;color:var(--red);background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:3px 10px;cursor:pointer;font-family:inherit;">Kick</button>':'')
-        +'</div></div>';
-    }).join('');
-    document.getElementById('clear-wrap').style.display='block';
+    if(listEl){
+      if(!sorted.length){listEl.innerHTML='<div style="text-align:center;color:var(--muted);padding:28px;font-size:13px">ยังไม่มีผู้ลงทะเบียน</div>';}
+      else{listEl.innerHTML=sorted.map(function(m,i){
+        var hasSession=m.has_session;
+        return'<div class="member-row">'
+          +'<div style="display:flex;gap:10px;align-items:center;flex:1;">'
+          +'<div class="av" style="background:'+(medals[i]||'#eef1f8')+';color:'+(i<3?'#000':'var(--navy)')+'">'+( i+1)+'</div>'
+          +'<div style="flex:1;"><div style="display:flex;align-items:center;gap:6px;">'
+          +'<span style="font-weight:600;font-size:14px">'+m.full_name+'</span>'
+          +(hasSession?'<span style="font-size:9px;font-weight:700;color:#16a34a;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:20px;padding:1px 7px;">● ออนไลน์</span>':'')
+          +'</div>'
+          +'<div style="font-size:11px;color:var(--muted)">'+m.department+'</div>'
+          +'<div style="margin-top:4px">'+STATIONS.map(function(s){
+            return'<span class="chip" style="background:'+(m.scores&&m.scores[s.id]?s.color+'22':'var(--bg3)')+';color:'+(m.scores&&m.scores[s.id]?s.accent:'var(--muted)')+';border:1px solid '+(m.scores&&m.scores[s.id]?s.accent+'44':'var(--border)')+'">'+s.id+'</span>';
+          }).join('')+'</div></div></div>'
+          +'<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">'
+          +'<div style="font-weight:700;font-size:18px;color:var(--navy)">'+m.total_score+'</div>'
+          +(hasSession?'<button onclick="doKickSession(\''+m.uid+'\',\''+m.full_name+'\')" style="font-size:10px;font-weight:600;color:var(--red);background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:3px 10px;cursor:pointer;font-family:inherit;">Kick</button>':'')
+          +'</div></div>';
+      }).join('');}
+    }
   });
   apiGet('getSettings',function(res){
     if(res.settings){
@@ -1029,9 +1207,24 @@ function loadAdmin(){
         var pts=document.getElementById('pts-'+id);
         var bon=document.getElementById('bon-'+id);
         var st=res.settings[id];
-        if(pts) pts.value=(st&&st.points!=null?st.points:st)||10;
+        if(pts) pts.value=(st&&st.points!=null?st.points:st)||1;
         if(bon) bon.value=(st&&st.bonus!=null?st.bonus:0);
       });
+    }
+  });
+  // โหลด app settings สำหรับ coming soon toggle
+  apiGet('getAppSettings',function(res){
+    if(res&&!res.error){
+      appSettings=res;
+      var tog=document.getElementById('cs-toggle');
+      var pill=document.getElementById('cs-pill');
+      var track=document.getElementById('cs-track');
+      var knob=document.getElementById('cs-knob');
+      var on=res.coming_soon;
+      if(tog) tog.checked=on;
+      if(pill){pill.textContent=on?'● กำลังแสดง Coming Soon':'● เปิดใช้งานปกติ';pill.style.background=on?'#fff7ed':'#f0fdf4';pill.style.color=on?'#c2410c':'#16a34a';pill.style.borderColor=on?'#fed7aa':'#bbf7d0';}
+      if(track) track.style.background=on?'var(--navy)':'var(--border)';
+      if(knob) knob.style.transform=on?'translateX(18px)':'translateX(0)';
     }
   });
 }
@@ -1070,15 +1263,86 @@ function doKickSession(uid,name){
     if(res.success){loadAdmin();}
   });
 }
-function switchTab(t){
-  ['members','settings','qr'].forEach(function(n){
-    document.getElementById('panel-'+n).style.display=n===t?'block':'none';
-    document.getElementById('tab-'+n).classList.toggle('active',n===t);
+function switchAdminTab(t){
+  ['overview','members','stations','settings'].forEach(function(n){
+    var panel=document.getElementById('apanel-'+n);
+    var tab=document.getElementById('atab-'+n);
+    if(panel) panel.style.display=n===t?'block':'none';
+    if(tab) tab.classList.toggle('active',n===t);
   });
-  if(t==='members')loadAdmin();
-  if(t==='qr'&&!adminQrBuilt)buildAdminQR();
+  if(t==='overview'||t==='members') loadAdmin();
+  if(t==='stations'){loadAdmin();loadStationStats();}
 }
-function buildAdminQR(){
+function switchTab(t){switchAdminTab(t);}
+
+function onCsToggle(){
+  var on=document.getElementById('cs-toggle').checked;
+  var pill=document.getElementById('cs-pill');
+  var track=document.getElementById('cs-track');
+  var knob=document.getElementById('cs-knob');
+  pill.textContent=on?'● กำลังแสดง Coming Soon':'● เปิดใช้งานปกติ';
+  pill.style.background=on?'#fff7ed':'#f0fdf4';
+  pill.style.color=on?'#c2410c':'#16a34a';
+  pill.style.borderColor=on?'#fed7aa':'#bbf7d0';
+  track.style.background=on?'var(--navy)':'var(--border)';
+  knob.style.transform=on?'translateX(18px)':'translateX(0)';
+  appSettings.coming_soon=on;
+  apiPost({action:'saveAppSettings',settings:{coming_soon:on}},function(){});
+}
+
+function loadStationStats(){
+  var el=document.getElementById('station-stats');
+  if(!el)return;
+  apiGet('getMembers',function(res){
+    var members=res.members||[];
+    var total=members.length;
+    var ORDER=['EE','ME','TO','PM'];
+    var medals=['#ffd700','#c0c0c0','#cd7f32'];
+    var html='';
+    ORDER.forEach(function(k){
+      var s=STATION_MAP[k];
+      // สมาชิกที่ผ่านฐาน k
+      var passed=members.filter(function(m){return m.scores&&m.scores[k];});
+      var pct=total?Math.round(passed.length/total*100):0;
+      // เรียงตามคะแนน
+      var sorted=passed.slice().sort(function(a,b){return b.total_score-a.total_score;});
+      var top3=sorted.slice(0,3);
+      html+='<div style="border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:12px;">';
+      // head
+      html+='<div style="display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid var(--border);">';
+      html+='<div style="width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;background:var(--bg2);">'+s.icon+'</div>';
+      html+='<div><div style="font-size:13px;font-weight:700;color:var(--navy);">ฐาน '+k+'</div><div style="font-size:10px;color:var(--muted);">'+s.name+'</div></div>';
+      html+='</div>';
+      // body
+      html+='<div style="padding:11px 14px;">';
+      // count row
+      html+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">';
+      html+='<div style="font-size:20px;font-weight:700;color:var(--navy);">'+passed.length+'</div>';
+      html+='<div style="font-size:12px;color:var(--sub);">คน / '+total+' คนทั้งหมด</div>';
+      html+='</div>';
+      // progress bar
+      html+='<div style="height:5px;background:var(--border);border-radius:3px;margin-bottom:12px;overflow:hidden;">'
+        +'<div style="height:100%;width:'+pct+'%;background:'+s.color+';border-radius:3px;"></div></div>';
+      // top 3
+      if(top3.length){
+        html+='<div style="font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px;">คะแนนสูงสุด 3 อันดับ</div>';
+        top3.forEach(function(m,i){
+          html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">'
+            +'<div style="width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;background:'+(medals[i]||'#eef1f8')+';flex-shrink:0;">'+(i+1)+'</div>'
+            +'<div style="flex:1;"><div style="font-size:13px;color:var(--navy);">'+m.full_name+'</div><div style="font-size:10px;color:var(--muted);">'+m.department+'</div></div>'
+            +'<div style="font-size:13px;font-weight:700;color:var(--navy);">'+m.total_score+'</div>'
+            +'</div>';
+        });
+      } else {
+        html+='<div style="font-size:12px;color:var(--muted);">ยังไม่มีผู้เข้าทำ</div>';
+      }
+      html+='</div></div>';
+    });
+    el.innerHTML=html;
+  });
+}
+
+buildAdminQR=function(){
   apiGet('getSettings',function(res){
     var s=res.settings||{};
     var ORDER=['EE','ME','TO','PM'];
@@ -1110,7 +1374,7 @@ function doSaveSettings(){
   var s={};
   ['EE','ME','TO','PM'].forEach(function(id){
     s[id]={
-      points:parseInt(document.getElementById('pts-'+id).value)||10,
+      points:parseInt(document.getElementById('pts-'+id).value)||1,
       bonus:parseInt(document.getElementById('bon-'+id).value)||0
     };
   });
@@ -1124,14 +1388,7 @@ function doSaveSettings(){
     }
   });
 }
-function doClear(){
-  if(!confirm('ลบข้อมูลสมาชิกทั้งหมด?'))return;
-  showLoad();
-  apiPost({action:'clearAll'},function(res){
-    hideLoad();
-    if(res.success){stLog={EE:[],ME:[],TO:[],PM:[]};currentUid=null;currentToken=null;clearSession();loadAdmin();}
-  });
-}
+// doClear ถูกลบออก — ไม่สามารถลบข้อมูลจากแอปได้ ต้องทำจาก Google Sheet โดยตรง
 
 /* ── Logout ── */
 function doLogout(){
@@ -1143,7 +1400,7 @@ function doLogout(){
 }
 
 /* ═══════════════════════════════════════════
-   QUIZ (ใหม่)
+   QUIZ — New Flow
 ═══════════════════════════════════════════ */
 var DEMO_QUESTIONS={
   EE:[
@@ -1151,7 +1408,7 @@ var DEMO_QUESTIONS={
     {q:'Inverter ในระบบไฟฟ้าโรงงานทำหน้าที่อะไร?',choices:['แปลง AC เป็น DC','ควบคุมความเร็วรอบมอเตอร์','สำรองไฟฉุกเฉิน','วัดกระแสไฟฟ้า'],ans:1},
     {q:'HMI คืออะไร?',choices:['อุปกรณ์วัดแรงดัน','หน้าจอโต้ตอบระหว่างคนกับเครื่องจักร','สายไฟแรงสูง','มอเตอร์ไฟฟ้า'],ans:1},
     {q:'ถ้า motor ทำงานที่ 50 Hz ต้องการลดความเร็วลง 50% ควรตั้ง frequency เท่าไหร่?',choices:['100 Hz','25 Hz','75 Hz','50 Hz'],ans:1},
-    {q:'สัญลักษณ์ใน PLC Ladder Diagram ที่แทน Coil (เอาท์พุต) คือ?',choices:['---[ ]---','---( )---','---[/]---','---[P]---'],ans:1},
+    {q:'สัญลักษณ์ใน PLC Ladder Diagram ที่แทน Coil คือ?',choices:['---[ ]---','---( )---','---[/]---','---[P]---'],ans:1},
   ],
   ME:[
     {q:'Laser Shaft Alignment ใช้แก้ปัญหาอะไร?',choices:['เพลาไม่ตรงแนว','สายพานขาด','ลูกปืนร้อนเกิน','น้ำมันรั่ว'],ans:0},
@@ -1175,125 +1432,240 @@ var DEMO_QUESTIONS={
     {q:'PM ย่อมาจากอะไร?',choices:['Power Management','Preventive Maintenance','Process Monitoring','Pressure Measurement'],ans:1},
   ]
 };
-var TIME_PER_Q=30,BONUS_MAX=5;
-var qState={station:'',questions:[],current:0,score:0,baseScore:0,bonusScore:0,stampScore:1,answered:false,selectedIdx:-1,timer:TIME_PER_Q,timerInterval:null,lastBonus:0};
-var ORDER_ST=['EE','ME','TO','PM'];
 
-function renderQuizIntro(){
-  clearInterval(qState.timerInterval);
-  var html='<div style="text-align:center;margin-bottom:20px;">'
-    +'<div style="font-size:30px;margin-bottom:8px;">📋</div>'
-    +'<div style="font-size:17px;font-weight:700;color:var(--navy);margin-bottom:4px;">เลือกฐานที่ต้องการทดสอบ</div>'
-    +'<div style="font-size:12px;color:var(--muted);">5 ข้อ · ข้อละ 30 วินาที · bonus ตามความเร็ว</div>'
-    +'</div>';
-  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">';
-  ORDER_ST.forEach(function(k){
-    var s=STATION_MAP[k];
-    html+='<button onclick="startQuiz(\''+k+'\')" style="background:var(--bg);border:1.5px solid var(--border);border-radius:16px;padding:18px 10px;text-align:center;cursor:pointer;font-family:inherit;transition:.15s;" onmouseover="this.style.borderColor=\''+s.color+'\'" onmouseout="this.style.borderColor=\'var(--border)\'">'
-      +'<div style="font-size:26px;margin-bottom:7px;">'+s.icon+'</div>'
-      +'<div style="font-size:13px;font-weight:700;color:var(--navy);">'+k+'</div>'
-      +'<div style="font-size:9px;color:var(--muted);margin-top:2px;">'+s.name+'</div>'
-      +'</button>';
-  });
-  html+='</div>';
-  document.getElementById('quizApp').innerHTML=html;
+// ลำดับการทำ quiz (TO→ME→EE→PM)
+var QUIZ_ORDER=['TO','ME','EE','PM'];
+var QZ_TIME=15, QZ_BONUS_MAX=5;
+var qzInterval=null, qzTimer=QZ_TIME, qzConfirmed=false, qzSelectedIdx=-1;
+var qzCur=0, qzBaseScore=0, qzBonusScore=0, qzQuestions=[], qzStation='';
+var qzDoneMap={}; // {TO:true, ME:true, ...}
+
+function calcQzBonus(t){return Math.round((t/QZ_TIME)*QZ_BONUS_MAX*10)/10;}
+
+function showQuizSelect(){
+  stopQuizTimer();
+  document.getElementById('quiz-select-view').style.display='block';
+  document.getElementById('quiz-active-view').style.display='none';
+  document.getElementById('quiz-result-view').style.display='none';
+  renderQzSelect();
 }
 
-function startQuiz(station){
-  qState.station=station;qState.current=0;qState.score=0;qState.baseScore=0;qState.bonusScore=0;
-  document.getElementById('quizApp').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px;">⏳ กำลังโหลดคำถาม…</div>';
+function renderQzSelect(){
+  // นับว่าผ่านกี่ฐาน
+  var done=QUIZ_ORDER.filter(function(k){return qzDoneMap[k];}).length;
+  document.getElementById('qs-overall-val').textContent=done+' / '+QUIZ_ORDER.length+' ฐาน';
+  document.getElementById('qs-overall-fill').style.width=(done/QUIZ_ORDER.length*100)+'%';
+
+  var html='';
+  QUIZ_ORDER.forEach(function(k,i){
+    var s=STATION_MAP[k];
+    var isDone=!!qzDoneMap[k];
+    var isActive=!isDone&&(i===0||qzDoneMap[QUIZ_ORDER[i-1]]);
+    var isLocked=!isDone&&!isActive;
+    var prevName=i>0?QUIZ_ORDER[i-1]:'';
+
+    // step connector
+    if(i>0){
+      var prevDone=!!qzDoneMap[QUIZ_ORDER[i-1]];
+      html+='<div style="display:flex;justify-content:center;height:10px;">'
+        +'<div style="width:2px;background:'+(prevDone?'#86efac':'var(--border)')+'border-radius:1px;"></div></div>';
+    }
+
+    var borderColor=isDone?'#86efac':isActive?'var(--navy)':'var(--border)';
+    var bg=isDone?'#f0fdf4':isActive?'var(--bg)':'var(--bg2)';
+    var opacity=isLocked?'.55':'1';
+    var cursor=isLocked?'not-allowed':isActive?'pointer':'default';
+
+    html+='<div onclick="'+(isActive?'startQzStation(\''+k+'\')':isLocked?'alert(\'ต้องทำ '+prevName+' ก่อน\')':'')
+      +'" style="border:1.5px solid '+borderColor+';background:'+bg+';border-radius:16px;padding:14px;display:flex;align-items:center;gap:12px;opacity:'+opacity+';cursor:'+cursor+';position:relative;'+(isActive?'box-shadow:0 4px 14px rgba(15,34,72,.08);':'')+'margin-bottom:0;">';
+
+    // icon
+    var iconBg=isDone?'#dcfce7':isActive?'var(--bg2)':'var(--border)';
+    html+='<div style="width:48px;height:48px;border-radius:12px;background:'+iconBg+';display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;">'+s.icon+'</div>';
+
+    // info
+    html+='<div style="flex:1;">';
+    var nameColor=isDone?'#16a34a':isActive?'var(--navy)':'var(--muted)';
+    html+='<div style="font-size:15px;font-weight:700;color:'+nameColor+';">'+k+' — '+s.name+'</div>';
+    if(isDone) html+='<div style="font-size:11px;color:#16a34a;margin-top:2px;">✓ ทำเสร็จแล้ว</div>';
+    else if(isActive) html+='<div style="font-size:11px;color:var(--accent);margin-top:2px;font-weight:600;">→ ถึงคิวของคุณแล้ว!</div>';
+    else html+='<div style="font-size:11px;color:var(--muted);margin-top:2px;">ปลดล็อกหลังทำ '+prevName+'</div>';
+    html+='</div>';
+
+    // right badge
+    if(isDone) html+='<div style="font-size:10px;font-weight:700;color:#16a34a;background:#dcfce7;border:1px solid #86efac;border-radius:20px;padding:3px 10px;">✓ เสร็จ</div>';
+    else if(isActive) html+='<div style="font-size:10px;font-weight:700;color:var(--navy);background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:3px 10px;">ถัดไป</div>';
+    else html+='<div style="font-size:11px;font-weight:600;color:var(--muted);">🔒</div>';
+
+    html+='<div style="position:absolute;top:10px;right:12px;font-size:10px;font-weight:700;color:var(--muted);">'+(i+1)+'</div>';
+    html+='</div>';
+  });
+  document.getElementById('qs-list').innerHTML=html;
+}
+
+function startQzStation(station){
+  qzStation=station;
+  qzCur=0; qzBaseScore=0; qzBonusScore=0;
+  document.getElementById('quiz-select-view').style.display='none';
+  document.getElementById('quiz-active-view').style.display='block';
+  document.getElementById('quiz-result-view').style.display='none';
+
+  var s=STATION_MAP[station];
+  document.getElementById('qa-station-name').textContent=s.icon+' '+station+' — '+s.name;
+  document.getElementById('qa-prog').style.background=s.color||'#10b981';
+
+  // fetch questions
   fetch(API+'?action=getQuestions&station='+station)
     .then(function(r){return r.json();})
-    .then(function(res){qState.questions=(res&&res.length)?res:DEMO_QUESTIONS[station];renderQuizQ();})
-    .catch(function(){qState.questions=DEMO_QUESTIONS[station];renderQuizQ();});
+    .then(function(res){qzQuestions=(res&&res.length)?res:DEMO_QUESTIONS[station];renderQzQ();})
+    .catch(function(){qzQuestions=DEMO_QUESTIONS[station];renderQzQ();});
 }
 
-function calcQBonus(t){return Math.round((t/TIME_PER_Q)*BONUS_MAX*10)/10;}
+function renderQzQ(){
+  var q=qzQuestions[qzCur];
+  document.getElementById('qa-counter').textContent=(qzCur+1)+' / '+qzQuestions.length;
+  document.getElementById('qa-prog').style.width=(qzCur/qzQuestions.length*100)+'%';
+  document.getElementById('qa-qnum').textContent='คำถามที่ '+(qzCur+1);
+  document.getElementById('qa-qtext').textContent=q.q;
+  document.getElementById('qa-result').style.display='none';
+  document.getElementById('qa-confirm').style.display='none';
+  document.getElementById('qa-next').disabled=true;
+  document.getElementById('qa-next').style.opacity='.3';
+  setQzUrgent(false);
 
-function renderQuizQ(){
-  var q=qState.questions[qState.current];
-  var s=STATION_MAP[qState.station];
-  var pct=(qState.current/qState.questions.length)*100;
-  var do_=163*(1-qState.timer/TIME_PER_Q);
-  var tc=qState.timer>10?'var(--accent)':'#dc2626';
-  var letters=['A','B','C','D'];
-  var html='';
-  html+='<div class="q-badge" style="background:'+s.color+';">'
-    +'<div class="q-badge-icon">'+s.icon+'</div>'
-    +'<div><div class="q-badge-name">ฐาน '+qState.station+' — '+s.name+'</div>'
-    +'<div class="q-badge-sub">ข้อ '+(qState.current+1)+' / '+qState.questions.length+'</div></div></div>';
-  html+='<div class="q-progress-row"><span style="font-size:12px;color:var(--muted);">ความคืบหน้า</span><span style="font-size:13px;font-weight:700;color:var(--accent);">'+qState.score+' คะแนน</span></div>';
-  html+='<div class="q-progress-bar"><div class="q-progress-fill" style="width:'+pct+'%"></div></div>';
-  html+='<div class="q-timer-wrap"><div class="q-timer-ring"><svg width="60" height="60" viewBox="0 0 60 60"><circle cx="30" cy="30" r="26"/><circle class="q-timer-prog" id="qTimerProg" cx="30" cy="30" r="26" style="stroke:'+tc+';stroke-dashoffset:'+do_+'"/></svg><div class="q-timer-num" id="qTimerNum">'+qState.timer+'</div></div><div class="q-bonus-badge" id="qBonusBadge">bonus +'+calcQBonus(qState.timer).toFixed(1)+'</div></div>';
-  html+='<div class="q-card"><div class="q-num">คำถามที่ '+(qState.current+1)+'</div><div class="q-text">'+q.q+'</div></div>';
-  html+='<div class="q-choices">';
-  q.choices.forEach(function(c,i){
-    var cls='q-choice';
-    if(qState.answered){cls+=' disabled';if(i===q.ans)cls+=' correct';else if(i===qState.selectedIdx)cls+=' wrong';}
-    else if(i===qState.selectedIdx)cls+=' sel';
-    html+='<button class="'+cls+'" onclick="selectQAnswer('+i+')">'
-      +'<div class="q-letter">'+letters[i]+'</div><span>'+c+'</span></button>';
-  });
-  html+='</div>';
-  if(qState.answered){
-    var ok=qState.selectedIdx===q.ans,bon=qState.lastBonus||0;
-    html+='<div class="q-result-row"><div class="q-result-ic">'+(ok?'✅':'❌')+'</div>'
-      +'<div><div class="q-result-txt">'+(ok?'ถูกต้อง! +1 คะแนน':'ไม่ถูกต้อง')+'</div>'
-      +(ok&&bon>0?'<div class="q-result-bonus">⚡ Bonus ความเร็ว +'+bon.toFixed(1)+' คะแนน</div>':'')
-      +'</div></div>';
-  }
-  html+='<button class="btn btn-navy" '+(qState.answered?'':'disabled style="opacity:.35;"')+' onclick="nextQQuestion()">'
-    +(qState.current<qState.questions.length-1?'ข้อถัดไป →':'ดูผลคะแนน →')+'</button>';
-  document.getElementById('quizApp').innerHTML=html;
-  if(!qState.answered)startQTimer();
+  var L=['A','B','C','D'];
+  document.getElementById('qa-choices').innerHTML=(q.choices||q.c).map(function(c,i){
+    return'<button onclick="selectQzChoice('+i+')" style="background:var(--bg);border:1.5px solid var(--border);border-radius:11px;padding:10px 13px;font-size:13px;color:var(--navy);cursor:pointer;text-align:left;font-family:inherit;display:flex;align-items:center;gap:9px;transition:.15s;">'
+      +'<div style="width:22px;height:22px;border-radius:50%;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;">'+L[i]+'</div>'
+      +'<span>'+c+'</span></button>';
+  }).join('');
+
+  qzConfirmed=false; qzSelectedIdx=-1;
+  startQzTimer();
 }
 
-function startQTimer(){
-  clearInterval(qState.timerInterval);qState.timer=TIME_PER_Q;
-  qState.timerInterval=setInterval(function(){
-    qState.timer--;
-    var p=document.getElementById('qTimerProg'),n=document.getElementById('qTimerNum'),b=document.getElementById('qBonusBadge');
-    if(p)p.style.strokeDashoffset=163*(1-qState.timer/TIME_PER_Q);
-    if(n)n.textContent=qState.timer;
-    if(b)b.textContent='bonus +'+calcQBonus(qState.timer).toFixed(1);
-    if(p)p.style.stroke=qState.timer>10?'var(--accent)':'#dc2626';
-    if(n)n.style.color=qState.timer>10?'var(--navy)':'#dc2626';
-    if(qState.timer<=0){clearInterval(qState.timerInterval);qState.answered=true;qState.selectedIdx=-1;qState.lastBonus=0;renderQuizQ();}
+function startQzTimer(){
+  stopQuizTimer(); qzTimer=QZ_TIME; updateQzTimer();
+  qzInterval=setInterval(function(){
+    if(qzConfirmed) return;
+    qzTimer--; updateQzTimer();
+    if(qzTimer<=5&&qzTimer>0){
+      setQzUrgent(true);
+      if(navigator.vibrate)navigator.vibrate(60);
+    }
+    if(qzTimer<=0){stopQuizTimer();if(!qzConfirmed)qzTimeout();}
   },1000);
 }
 
-function selectQAnswer(idx){
-  if(qState.answered)return;
-  clearInterval(qState.timerInterval);qState.answered=true;qState.selectedIdx=idx;
-  var q=qState.questions[qState.current],bonus=0;
-  if(idx===q.ans){qState.baseScore+=1;bonus=calcQBonus(qState.timer);qState.bonusScore+=bonus;qState.score=Math.round((qState.baseScore+qState.bonusScore+qState.stampScore)*10)/10;}
-  qState.lastBonus=bonus;renderQuizQ();
+function stopQuizTimer(){clearInterval(qzInterval);}
+
+function updateQzTimer(){
+  var circ=113, offset=circ*(qzTimer/QZ_TIME);
+  document.getElementById('qa-ring-prog').style.strokeDashoffset=circ-offset;
+  document.getElementById('qa-ring-num').textContent=qzTimer;
+  document.getElementById('qa-timer-lbl').textContent=qzTimer+' วินาที';
+  var urg=qzTimer<=5;
+  document.getElementById('qa-ring-prog').style.stroke=urg?'#dc2626':'#10b981';
+  document.getElementById('qa-ring-num').style.color=urg?'#dc2626':'var(--navy)';
+  document.getElementById('qa-timer-lbl').style.color=urg?'#dc2626':'var(--navy)';
+  var bp=document.getElementById('qa-bonus-pill');
+  bp.textContent='⚡ +'+calcQzBonus(qzTimer).toFixed(1);
+  if(urg){bp.style.color='#dc2626';bp.style.borderColor='#fca5a5';bp.style.background='#fef2f2';}
+  else{bp.style.color='#10b981';bp.style.borderColor='#86efac';bp.style.background='#f0fdf4';}
 }
 
-function nextQQuestion(){
-  qState.current++;qState.answered=false;qState.selectedIdx=-1;
-  if(qState.current>=qState.questions.length)renderQuizResult();else renderQuizQ();
+function setQzUrgent(on){
+  var ring=document.getElementById('qa-ring');
+  var row=document.getElementById('qa-timer-row');
+  var card=document.getElementById('qa-qcard');
+  var fl=document.getElementById('quiz-flash');
+  if(on){
+    if(!ring._pint)ring._pint=setInterval(function(){ring.style.transform=ring.style.transform===''?'scale(1.08)':'';},225);
+    if(!fl._fint){fl.style.opacity='0.18';fl._fint=setInterval(function(){fl.style.opacity=fl.style.opacity==='0'?'0.18':'0';},450);}
+    row.style.borderColor='#fca5a5';row.style.background='#fff5f5';
+    card.style.borderColor='#fca5a5';card.style.background='#fff5f5';
+  } else {
+    if(ring._pint){clearInterval(ring._pint);ring._pint=null;ring.style.transform='';}
+    if(fl._fint){clearInterval(fl._fint);fl._fint=null;fl.style.opacity='0';}
+    row.style.borderColor='';row.style.background='';
+    card.style.borderColor='';card.style.background='';
+  }
 }
 
-function renderQuizResult(){
-  var s=STATION_MAP[qState.station];
-  var html='<div class="q-badge" style="background:'+s.color+';">'
-    +'<div class="q-badge-icon">'+s.icon+'</div>'
-    +'<div><div class="q-badge-name">ฐาน '+qState.station+' — เสร็จสิ้น!</div>'
-    +'<div class="q-badge-sub">Quiz สำเร็จ ✓</div></div></div>'
-    +'<div class="q-final">'
-    +'<div style="font-size:40px;margin-bottom:6px;">🏅</div>'
-    +'<div class="q-final-score">'+qState.score.toFixed(1)+'</div>'
-    +'<div style="font-size:13px;color:var(--muted);margin-top:4px;">คะแนนรวมในรอบนี้</div>'
-    +'<div class="q-score-row">'
-    +'<div class="q-score-item"><div class="q-score-val">1</div><div class="q-score-lbl">Stamp</div></div>'
-    +'<div class="q-score-item"><div class="q-score-val">'+qState.baseScore+'</div><div class="q-score-lbl">Quiz</div></div>'
-    +'<div class="q-score-item"><div class="q-score-val">'+qState.bonusScore.toFixed(1)+'</div><div class="q-score-lbl">Bonus</div></div>'
-    +'</div>'
-    +'<button onclick="renderQuizIntro()" class="btn btn-navy" style="margin-bottom:10px;">ทดสอบฐานอื่น →</button>'
-    +'<button onclick="go(\'home\')" class="btn btn-outline">กลับหน้าหลัก</button>'
-    +'</div>';
-  document.getElementById('quizApp').innerHTML=html;
+function selectQzChoice(i){
+  if(qzConfirmed)return;
+  qzSelectedIdx=i;
+  document.getElementById('qa-choices').querySelectorAll('button').forEach(function(c,idx){
+    c.style.borderColor=idx===i?'#2563eb':'var(--border)';
+    c.style.background=idx===i?'#eff6ff':'var(--bg)';
+    c.style.color=idx===i?'#2563eb':'var(--navy)';
+    c.querySelector('div').style.background=idx===i?'#2563eb':'var(--bg2)';
+    c.querySelector('div').style.color=idx===i?'#fff':'';
+  });
+  document.getElementById('qa-confirm').style.display='block';
+}
+
+function confirmQuizAnswer(){
+  if(qzConfirmed||qzSelectedIdx<0)return;
+  qzConfirmed=true; stopQuizTimer(); setQzUrgent(false);
+  document.getElementById('qa-confirm').style.display='none';
+  var q=qzQuestions[qzCur]; var ans=q.ans!=null?q.ans:q.a;
+  var correct=(qzSelectedIdx===ans), bonus=0;
+  var L=['A','B','C','D'];
+  document.getElementById('qa-choices').querySelectorAll('button').forEach(function(c,idx){
+    c.onclick=null; c.style.cursor='default';
+    if(idx===ans){c.style.borderColor='#16a34a';c.style.background='#f0fdf4';c.style.color='#16a34a';c.querySelector('div').style.background='#16a34a';c.querySelector('div').style.color='#fff';}
+    else if(idx===qzSelectedIdx){c.style.borderColor='#dc2626';c.style.background='#fef2f2';c.style.color='#dc2626';c.querySelector('div').style.background='#dc2626';c.querySelector('div').style.color='#fff';}
+    else{c.style.borderColor='var(--border)';c.style.background='var(--bg)';}
+  });
+  if(correct){qzBaseScore+=1;bonus=calcQzBonus(qzTimer);qzBonusScore+=bonus;}
+  var totalScore=Math.round((qzBaseScore+qzBonusScore)*10)/10;
+  document.getElementById('qa-score').textContent=totalScore+' คะแนน';
+  document.getElementById('qa-timer-lbl').textContent=qzTimer+' วินาที (หยุด)';
+  var rr=document.getElementById('qa-result');
+  rr.style.cssText='display:flex;border-radius:11px;padding:10px 13px;margin-bottom:10px;align-items:center;gap:9px;font-size:13px;border:1.5px solid '+(correct?'#86efac':'#fca5a5')+';background:'+(correct?'#f0fdf4':'#fef2f2')+';';
+  rr.innerHTML='<span style="font-size:20px;">'+(correct?'✅':'❌')+'</span>'
+    +'<div><div style="font-size:13px;font-weight:600;">'+(correct?'ถูกต้อง! +1':'ไม่ถูกต้อง')+'</div>'
+    +(correct&&bonus>0?'<div style="font-size:11px;color:#10b981;margin-top:1px;">⚡ Bonus +'+bonus.toFixed(1)+'</div>':'')+'</div>';
+  document.getElementById('qa-next').disabled=false;
+  document.getElementById('qa-next').style.opacity='1';
+  document.getElementById('qa-next').textContent=qzCur<qzQuestions.length-1?'ข้อถัดไป →':'ดูผลคะแนน →';
+}
+
+function qzTimeout(){
+  qzConfirmed=true; setQzUrgent(false);
+  document.getElementById('qa-confirm').style.display='none';
+  var q=qzQuestions[qzCur]; var ans=q.ans!=null?q.ans:q.a;
+  document.getElementById('qa-choices').querySelectorAll('button').forEach(function(c,idx){
+    c.onclick=null;c.style.cursor='default';
+    if(idx===ans){c.style.borderColor='#16a34a';c.style.background='#f0fdf4';c.style.color='#16a34a';}
+    else{c.style.borderColor='var(--border)';c.style.background='var(--bg)';}
+  });
+  var rr=document.getElementById('qa-result');
+  rr.style.cssText='display:flex;border-radius:11px;padding:10px 13px;margin-bottom:10px;align-items:center;gap:9px;font-size:13px;border:1.5px solid #fca5a5;background:#fef2f2;';
+  rr.innerHTML='<span style="font-size:20px;">⏱</span><div style="font-size:13px;font-weight:600;color:#dc2626;">หมดเวลา! ไม่ได้คะแนน</div>';
+  document.getElementById('qa-next').disabled=false;
+  document.getElementById('qa-next').style.opacity='1';
+  document.getElementById('qa-next').textContent=qzCur<qzQuestions.length-1?'ข้อถัดไป →':'ดูผลคะแนน →';
+}
+
+function nextQuizQ(){
+  qzCur++;
+  if(qzCur>=qzQuestions.length){showQzResult();return;}
+  qzConfirmed=false;qzSelectedIdx=-1;
+  renderQzQ();
+}
+
+function showQzResult(){
+  stopQuizTimer(); setQzUrgent(false);
+  qzDoneMap[qzStation]=true;
+  var total=Math.round((qzBaseScore+qzBonusScore)*10)/10;
+  document.getElementById('quiz-active-view').style.display='none';
+  document.getElementById('quiz-result-view').style.display='block';
+  document.getElementById('qr-score').textContent=total.toFixed(1);
+  document.getElementById('qr-station').textContent='คะแนนจาก '+qzStation+' Quiz';
+  document.getElementById('qr-base').textContent=qzBaseScore;
+  document.getElementById('qr-bonus').textContent=qzBonusScore.toFixed(1);
 }
 
 /* ═══════════════════════════════════════════
@@ -1430,11 +1802,12 @@ function initApp(){
   // ซ่อน entry-panel ก่อนให้ ring เริ่ม
   var ep=document.getElementById('entry-panel');
   if(ep) ep.style.transform='translateY(100%)';
-  // โหลด employees
+  // โหลด employees + appSettings
   apiGet('getEmployees',function(res){
     var employees=(res&&res.employees)||[];
     employeeDB=employees.map(function(e){return{firstName:e.firstName,lastName:e.lastName,dept:e.dept,position:e.position||''};});
   });
+  apiGet('getAppSettings',function(res){if(res&&!res.error)appSettings=res;});
   startPreviewRing(3);
 }
 </script>
