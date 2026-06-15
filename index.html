@@ -361,7 +361,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
       <div id="reg-suggest" class="sug-list" style="display:none"></div>
     </div>
     <div id="reg-dept-pill" class="dept-pill" style="display:none">
-      <div class="dp-dot"></div><span class="dp-txt">พบในระบบ · ฝ่าย</span><span class="dp-val" id="reg-dept-val">—</span>
+      <div class="dp-dot"></div><span class="dp-txt">พบในระบบ · ตำแหน่ง</span><span class="dp-val" id="reg-dept-val">—</span>
     </div>
     <button id="reg-submit" onclick="onRegSubmit()" style="width:100%;padding:15px;background:#1e3a5f;border:none;border-radius:14px;color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;opacity:0;transform:translateY(8px);transition:opacity .35s,transform .35s;pointer-events:none;">เข้าร่วมกิจกรรม →</button>
   </div>
@@ -451,7 +451,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
 </div>
 
 <!-- HOME -->
-<div id="pg-home" class="page">
+<div id="pg-home" class="page" style="position:relative;">
 
   <!-- Kick overlay -->
   <div id="kick-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);z-index:300;align-items:flex-end;justify-content:center;">
@@ -499,8 +499,8 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
   </div>
   <div style="height:20px"></div>
 
-  <!-- Station detail overlay (slide in from right) -->
-  <div id="st-detail-overlay" style="position:fixed;inset:0;background:#fff;transform:translateX(100%);transition:transform .35s cubic-bezier(.34,1.05,.64,1);z-index:200;overflow-y:auto;max-width:420px;margin:0 auto;">
+  <!-- Station detail overlay -->
+  <div id="st-detail-overlay" style="display:none;position:absolute;inset:0;background:#fff;z-index:200;overflow-y:auto;">
     <div style="padding:16px 20px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;position:sticky;top:0;background:#fff;z-index:1;">
       <button onclick="closeStationDetail()" style="width:32px;height:32px;border-radius:9px;background:var(--bg2);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;flex-shrink:0;">←</button>
       <div style="flex:1;">
@@ -831,10 +831,10 @@ var ADMIN_PASS='engineer_1997';
 var adminPassOverride=null;
 
 var STATIONS=[
-  {id:'EE',icon:'⚡',label:'Electrical Eng.',activity:'Logic Master',color:'#1e40af',accent:'#3b82f6'},
-  {id:'ME',icon:'⚙️',label:'Mechanical Eng.',activity:'Force & Flow',color:'#065f46',accent:'#10b981'},
-  {id:'TO',icon:'🔬',label:'Tooling Eng.',activity:'Micrometer Pro',color:'#92400e',accent:'#f59e0b'},
-  {id:'PM',icon:'📳',label:'Preventive Maint.',activity:'Diagnostic Challenge',color:'#4c1d95',accent:'#8b5cf6'},
+  {id:'TO',icon:'🔬',name:'Tooling Eng.',label:'Tooling Eng.',activity:'Micrometer Pro',color:'#92400e',accent:'#f59e0b'},
+  {id:'ME',icon:'⚙️',name:'Mechanical Eng.',label:'Mechanical Eng.',activity:'Force & Flow',color:'#065f46',accent:'#10b981'},
+  {id:'EE',icon:'⚡',name:'Electrical Eng.',label:'Electrical Eng.',activity:'Logic Master',color:'#1e40af',accent:'#3b82f6'},
+  {id:'PM',icon:'📳',name:'Preventive Maint.',label:'Preventive Maint.',activity:'Diagnostic Challenge',color:'#4c1d95',accent:'#8b5cf6'},
 ];
 var STATION_MAP={
   EE:{name:'Electrical Eng.',icon:'⚡',color:'#1e40af'},
@@ -1296,11 +1296,11 @@ function openStationDetail(id){
     qSub.textContent='5 ข้อ · ข้อละ 15 วินาที · bonus ความเร็ว'; qSub.style.color='rgba(255,255,255,.7)';
   }
   document.getElementById('std-scan-sub').textContent='รับได้ 1 ครั้ง · สแกนจาก QR ของเจ้าหน้าที่ฐาน '+id;
-  document.getElementById('st-detail-overlay').style.transform='translateX(0)';
+  document.getElementById('st-detail-overlay').style.display='block';
 }
 
 function closeStationDetail(){
-  document.getElementById('st-detail-overlay').style.transform='translateX(100%)';
+  document.getElementById('st-detail-overlay').style.display='none';
   currentStationDetail=null;
 }
 
