@@ -198,6 +198,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
 .cd-row{display:flex;justify-content:center;align-items:flex-end;gap:4px;}
 .cd-unit{text-align:center;min-width:52px;}
 .cd-unit-num{font-size:32px;font-weight:700;color:var(--navy);line-height:1;font-variant-numeric:tabular-nums;}
+@keyframes elSpin{to{transform:rotate(360deg)}}
 .cd-unit-num.accent{color:var(--accent);}
 .cd-unit-lbl{font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-top:4px;}
 .cd-sep{font-size:26px;font-weight:300;color:var(--border2);padding-bottom:8px;}
@@ -335,7 +336,17 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
     </div>
   </div>
 
-  <!-- Input slide-up panel -->
+  <!-- Loading overlay — แสดงหลังกดยืนยัน -->
+  <div id="entry-loading" style="position:absolute;inset:0;background:#fff;z-index:20;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;border-radius:0;">
+    <div style="position:relative;width:36px;height:36px;">
+      <div id="el-spinner" style="width:36px;height:36px;border:2.5px solid var(--border);border-top-color:#1e3a5f;border-radius:50%;animation:elSpin .7s linear infinite;"></div>
+      <svg id="el-check" style="display:none;position:absolute;inset:0;" viewBox="0 0 36 36" fill="none">
+        <circle cx="18" cy="18" r="17" stroke="#16a34a" stroke-width="2"/>
+        <polyline points="10,18 15,24 26,12" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div id="el-txt" style="font-size:13px;color:var(--muted);">กำลังเข้าสู่ระบบ...</div>
+  </div>
   <div id="entry-panel" style="position:absolute;bottom:0;left:0;right:0;background:#fff;border-radius:22px 22px 0 0;padding:20px 24px 44px;border-top:0.5px solid var(--border);transform:translateY(100%);transition:transform .45s cubic-bezier(.34,1.1,.64,1);">
     <div style="width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 18px;"></div>
     <div style="font-size:17px;font-weight:700;color:var(--navy);margin-bottom:3px;">สวัสดี 👋</div>
@@ -1005,25 +1016,51 @@ function showBlockedPopup(name,dept){
 }
 
 /* ── Confirm → enterSession ── */
+function showEntryLoading(success){
+  var el=document.getElementById('entry-loading');
+  el.style.display='flex';
+  if(success){
+    document.getElementById('el-spinner').style.display='none';
+    document.getElementById('el-check').style.display='block';
+    document.getElementById('el-txt').textContent='เข้าสู่ระบบสำเร็จ';
+    document.getElementById('el-txt').style.color='#16a34a';
+  }
+}
+function hideEntryLoading(){
+  var el=document.getElementById('entry-loading');
+  el.style.display='none';
+  document.getElementById('el-spinner').style.display='block';
+  document.getElementById('el-check').style.display='none';
+  document.getElementById('el-txt').textContent='กำลังเข้าสู่ระบบ...';
+  document.getElementById('el-txt').style.color='';
+}
 function confirmEnter(){
   if(!selectedReg)return;
   document.getElementById('confirm-popup').style.display='none';
+  document.getElementById('entry-panel').style.transform='translateY(100%)';
+  showEntryLoading(false);
   var fullName=selectedReg.firstName+' '+selectedReg.lastName;
   var dept=selectedReg.dept;
   var errEl=document.getElementById('reg-err');
-  errEl.style.display='none';showLoad();
+  errEl.style.display='none';
   apiPost({action:'enterSession',full_name:fullName,department:dept},function(res){
-    hideLoad();
     if(res.error==='session_active'){
+      hideEntryLoading();
+      document.getElementById('entry-panel').style.transform='translateY(0)';
       showBlockedPopup(res.full_name,res.department);return;
     }
-    if(res.error){showErr(errEl,res.error);return;}
+    if(res.error){
+      hideEntryLoading();
+      document.getElementById('entry-panel').style.transform='translateY(0)';
+      showErr(errEl,res.error);return;
+    }
     currentUid=res.uid;currentToken=res.token;
     saveSession(res.uid,res.token);
     document.getElementById('reg-name').value='';
     document.getElementById('reg-dept-pill').style.display='none';
     selectedReg=null;
-    afterAuth();
+    showEntryLoading(true);
+    setTimeout(function(){hideEntryLoading();afterAuth();},600);
   });
 }
 function afterAuth(){
