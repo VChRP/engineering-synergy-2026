@@ -138,7 +138,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
 .tl-txt{font-size:11px;color:#1d4ed8;font-weight:600;flex:1;}
 .tl-time{font-size:10px;color:#60a5fa;font-weight:600;}
 .sec-lbl{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px;}
-.st-grid{display:flex;flex-direction:column;gap:0;margin-bottom:16px;}
+.st-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
 .st-card{background:var(--bg);border:1.5px solid var(--border);border-radius:18px;padding:18px 12px;text-align:center;cursor:pointer;position:relative;overflow:hidden;transition:.2s;box-shadow:0 1px 4px rgba(0,30,80,.05);}
 .st-card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,30,80,.09);}
 .st-card:active{transform:scale(.97);}
@@ -490,7 +490,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
     </div>
     <button class="rc-refresh" id="homeRefreshBtn" onclick="loadHome()" title="รีเฟรชข้อมูล">↻</button>
   </div>
-  <div id="home-last-refresh" style="text-align:right;font-size:10px;color:var(--muted);margin-top:4px;margin-bottom:8px;"></div>
+  <div id="home-last-refresh" style="text-align:right;font-size:10px;color:var(--muted);margin-top:4px;margin-bottom:12px;"></div>
   <div class="sec-lbl">ฐานกิจกรรม</div>
   <div class="st-grid" id="home-stations"></div>
 
@@ -498,6 +498,42 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
     <button class="btn-danger-sm" onclick="doLogout()">↩ ออกจากระบบ</button>
   </div>
   <div style="height:20px"></div>
+
+  <!-- Station detail overlay (slide in from right) -->
+  <div id="st-detail-overlay" style="position:fixed;inset:0;background:#fff;transform:translateX(100%);transition:transform .35s cubic-bezier(.34,1.05,.64,1);z-index:200;overflow-y:auto;max-width:420px;margin:0 auto;">
+    <div style="padding:16px 20px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;position:sticky;top:0;background:#fff;z-index:1;">
+      <button onclick="closeStationDetail()" style="width:32px;height:32px;border-radius:9px;background:var(--bg2);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;flex-shrink:0;">←</button>
+      <div style="flex:1;">
+        <div id="std-title" style="font-size:15px;font-weight:700;color:var(--navy);">—</div>
+        <div id="std-sub" style="font-size:10px;color:var(--muted);">—</div>
+      </div>
+    </div>
+    <div style="padding:20px 20px 40px;">
+      <div style="text-align:center;padding:16px 0 24px;">
+        <div id="std-icon" style="font-size:56px;margin-bottom:10px;"></div>
+        <div id="std-stamp" style="display:none;font-size:12px;font-weight:600;color:#16a34a;background:#f0fdf4;border:1px solid #86efac;border-radius:20px;padding:4px 14px;display:inline-block;"></div>
+      </div>
+      <div class="sec-lbl">กิจกรรมในฐานนี้</div>
+      <!-- Quiz card -->
+      <div id="std-quiz-card" onclick="openStationQuiz()" style="border-radius:14px;padding:16px;margin-bottom:10px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:.15s;">
+        <div style="font-size:28px;flex-shrink:0;">📋</div>
+        <div style="flex:1;">
+          <div id="std-quiz-title" style="font-size:15px;font-weight:700;">ทำ Quiz</div>
+          <div id="std-quiz-sub" style="font-size:12px;margin-top:2px;opacity:.75;">5 ข้อ · ข้อละ 15 วินาที · bonus ความเร็ว</div>
+        </div>
+        <div style="font-size:18px;">→</div>
+      </div>
+      <!-- Scan Bonus card -->
+      <div onclick="openStationScan()" style="background:linear-gradient(135deg,#1e40af,#2563eb);border-radius:14px;padding:16px;display:flex;align-items:center;gap:12px;cursor:pointer;color:#fff;">
+        <div style="font-size:28px;flex-shrink:0;">📷</div>
+        <div style="flex:1;">
+          <div style="font-size:15px;font-weight:700;">สแกน QR รับ Bonus</div>
+          <div id="std-scan-sub" style="font-size:12px;margin-top:2px;opacity:.75;">รับได้ 1 ครั้ง · สแกนจาก QR ของเจ้าหน้าที่</div>
+        </div>
+        <div style="font-size:18px;">→</div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- STATION (Admin) -->
@@ -1186,37 +1222,102 @@ function doResetPass(){
   else{var newPass=document.getElementById('rp-new').value.trim();if(newPass.length<4){showErr(errEl,'รหัสผ่านต้องมีอย่างน้อย 4 ตัวอักษร');return;}adminPassOverride=newPass;rpStep=1;document.getElementById('rp-new-wrap').style.display='none';document.getElementById('rp-ans').value='';document.getElementById('rp-new').value='';okEl.textContent='✅ เปลี่ยนรหัสผ่านสำเร็จ';okEl.style.display='block';setTimeout(function(){go('admin-login');},1500);}
 }
 
-/* ── Station cards ── */
+/* ── Station grid 2x2 + detail view ── */
+var currentStationDetail=null;
+var QUIZ_ORDER_HOME=['TO','ME','EE','PM'];
+
+function getStationState(id){
+  var i=QUIZ_ORDER_HOME.indexOf(id);
+  if(qzDoneMap&&qzDoneMap[id]) return 'done';
+  if(i===0) return 'available';
+  if(qzDoneMap&&qzDoneMap[QUIZ_ORDER_HOME[i-1]]) return 'available';
+  return 'locked';
+}
+
 function renderStations(m){
   document.getElementById('home-stations').innerHTML=STATIONS.map(function(s){
-    var done=m&&!!m.scores[s.id];
-    var pts=(settingsCache[s.id]&&settingsCache[s.id].points)||settingsCache[s.id]||10;
-    var qzDone=qzDoneMap&&qzDoneMap[s.id];
-    return'<div class="st-card '+(done?'done':'pending')+'" style="'+(done?'border-color:'+s.accent+'44;':'')+'text-align:left;padding:14px 16px;margin-bottom:10px;border-radius:14px;cursor:default;" >'
-      // header row
-      +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">'
-        +(done?'<div style="position:relative;"><span class="st-ico" style="opacity:1;filter:none;">'+s.icon+'</span><div class="st-stamp" style="top:-4px;right:-6px;">✓</div></div>':'<span class="st-ico">'+s.icon+'</span>')
-        +'<div style="flex:1;">'
-          +'<div class="st-id'+(done?' dc':'')+'" style="'+(done?'color:'+s.accent+';':'')+'">' +s.id+'</div>'
-          +'<div class="st-lbl2">'+s.label+'</div>'
-        +'</div>'
-        +(done
-          ?'<div class="st-pts-done" style="color:'+s.accent+';background:'+s.accent+'18">+'+m.scores[s.id]+' pts</div>'
-          :'<div class="st-pts">+'+pts+' pts</div>'
-        )
-      +'</div>'
-      // action buttons
-      +'<div style="display:flex;gap:8px;">'
-        +'<button onclick="go(\'quiz\')" style="flex:1;padding:9px 6px;background:'+(qzDone?'#f0fdf4':'var(--navy)')+';color:'+(qzDone?'#16a34a':'#fff')+';border:'+(qzDone?'1.5px solid #86efac':'none')+';border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">'
-          +(qzDone?'✓ Quiz เสร็จ':'📋 Quiz')
-        +'</button>'
-        +'<button onclick="go(\'scan-bonus\')" style="flex:1;padding:9px 6px;background:linear-gradient(135deg,#1e40af,#2563eb);color:#fff;border:none;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">📷 สแกน Bonus</button>'
-      +'</div>'
+    var state=getStationState(s.id);
+    var isDone=state==='done';
+    var isAvail=state==='available';
+    var prevId=QUIZ_ORDER_HOME[QUIZ_ORDER_HOME.indexOf(s.id)-1]||'';
+    var onclick=state==='locked'
+      ?'showStationToast(\'ต้องผ่านฐาน '+prevId+' ก่อน\')'
+      :'openStationDetail(\''+s.id+'\')';
+    return'<div onclick="'+onclick+'" style="'
+      +'border:1.5px solid '+(isDone?'#86efac':isAvail?'var(--navy)':'var(--border)')+';'
+      +'background:'+(isDone?'#f0fdf4':isAvail?'var(--bg)':'var(--bg2)')+';'
+      +'border-radius:18px;padding:20px 12px;text-align:center;position:relative;transition:.18s;'
+      +(isAvail?'box-shadow:0 4px 14px rgba(15,34,72,.12);':'')
+      +(state==='locked'?'opacity:.55;cursor:not-allowed;':'cursor:pointer;')
+      +'">'
+      +(isDone?'<div style="position:absolute;top:8px;right:9px;width:20px;height:20px;border-radius:50%;background:#16a34a;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:700;">✓</div>':'')
+      +(state==='locked'?'<div style="position:absolute;top:8px;right:9px;font-size:12px;color:#cbd5e1;">🔒</div>':'')
+      +'<div style="font-size:36px;margin-bottom:8px;'+(state==='locked'?'filter:grayscale(1);opacity:.5;':'')+'">'+s.icon+'</div>'
+      +'<div style="font-size:14px;font-weight:700;color:'+(isDone?'#16a34a':isAvail?'var(--navy)':'var(--muted)')+';">'+s.id+'</div>'
+      +'<div style="font-size:10px;color:var(--muted);margin-top:1px;">'+s.name+'</div>'
+      +'<div style="font-size:10px;font-weight:600;margin-top:8px;padding:3px 10px;border-radius:20px;display:inline-block;'
+      +(isDone?'background:#dcfce7;color:#16a34a;border:1px solid #86efac;':isAvail?'background:var(--navy);color:#fff;':'background:var(--bg3);color:var(--muted);border:1px solid var(--border);')
+      +'">'+( isDone?'✓ เสร็จ':isAvail?'เข้าได้เลย →':'🔒 ล็อก')+'</div>'
       +'</div>';
   }).join('');
 }
 
-/* ── Popup ── */
+function showStationToast(msg){
+  var existing=document.getElementById('st-toast-el');
+  if(existing) document.body.removeChild(existing);
+  var el=document.createElement('div');
+  el.id='st-toast-el';
+  el.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 22px;border-radius:20px;font-size:13px;font-weight:600;z-index:999;white-space:nowrap;font-family:\'IBM Plex Sans Thai\',sans-serif;';
+  el.textContent=msg;
+  document.body.appendChild(el);
+  setTimeout(function(){if(el.parentNode)document.body.removeChild(el);},2000);
+}
+
+function openStationDetail(id){
+  currentStationDetail=id;
+  var s=STATION_MAP[id];
+  var qzDone=!!(qzDoneMap&&qzDoneMap[id]);
+  document.getElementById('std-title').textContent='ฐาน '+id+' — '+s.name;
+  document.getElementById('std-sub').textContent=qzDone?'Quiz เสร็จแล้ว ✓':'กำลังดำเนินการ';
+  document.getElementById('std-icon').textContent=s.icon;
+  var stampEl=document.getElementById('std-stamp');
+  if(qzDone){stampEl.textContent='✓ Quiz เสร็จแล้ว';stampEl.style.display='inline-block';}
+  else{stampEl.style.display='none';}
+  var qCard=document.getElementById('std-quiz-card');
+  var qTitle=document.getElementById('std-quiz-title');
+  var qSub=document.getElementById('std-quiz-sub');
+  if(qzDone){
+    qCard.style.cssText='border-radius:14px;padding:16px;margin-bottom:10px;display:flex;align-items:center;gap:12px;cursor:pointer;background:#f0fdf4;border:1.5px solid #86efac;';
+    qTitle.style.color='#16a34a'; qTitle.textContent='✓ Quiz เสร็จแล้ว';
+    qSub.textContent='กดเพื่อดูหน้า Quiz'; qSub.style.color='#16a34a';
+  } else {
+    qCard.style.cssText='border-radius:14px;padding:16px;margin-bottom:10px;display:flex;align-items:center;gap:12px;cursor:pointer;background:var(--navy);';
+    qTitle.style.color='#fff'; qTitle.textContent='ทำ Quiz';
+    qSub.textContent='5 ข้อ · ข้อละ 15 วินาที · bonus ความเร็ว'; qSub.style.color='rgba(255,255,255,.7)';
+  }
+  document.getElementById('std-scan-sub').textContent='รับได้ 1 ครั้ง · สแกนจาก QR ของเจ้าหน้าที่ฐาน '+id;
+  document.getElementById('st-detail-overlay').style.transform='translateX(0)';
+}
+
+function closeStationDetail(){
+  document.getElementById('st-detail-overlay').style.transform='translateX(100%)';
+  currentStationDetail=null;
+}
+
+function openStationQuiz(){
+  var id=currentStationDetail;
+  closeStationDetail();
+  if(!id) return;
+  go('quiz');
+  setTimeout(function(){startQzStation(id);},150);
+}
+
+function openStationScan(){
+  closeStationDetail();
+  go('scan-bonus');
+}
+
+/* ── Popup (station info) ── */
 function onStationClick(id){if(seenPopup[id])return;var info=STATION_INFO[id],st=STATIONS.find(function(s){return s.id===id;});document.getElementById('popup-icon').textContent=st.icon;document.getElementById('popup-title').textContent=info.title;document.getElementById('popup-sub').textContent=info.sub;document.getElementById('popup-body').textContent=info.body;document.getElementById('popup-tags').innerHTML=info.tags.map(function(t){return'<span class="ptag" style="background:'+info.accent+'18;color:'+info.accent+';border:1px solid '+info.accent+'30">'+t+'</span>';}).join('');document.getElementById('popup-btn').style.background=info.color;document.getElementById('popup-btn').dataset.stId=id;document.getElementById('st-popup').style.display='block';}
 function dismissPopup(){seenPopup[document.getElementById('popup-btn').dataset.stId]=true;document.getElementById('st-popup').style.display='none';}
 function closePopup(e){if(e.target===e.currentTarget)dismissPopup();}
