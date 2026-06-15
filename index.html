@@ -199,6 +199,8 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
 .cd-unit{text-align:center;min-width:52px;}
 .cd-unit-num{font-size:32px;font-weight:700;color:var(--navy);line-height:1;font-variant-numeric:tabular-nums;}
 @keyframes elSpin{to{transform:rotate(360deg)}}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.skel{background:linear-gradient(90deg,#f1f4f9 25%,#e8ecf1 50%,#f1f4f9 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:6px;display:inline-block;}
 .cd-unit-num.accent{color:var(--accent);}
 .cd-unit-lbl{font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-top:4px;}
 .cd-sep{font-size:26px;font-weight:300;color:var(--border2);padding-bottom:8px;}
@@ -449,6 +451,18 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
 
 <!-- HOME -->
 <div id="pg-home" class="page">
+
+  <!-- Kick overlay -->
+  <div id="kick-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);z-index:300;align-items:flex-end;justify-content:center;">
+    <div style="background:#fff;border-radius:24px 24px 0 0;padding:24px 24px 48px;width:100%;max-width:420px;">
+      <div style="width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px;"></div>
+      <div style="font-size:28px;margin-bottom:10px;">🔒</div>
+      <div style="font-size:18px;font-weight:700;color:var(--navy);margin-bottom:6px;">ถูกออกจากระบบ</div>
+      <div style="font-size:13px;color:var(--sub);line-height:1.65;margin-bottom:22px;">Admin ได้ reset session ของคุณ<br>กรุณาเข้าสู่ระบบใหม่อีกครั้ง</div>
+      <button class="btn btn-navy" onclick="dismissKick()">รับทราบ เข้าสู่ระบบใหม่</button>
+    </div>
+  </div>
+
   <div id="st-popup" style="display:none">
     <div class="popup-overlay" onclick="closePopup(event)">
       <div class="popup-sheet" onclick="event.stopPropagation()">
@@ -474,8 +488,9 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
       <div class="rc-score" id="home-score">0</div>
       <div class="rc-sub" id="home-rank-sub">จาก — คน</div>
     </div>
-    <button class="rc-refresh" onclick="loadHome()">↻</button>
+    <button class="rc-refresh" id="homeRefreshBtn" onclick="loadHome()" title="รีเฟรชข้อมูล">↻</button>
   </div>
+  <div id="home-last-refresh" style="text-align:right;font-size:10px;color:var(--muted);margin-top:4px;margin-bottom:8px;"></div>
   <div class="tl-pill">
     <div class="tl-dot"></div>
     <div class="tl-txt">Booth Rotation กำลังดำเนินการ</div>
@@ -843,7 +858,7 @@ function go(page,param){
   else{var el=document.getElementById('pg-'+page);if(el)el.classList.add('active');}
   window.scrollTo(0,0);
 }
-function goHome(){loadHome();go('home');}
+/* goHome defined in afterAuth section */
 
 /* ── Session storage ── */
 function saveSession(uid,token){try{localStorage.setItem('eoh_uid',uid);localStorage.setItem('eoh_token',token);}catch(e){}}
@@ -1064,29 +1079,110 @@ function confirmEnter(){
   });
 }
 function afterAuth(){
-  // โหลด app settings ก่อนตัดสินใจ
+  // navigate ทันที ไม่รอ API
+  var cs=appSettings.coming_soon;
+  var bypassList=appSettings.bypass_list||[];
+  // ถ้ายังไม่รู้ชื่อ ให้ดึง background แล้วเช็คทีหลัง
   apiGet('getAppSettings',function(res){
     if(res&&!res.error) appSettings=res;
-    var bypassList=appSettings.bypass_list||[];
-    var fullName='';
-    // หาชื่อจาก members
+  });
+  // navigate ก่อนเลย แล้วโหลดข้อมูลใน background
+  if(cs){
+    // เช็ค bypass จาก members background
     apiGet('getMembers',function(mr){
       var m=(mr.members||[]).find(function(x){return x.uid===currentUid;});
-      if(m) fullName=m.full_name;
-      // เช็ค bypass
-      var isBypass=bypassList.indexOf(fullName)>=0;
-      // เช็ค coming soon
-      var cs=appSettings.coming_soon;
-      if(cs&&!isBypass){
-        updateCountdown();setInterval(updateCountdown,1000);go('coming');
-      } else {
-        goHome();
-      }
+      var fullName=m?m.full_name:'';
+      var isBypass=(appSettings.bypass_list||[]).indexOf(fullName)>=0;
+      if(!isBypass){updateCountdown();setInterval(updateCountdown,1000);go('coming');}
+      else{goHome();}
     });
-  });
+  } else {
+    goHome();
+  }
 }
 
-/* ── Admin Login ── */
+/* ── Polling — ตรวจ session ทุก 30 วิ ── */
+var pollInterval=null;
+function startSessionPolling(){
+  stopSessionPolling();
+  pollInterval=setInterval(function(){
+    if(!currentUid||!currentToken)return;
+    apiGet('getMembers',function(res){
+      if(res.error)return;
+      var m=(res.members||[]).find(function(x){return x.uid===currentUid;});
+      if(!m||!m.has_session){
+        stopSessionPolling();
+        showKickNotification();
+      }
+    });
+  },30000);
+}
+function stopSessionPolling(){
+  if(pollInterval){clearInterval(pollInterval);pollInterval=null;}
+}
+function showKickNotification(){
+  var overlay=document.getElementById('kick-overlay');
+  if(overlay) overlay.style.display='flex';
+}
+function dismissKick(){
+  var overlay=document.getElementById('kick-overlay');
+  if(overlay) overlay.style.display='none';
+  currentUid=null;currentToken=null;clearSession();
+  goPreview();
+}
+
+/* ── Home ── */
+function goHome(){go('home');loadHome();startSessionPolling();}
+function loadHome(){
+  // แสดง skeleton ทันที
+  renderHomeSkeleton();
+  var lastEl=document.getElementById('home-last-refresh');
+  apiGet('getMembers',function(res){
+    if(res.error){
+      renderHomeError();return;
+    }
+    var members=res.members||[];
+    var m=currentUid?members.find(function(x){return x.uid===currentUid;}):null;
+    var sorted=members.slice().sort(function(a,b){return b.total_score-a.total_score;});
+    var rank=m?sorted.findIndex(function(x){return x.uid===m.uid;})+1:'—';
+    document.getElementById('home-name').textContent=m?m.full_name.split(' ')[0]:'—';
+    document.getElementById('home-dept').textContent=m?m.department:'—';
+    document.getElementById('home-rank').textContent=rank;
+    document.getElementById('home-score').textContent=m?m.total_score:0;
+    document.getElementById('home-rank-sub').textContent='จาก '+members.length+' คน';
+    renderStations(m);
+    var lbEl=document.getElementById('home-lb');
+    if(!sorted.length){lbEl.innerHTML='<div class="lb-box" style="text-align:center;color:var(--muted);padding:22px;font-size:13px">ยังไม่มีผู้ลงทะเบียน</div>';return;}
+    var medals=['🥇','🥈','🥉'];
+    lbEl.innerHTML='<div class="lb-box">'+sorted.slice(0,10).map(function(mem,i){
+      var isMe=mem.uid===currentUid;
+      return'<div class="lb-item'+(isMe?' me':'')+'">'
+        +'<div class="lb-rank">'+(medals[i]||(i+1))+'</div>'
+        +'<div style="flex:1"><div class="lb-name">'+mem.full_name+(isMe?'<span class="me-tag">คุณ</span>':'')+'</div>'
+        +'<div class="lb-sub">'+mem.department+' · '+Object.keys(mem.scores||{}).length+'/4 ฐาน</div></div>'
+        +'<div class="lb-score">'+mem.total_score+'</div></div>';
+    }).join('')+'</div>';
+    if(lastEl){var d=new Date();lastEl.textContent='อัปเดตล่าสุด: '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');}
+  });
+}
+function renderHomeSkeleton(){
+  var s='<div class="skel" style="height:14px;width:60%;margin-bottom:6px;"></div><div class="skel" style="height:10px;width:35%;"></div>';
+  var el=document.getElementById('home-name');if(el)el.innerHTML=s;
+  var lbEl=document.getElementById('home-lb');
+  if(lbEl) lbEl.innerHTML='<div class="lb-box">'+[1,2,3].map(function(){
+    return'<div class="lb-item"><div class="skel" style="width:24px;height:24px;border-radius:50%;"></div>'
+      +'<div style="flex:1;margin-left:10px;"><div class="skel" style="height:12px;width:60%;margin-bottom:5px;"></div><div class="skel" style="height:10px;width:35%;"></div></div>'
+      +'<div class="skel" style="width:28px;height:16px;"></div></div>';
+  }).join('')+'</div>';
+}
+function renderHomeError(){
+  var lbEl=document.getElementById('home-lb');
+  if(lbEl) lbEl.innerHTML='<div class="lb-box" style="text-align:center;padding:24px;">'
+    +'<div style="font-size:22px;margin-bottom:8px;">⚠️</div>'
+    +'<div style="font-size:13px;color:var(--muted);margin-bottom:14px;">โหลดข้อมูลไม่สำเร็จ</div>'
+    +'<button onclick="loadHome()" style="padding:10px 20px;background:var(--navy);border:none;border-radius:10px;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">ลองใหม่</button>'
+    +'</div>';
+}
 function doAdminLogin(){
   var passEl=document.getElementById('al-pass');
   var errEl=document.getElementById('al-err');
@@ -1113,34 +1209,7 @@ function doResetPass(){
   else{var newPass=document.getElementById('rp-new').value.trim();if(newPass.length<4){showErr(errEl,'รหัสผ่านต้องมีอย่างน้อย 4 ตัวอักษร');return;}adminPassOverride=newPass;rpStep=1;document.getElementById('rp-new-wrap').style.display='none';document.getElementById('rp-ans').value='';document.getElementById('rp-new').value='';okEl.textContent='✅ เปลี่ยนรหัสผ่านสำเร็จ';okEl.style.display='block';setTimeout(function(){go('admin-login');},1500);}
 }
 
-/* ── Home ── */
-function loadHome(){
-  renderStations(null);showLoad();
-  apiGet('getMembers',function(res){
-    hideLoad();if(res.error)return;
-    var members=res.members;
-    var m=currentUid?members.find(function(x){return x.uid===currentUid;}):null;
-    var sorted=members.slice().sort(function(a,b){return b.total_score-a.total_score;});
-    var rank=m?sorted.findIndex(function(x){return x.uid===m.uid;})+1:'—';
-    document.getElementById('home-name').textContent=m?m.full_name.split(' ')[0]:'—';
-    document.getElementById('home-dept').textContent=m?m.department:'—';
-    document.getElementById('home-rank').textContent=rank;
-    document.getElementById('home-score').textContent=m?m.total_score:0;
-    document.getElementById('home-rank-sub').textContent='จาก '+members.length+' คน';
-    renderStations(m);
-    var lbEl=document.getElementById('home-lb');
-    if(!sorted.length){lbEl.innerHTML='<div class="lb-box" style="text-align:center;color:var(--muted);padding:22px;font-size:13px">ยังไม่มีผู้ลงทะเบียน</div>';return;}
-    var medals=['🥇','🥈','🥉'];
-    lbEl.innerHTML='<div class="lb-box">'+sorted.slice(0,10).map(function(mem,i){
-      var isMe=mem.uid===currentUid;
-      return'<div class="lb-item'+(isMe?' me':'')+'">'
-        +'<div class="lb-rank">'+(medals[i]||(i+1))+'</div>'
-        +'<div style="flex:1"><div class="lb-name">'+mem.full_name+(isMe?'<span class="me-tag">คุณ</span>':'')+'</div>'
-        +'<div class="lb-sub">'+mem.department+' · '+Object.keys(mem.scores).length+'/4 ฐาน</div></div>'
-        +'<div class="lb-score">'+mem.total_score+'</div></div>';
-    }).join('')+'</div>';
-  });
-}
+/* ── Station cards ── */
 function renderStations(m){
   document.getElementById('home-stations').innerHTML=STATIONS.map(function(s){
     var done=m&&!!m.scores[s.id],pts=(settingsCache[s.id]&&settingsCache[s.id].points)||settingsCache[s.id]||10;
@@ -1437,6 +1506,7 @@ function doSaveSettings(){
 /* ── Logout ── */
 function doLogout(){
   if(!confirm('ออกจากระบบ?\nข้อมูลคะแนนของคุณจะยังถูกบันทึกไว้'))return;
+  stopSessionPolling();
   if(currentUid&&currentToken){
     apiPost({action:'logoutSession',uid:currentUid,token:currentToken},function(){});
   }
@@ -1833,25 +1903,40 @@ function addToCalendar(){
 
 function initApp(){
   apiGet('getSettings',function(res){if(res.settings)settingsCache=res.settings;});
-  var uid=loadSessionUid();
-  var token=loadSessionToken();
-  if(uid&&token){
-    apiGet('getMembers',function(res){
-      if(res.members&&res.members.find(function(m){return m.uid===uid;})){
-        currentUid=uid;currentToken=token;
-      }
-    });
-  }
-  go('preview');
-  // ซ่อน entry-panel ก่อนให้ ring เริ่ม
-  var ep=document.getElementById('entry-panel');
-  if(ep) ep.style.transform='translateY(100%)';
-  // โหลด employees + appSettings
   apiGet('getEmployees',function(res){
     var employees=(res&&res.employees)||[];
     employeeDB=employees.map(function(e){return{firstName:e.firstName,lastName:e.lastName,dept:e.dept,position:e.position||''};});
   });
   apiGet('getAppSettings',function(res){if(res&&!res.error)appSettings=res;});
+
+  var uid=loadSessionUid();
+  var token=loadSessionToken();
+
+  if(uid&&token){
+    // มี session ใน localStorage — ตรวจสอบก่อน navigate
+    apiGet('getMembers',function(res){
+      var m=(res.members||[]).find(function(x){return x.uid===uid;});
+      if(m&&m.has_session){
+        // session ยังอยู่ → restore กลับหน้า home
+        currentUid=uid;currentToken=token;
+        go('home');
+        loadHome();
+        startSessionPolling();
+      } else {
+        // session หมดหรือโดน kick → กลับ preview
+        clearSession();
+        goToPreview();
+      }
+    });
+  } else {
+    goToPreview();
+  }
+}
+
+function goToPreview(){
+  go('preview');
+  var ep=document.getElementById('entry-panel');
+  if(ep) ep.style.transform='translateY(100%)';
   startPreviewRing(3);
 }
 </script>
