@@ -1135,10 +1135,16 @@ function loadHome(){
     }
     var members=res.members||[];
     var m=currentUid?members.find(function(x){return x.uid===currentUid;}):null;
+    // restore qzDoneMap จาก sheet
+    if(m&&m.quiz_done&&m.quiz_done.length){
+      m.quiz_done.forEach(function(k){qzDoneMap[k]=true;});
+    }
     var sorted=members.slice().sort(function(a,b){return b.total_score-a.total_score;});
     var rank=m?sorted.findIndex(function(x){return x.uid===m.uid;})+1:'—';
     document.getElementById('home-name').textContent=m?m.full_name.split(' ')[0]:'—';
-    document.getElementById('home-dept').textContent=m?m.department:'—';
+    // หา position จาก employeeDB
+    var emp=employeeDB.find(function(e){return (e.firstName+' '+e.lastName)===m.full_name;});
+    document.getElementById('home-dept').textContent=emp&&emp.position?emp.position:m.department||'—';
     document.getElementById('home-rank').textContent=rank;
     document.getElementById('home-score').textContent=m?m.total_score:0;
     renderStations(m);
@@ -1772,6 +1778,10 @@ function nextQuizQ(){
 function showQzResult(){
   stopQuizTimer(); setQzUrgent(false);
   qzDoneMap[qzStation]=true;
+  // บันทึกลง sheet
+  if(currentUid){
+    apiPost({action:'saveQuizDone',uid:currentUid,station:qzStation},function(){});
+  }
   var total=Math.round((qzBaseScore+qzBonusScore)*10)/10;
   document.getElementById('quiz-active-view').style.display='none';
   document.getElementById('quiz-result-view').style.display='block';
