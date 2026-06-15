@@ -138,7 +138,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
 .tl-txt{font-size:11px;color:#1d4ed8;font-weight:600;flex:1;}
 .tl-time{font-size:10px;color:#60a5fa;font-weight:600;}
 .sec-lbl{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px;}
-.st-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:22px;}
+.st-grid{display:flex;flex-direction:column;gap:0;margin-bottom:16px;}
 .st-card{background:var(--bg);border:1.5px solid var(--border);border-radius:18px;padding:18px 12px;text-align:center;cursor:pointer;position:relative;overflow:hidden;transition:.2s;box-shadow:0 1px 4px rgba(0,30,80,.05);}
 .st-card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,30,80,.09);}
 .st-card:active{transform:scale(.97);}
@@ -487,38 +487,14 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
     <div class="rc-info">
       <div class="rc-sl">คะแนนสะสม</div>
       <div class="rc-score" id="home-score">0</div>
-      <div class="rc-sub" id="home-rank-sub">จาก — คน</div>
     </div>
     <button class="rc-refresh" id="homeRefreshBtn" onclick="loadHome()" title="รีเฟรชข้อมูล">↻</button>
   </div>
   <div id="home-last-refresh" style="text-align:right;font-size:10px;color:var(--muted);margin-top:4px;margin-bottom:8px;"></div>
-  <div class="tl-pill">
-    <div class="tl-dot"></div>
-    <div class="tl-txt">Booth Rotation กำลังดำเนินการ</div>
-    <div class="tl-time">09:45–11:30</div>
-  </div>
   <div class="sec-lbl">ฐานกิจกรรม</div>
   <div class="st-grid" id="home-stations"></div>
 
-  <!-- ── Quiz + สแกน bonus (ใหม่) ── -->
-  <div class="sec-lbl">กิจกรรมเพิ่มเติม</div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:22px;">
-    <button onclick="go('quiz')" style="background:var(--navy);border:none;border-radius:18px;padding:18px 12px;text-align:center;cursor:pointer;color:#fff;font-family:inherit;">
-      <div style="font-size:26px;margin-bottom:6px;">📋</div>
-      <div style="font-size:13px;font-weight:700;">Quiz</div>
-      <div style="font-size:9px;opacity:.6;margin-top:3px;">ทำแบบทดสอบ</div>
-    </button>
-    <button onclick="go('scan-bonus')" style="background:linear-gradient(135deg,#1e40af,#2563eb);border:none;border-radius:18px;padding:18px 12px;text-align:center;cursor:pointer;color:#fff;font-family:inherit;">
-      <div style="font-size:26px;margin-bottom:6px;">📷</div>
-      <div style="font-size:13px;font-weight:700;">สแกน Bonus</div>
-      <div style="font-size:9px;opacity:.6;margin-top:3px;">รับคะแนนพิเศษ</div>
-    </button>
-  </div>
-
-  <div class="sec-lbl">Leaderboard</div>
-  <div id="home-lb" style="margin-bottom:20px"></div>
-  <button class="btn btn-outline" style="font-size:12px;padding:10px;margin-bottom:10px" onclick="go('admin')">⚙️ Admin</button>
-  <div style="display:flex;justify-content:center;padding-top:4px">
+  <div style="display:flex;justify-content:center;padding-top:16px;margin-bottom:4px;">
     <button class="btn-danger-sm" onclick="doLogout()">↩ ออกจากระบบ</button>
   </div>
   <div style="height:20px"></div>
@@ -1165,39 +1141,18 @@ function loadHome(){
     document.getElementById('home-dept').textContent=m?m.department:'—';
     document.getElementById('home-rank').textContent=rank;
     document.getElementById('home-score').textContent=m?m.total_score:0;
-    document.getElementById('home-rank-sub').textContent='จาก '+members.length+' คน';
     renderStations(m);
-    var lbEl=document.getElementById('home-lb');
-    if(!sorted.length){lbEl.innerHTML='<div class="lb-box" style="text-align:center;color:var(--muted);padding:22px;font-size:13px">ยังไม่มีผู้ลงทะเบียน</div>';return;}
-    var medals=['🥇','🥈','🥉'];
-    lbEl.innerHTML='<div class="lb-box">'+sorted.slice(0,10).map(function(mem,i){
-      var isMe=mem.uid===currentUid;
-      return'<div class="lb-item'+(isMe?' me':'')+'">'
-        +'<div class="lb-rank">'+(medals[i]||(i+1))+'</div>'
-        +'<div style="flex:1"><div class="lb-name">'+mem.full_name+(isMe?'<span class="me-tag">คุณ</span>':'')+'</div>'
-        +'<div class="lb-sub">'+mem.department+' · '+Object.keys(mem.scores||{}).length+'/4 ฐาน</div></div>'
-        +'<div class="lb-score">'+mem.total_score+'</div></div>';
-    }).join('')+'</div>';
     if(lastEl){var d=new Date();lastEl.textContent='อัปเดตล่าสุด: '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');}
   });
 }
 function renderHomeSkeleton(){
   var s='<div class="skel" style="height:14px;width:60%;margin-bottom:6px;"></div><div class="skel" style="height:10px;width:35%;"></div>';
   var el=document.getElementById('home-name');if(el)el.innerHTML=s;
-  var lbEl=document.getElementById('home-lb');
-  if(lbEl) lbEl.innerHTML='<div class="lb-box">'+[1,2,3].map(function(){
-    return'<div class="lb-item"><div class="skel" style="width:24px;height:24px;border-radius:50%;"></div>'
-      +'<div style="flex:1;margin-left:10px;"><div class="skel" style="height:12px;width:60%;margin-bottom:5px;"></div><div class="skel" style="height:10px;width:35%;"></div></div>'
-      +'<div class="skel" style="width:28px;height:16px;"></div></div>';
-  }).join('')+'</div>';
 }
 function renderHomeError(){
-  var lbEl=document.getElementById('home-lb');
-  if(lbEl) lbEl.innerHTML='<div class="lb-box" style="text-align:center;padding:24px;">'
-    +'<div style="font-size:22px;margin-bottom:8px;">⚠️</div>'
-    +'<div style="font-size:13px;color:var(--muted);margin-bottom:14px;">โหลดข้อมูลไม่สำเร็จ</div>'
-    +'<button onclick="loadHome()" style="padding:10px 20px;background:var(--navy);border:none;border-radius:10px;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">ลองใหม่</button>'
-    +'</div>';
+  // แสดง error ผ่านปุ่ม retry บน rank card
+  var el=document.getElementById('home-score');
+  if(el) el.textContent='—';
 }
 function doAdminLogin(){
   var passEl=document.getElementById('al-pass');
@@ -1228,14 +1183,29 @@ function doResetPass(){
 /* ── Station cards ── */
 function renderStations(m){
   document.getElementById('home-stations').innerHTML=STATIONS.map(function(s){
-    var done=m&&!!m.scores[s.id],pts=(settingsCache[s.id]&&settingsCache[s.id].points)||settingsCache[s.id]||10;
-    return'<div class="st-card '+(done?'done':'pending')+'" style="'+(done?'border-color:'+s.accent+'44;':'')+'\" onclick="onStationClick(\''+s.id+'\')">'
-      +(done?'<div class="st-stamp">✓</div>':'')
-      +'<span class="st-ico">'+s.icon+'</span>'
-      +'<div class="st-id'+(done?' dc':'')+'" style="'+(done?'color:'+s.accent:'')+'">'+s.id+'</div>'
-      +'<div class="st-lbl2">'+s.label+'</div>'
-      +'<div class="st-act">'+s.activity+'</div>'
-      +(done?'<div class="st-pts-done" style="color:'+s.accent+';background:'+s.accent+'18">+'+m.scores[s.id]+' pts</div>':'<div class="st-pts">+'+pts+' pts</div>')
+    var done=m&&!!m.scores[s.id];
+    var pts=(settingsCache[s.id]&&settingsCache[s.id].points)||settingsCache[s.id]||10;
+    var qzDone=qzDoneMap&&qzDoneMap[s.id];
+    return'<div class="st-card '+(done?'done':'pending')+'" style="'+(done?'border-color:'+s.accent+'44;':'')+'text-align:left;padding:14px 16px;margin-bottom:10px;border-radius:14px;cursor:default;" >'
+      // header row
+      +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">'
+        +(done?'<div style="position:relative;"><span class="st-ico" style="opacity:1;filter:none;">'+s.icon+'</span><div class="st-stamp" style="top:-4px;right:-6px;">✓</div></div>':'<span class="st-ico">'+s.icon+'</span>')
+        +'<div style="flex:1;">'
+          +'<div class="st-id'+(done?' dc':'')+'" style="'+(done?'color:'+s.accent+';':'')+'">' +s.id+'</div>'
+          +'<div class="st-lbl2">'+s.label+'</div>'
+        +'</div>'
+        +(done
+          ?'<div class="st-pts-done" style="color:'+s.accent+';background:'+s.accent+'18">+'+m.scores[s.id]+' pts</div>'
+          :'<div class="st-pts">+'+pts+' pts</div>'
+        )
+      +'</div>'
+      // action buttons
+      +'<div style="display:flex;gap:8px;">'
+        +'<button onclick="go(\'quiz\')" style="flex:1;padding:9px 6px;background:'+(qzDone?'#f0fdf4':'var(--navy)')+';color:'+(qzDone?'#16a34a':'#fff')+';border:'+(qzDone?'1.5px solid #86efac':'none')+';border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">'
+          +(qzDone?'✓ Quiz เสร็จ':'📋 Quiz')
+        +'</button>'
+        +'<button onclick="go(\'scan-bonus\')" style="flex:1;padding:9px 6px;background:linear-gradient(135deg,#1e40af,#2563eb);color:#fff;border:none;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">📷 สแกน Bonus</button>'
+      +'</div>'
       +'</div>';
   }).join('');
 }
