@@ -613,9 +613,24 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
     <div id="station-stats"><div style="text-align:center;color:var(--muted);padding:22px;font-size:13px;">กำลังโหลด...</div></div>
     <div class="sec-lbl" style="margin-top:16px;">QR Bonus ประจำฐาน</div>
     <div style="font-size:12px;color:var(--muted);background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:10px 14px;margin-bottom:12px;line-height:1.6;">
-      เปิดหน้านี้ไว้ที่เครื่องเจ้าหน้าที่ · ผู้เข้าร่วมสแกนจากแท็บ "สแกน Bonus" ในแอปของตัวเอง · รับได้ <strong>1 ครั้ง/ฐาน</strong>
+      แตะฐานเพื่อแสดง QR · ผู้เข้าร่วมสแกนจากแอปของตัวเอง · รับได้ <strong>1 ครั้ง/ฐาน</strong>
     </div>
-    <div class="qr-grid" id="adminQrGrid"><div style="text-align:center;color:var(--muted);padding:20px;font-size:13px;grid-column:span 2">กำลังโหลด...</div></div>
+    <div class="grid2" id="adminQrGrid">
+      <div style="text-align:center;color:var(--muted);padding:20px;font-size:13px;grid-column:span 2">กำลังโหลด...</div>
+    </div>
+
+    <!-- QR popup overlay -->
+    <div id="qr-popup-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);z-index:500;align-items:flex-end;justify-content:center;">
+      <div style="background:#fff;border-radius:22px 22px 0 0;padding:20px 22px 48px;width:100%;max-width:420px;text-align:center;">
+        <div style="width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 18px;"></div>
+        <div id="qr-popup-icon" style="font-size:32px;margin-bottom:4px;"></div>
+        <div id="qr-popup-title" style="font-size:18px;font-weight:700;color:var(--navy);margin-bottom:2px;"></div>
+        <div id="qr-popup-sub" style="font-size:12px;color:var(--muted);margin-bottom:16px;"></div>
+        <div id="qr-popup-box" style="width:180px;height:180px;margin:0 auto 10px;"></div>
+        <div id="qr-popup-label" style="font-size:10px;color:var(--muted);font-family:monospace;margin-bottom:20px;"></div>
+        <button onclick="closeQRPopup()" style="width:100%;padding:13px;background:var(--bg2);border:1.5px solid var(--border);border-radius:12px;font-size:14px;font-weight:600;color:var(--sub);cursor:pointer;font-family:inherit;">← ปิด</button>
+      </div>
+    </div>
   </div>
 
   <!-- ── SETTINGS ── -->
@@ -1385,7 +1400,7 @@ function switchAdminTab(t){
     if(tab) tab.classList.toggle('active',n===t);
   });
   if(t==='overview'||t==='members') loadAdmin();
-  if(t==='stations'){loadAdmin();loadStationStats();}
+  if(t==='stations'){loadAdmin();loadStationStats();if(!adminQrBuilt)buildAdminQR();}
 }
 function switchTab(t){switchAdminTab(t);}
 
@@ -1459,30 +1474,43 @@ function loadStationStats(){
 buildAdminQR=function(){
   apiGet('getSettings',function(res){
     var s=res.settings||{};
-    var ORDER=['EE','ME','TO','PM'];
+    var ORDER=['TO','ME','EE','PM'];
     var html='';
     ORDER.forEach(function(k){
       var info=STATION_MAP[k];
       var bonus=(s[k]&&s[k].bonus!=null?s[k].bonus:0);
-      html+='<div class="qr-card">'
-        +'<div class="qr-card-ic">'+info.icon+'</div>'
-        +'<div class="qr-card-nm">ฐาน '+k+'</div>'
-        +'<div class="qr-card-dp">'+info.name+'</div>'
-        +'<div class="qr-card-tag">+'+bonus+' bonus</div>'
-        +'<div class="qr-box" id="adqr-'+k+'"></div>'
-        +'<div class="qr-code-lbl">EOH-BONUS-'+k+'</div>'
-        +'</div>';
+      html+='<button onclick="showAdminQR(\''+k+'\')" style="background:var(--bg2);border:1.5px solid var(--border);border-radius:14px;padding:16px 10px;text-align:center;cursor:pointer;font-family:inherit;transition:.15s;" onmouseover="this.style.borderColor=\'var(--navy)\'" onmouseout="this.style.borderColor=\'var(--border)\'">'
+        +'<div style="font-size:26px;margin-bottom:6px;">'+info.icon+'</div>'
+        +'<div style="font-size:13px;font-weight:700;color:var(--navy);">'+k+'</div>'
+        +'<div style="font-size:10px;color:var(--muted);margin-top:1px;">'+info.name+'</div>'
+        +'<div style="font-size:10px;font-weight:700;color:var(--accent);background:var(--blue-light);border:1px solid #bfdbfe;border-radius:20px;padding:2px 8px;display:inline-block;margin-top:6px;">+'+bonus+' bonus</div>'
+        +'</button>';
     });
     document.getElementById('adminQrGrid').innerHTML=html;
-    ORDER.forEach(function(k){
-      new QRCode(document.getElementById('adqr-'+k),{
-        text:'EOH-BONUS-'+k,width:110,height:110,
-        colorDark:'#0f2248',colorLight:'#ffffff',
-        correctLevel:QRCode.CorrectLevel.H
-      });
-    });
     adminQrBuilt=true;
   });
+}
+
+var qrPopupInstance=null;
+function showAdminQR(k){
+  var info=STATION_MAP[k];
+  document.getElementById('qr-popup-icon').textContent=info.icon;
+  document.getElementById('qr-popup-title').textContent='ฐาน '+k+' — '+info.name;
+  document.getElementById('qr-popup-sub').textContent='ให้ผู้เข้าร่วมสแกน QR นี้เพื่อรับ bonus';
+  document.getElementById('qr-popup-label').textContent='ENS-BONUS-'+k;
+  var box=document.getElementById('qr-popup-box');
+  box.innerHTML='';
+  qrPopupInstance=new QRCode(box,{
+    text:'ENS-BONUS-'+k,width:180,height:180,
+    colorDark:'#0f2248',colorLight:'#ffffff',
+    correctLevel:QRCode.CorrectLevel.H
+  });
+  document.getElementById('qr-popup-overlay').style.display='flex';
+}
+function closeQRPopup(){
+  document.getElementById('qr-popup-overlay').style.display='none';
+  document.getElementById('qr-popup-box').innerHTML='';
+  qrPopupInstance=null;
 }
 function doSaveSettings(){
   var s={};
@@ -1837,7 +1865,7 @@ function stopBonusScanner(){
 function onBonusScan(text){
   var now=Date.now();
   if(bonusBusy||(now-lastBonusScanAt)<2500)return;
-  var m=String(text).trim().toUpperCase().match(/^EOH-BONUS-(EE|ME|TO|PM)$/);
+  var m=String(text).trim().toUpperCase().match(/^ENS-BONUS-(EE|ME|TO|PM)$/);
   if(!m){
     showBonusScanResult(false,'QR ไม่ถูกต้อง','ไม่ใช่ QR โบนัสประจำฐาน');
     lastBonusScanAt=now;return;
