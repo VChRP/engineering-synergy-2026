@@ -2,281 +2,1857 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Demo — Session & Kick</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Engineering Synergy 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
+:root{
+  --navy:#0f2248;--navy2:#1a3560;--navy3:#253f6e;
+  --accent:#2563eb;--blue-light:#eff6ff;
+  --green:#16a34a;--red:#dc2626;
+  --bg:#ffffff;--bg2:#f8f9fb;--bg3:#f1f4f9;
+  --text:#0f2248;--sub:#64748b;--muted:#94a3b8;
+  --border:#e2e6ed;--border2:#d1d9e6;
+}
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'IBM Plex Sans Thai',-apple-system,sans-serif;background:#f1f4f9;display:flex;justify-content:center;gap:16px;padding:24px 16px;flex-wrap:wrap;}
-.phone{background:#fff;border-radius:24px;border:1px solid #e2e6ed;width:100%;max-width:320px;min-height:480px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 4px 20px rgba(0,30,80,.07);position:relative;}
-.phone-label{font-size:11px;font-weight:600;color:#64748b;text-align:center;margin-bottom:8px;letter-spacing:.5px;text-transform:uppercase;}
-.head{padding:16px 18px 12px;border-bottom:1px solid #e2e6ed;}
-.body{padding:16px 18px;flex:1;}
+html,body{height:100%;}
+body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;}
+.wrap{max-width:420px;margin:0 auto;padding:0 24px 100px;position:relative;}
+.page{display:none;}.page.active{display:block;}
 
-/* pages */
-.pg{display:none;} .pg.active{display:block;}
+/* ── Loading ── */
+#loading{position:fixed;inset:0;background:rgba(255,255,255,.94);z-index:900;display:none;align-items:center;justify-content:center;flex-direction:column;gap:10px;backdrop-filter:blur(6px);}
+#loading.show{display:flex;}
+.spin{width:28px;height:28px;border:2.5px solid var(--border2);border-top-color:var(--navy);border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-/* preview */
-.prev-title{font-size:38px;font-weight:700;color:#0f2248;letter-spacing:-1.5px;line-height:1.05;text-align:center;padding:32px 0 8px;}
-.prev-sub{font-size:12px;color:#94a3b8;text-align:center;margin-bottom:32px;}
+/* ── Splash ── */
+#pg-splash{position:fixed;inset:0;z-index:800;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;transition:opacity .6s ease;}
+#pg-splash.hide{opacity:0;pointer-events:none;}
+.splash-logo{width:140px;height:80px;display:flex;align-items:center;justify-content:center;margin-bottom:32px;animation:logoIn .8s cubic-bezier(.34,1.3,.64,1) both;}
+.splash-logo img{width:100%;height:100%;object-fit:contain;mix-blend-mode:multiply;}
+.splash-title{font-size:13px;font-weight:600;color:var(--sub);letter-spacing:2px;text-transform:uppercase;animation:fadeUp .6s .3s both;}
+.splash-sub{font-size:22px;font-weight:700;color:var(--navy);letter-spacing:-.4px;margin-top:6px;animation:fadeUp .6s .45s both;}
+.splash-bar{width:48px;height:2px;background:var(--border);border-radius:2px;margin-top:32px;overflow:hidden;animation:fadeUp .4s .6s both;}
+.splash-fill{height:100%;background:var(--navy);border-radius:2px;animation:fill 1.6s .4s ease forwards;}
+@keyframes logoIn{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes fadeUp{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes fill{from{width:0}to{width:100%}}
 
-/* home */
-.rank-card{background:#0f2248;border-radius:14px;padding:16px;margin-bottom:12px;display:flex;align-items:center;gap:12px;}
-.rank-ring{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.2);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;}
-.rank-ring span{font-size:8px;color:rgba(255,255,255,.5);}
-.rank-ring strong{font-size:18px;font-weight:700;color:#fff;line-height:1;}
+/* ── Divider ── */
+.divider{height:1px;background:var(--border);margin:20px 0;}
 
-/* skeleton */
-.skel{background:linear-gradient(90deg,#f1f4f9 25%,#e8ecf1 50%,#f1f4f9 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:6px;}
-@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+/* ── Buttons ── */
+.btn{width:100%;padding:14px;border:none;border-radius:14px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;transition:.18s;text-align:center;display:block;letter-spacing:-.1px;}
+.btn+.btn{margin-top:10px;}
+.btn-navy{background:var(--navy);color:#fff;}
+.btn-navy:active{background:var(--navy2);}
+.btn-navy:disabled{background:var(--navy) !important;color:#fff !important;-webkit-text-fill-color:#fff;}
+.btn-outline{background:transparent;border:1.5px solid var(--border2);color:var(--sub);font-size:14px;}
+.btn-outline:active{border-color:var(--navy);color:var(--navy);}
+.btn-ghost-sm{background:none;border:none;color:var(--accent);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;padding:0;}
+.btn-danger-sm{padding:9px 20px;background:var(--bg);border:1.5px solid #fecaca;border-radius:10px;color:var(--red);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;}
 
-/* kick popup */
-.kick-overlay{position:absolute;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(3px);display:none;align-items:flex-end;justify-content:center;z-index:50;border-radius:24px;}
-.kick-sheet{background:#fff;border-radius:20px 20px 0 0;padding:24px 20px 36px;width:100%;}
+/* ── Input ── */
+.lbl{font-size:12px;font-weight:600;color:var(--sub);margin-bottom:6px;display:block;letter-spacing:.2px;}
+.input-box{background:var(--bg);border:1.5px solid var(--border2);border-radius:14px;overflow:hidden;transition:.18s;}
+.input-box:focus-within{border-color:var(--navy);box-shadow:0 0 0 3px rgba(37,99,235,.08);}
+.fi{width:100%;padding:14px 16px;background:transparent;border:none;outline:none;font-size:15px;color:var(--text);font-family:inherit;}
+.fi::placeholder{color:var(--muted);}
 
-/* toast */
-.toast{position:absolute;top:16px;left:16px;right:16px;background:#0f2248;color:#fff;padding:10px 14px;border-radius:10px;font-size:12px;font-weight:600;display:none;align-items:center;gap:8px;z-index:60;}
+/* ── Suggest ── */
+.sug-wrap{position:relative;margin-bottom:8px;}
+.sug-list{position:absolute;top:calc(100% + 6px);left:0;right:0;background:#fff;border:1.5px solid var(--border2);border-radius:14px;overflow:hidden;z-index:200;box-shadow:0 8px 28px rgba(0,30,80,.1);}
+.sug-item{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--bg3);cursor:pointer;transition:.1s;}
+.sug-item:last-child{border-bottom:none;}
+.sug-item:hover,.sug-item.sel{background:var(--blue-light);}
+.sug-name{font-size:14px;font-weight:500;color:var(--text);}
+.sug-dept{font-size:10px;font-weight:700;color:var(--accent);background:var(--blue-light);padding:2px 9px;border-radius:20px;border:1px solid #bfdbfe;}
 
-/* poll indicator */
-.poll-bar{height:2px;background:#e2e6ed;border-radius:1px;overflow:hidden;margin-top:8px;}
-.poll-fill{height:100%;background:#2563eb;border-radius:1px;transition:width 1s linear;}
+/* ── Alert ── */
+.err{background:#fef2f2;border:1.5px solid #fecaca;border-radius:12px;padding:10px 14px;color:var(--red);font-size:13px;margin-bottom:14px;display:none;}
+.ok-box{background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:12px;padding:10px 14px;color:var(--green);font-size:13px;margin-bottom:14px;display:none;}
 
-.btn{width:100%;padding:12px;border:none;border-radius:11px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:8px;}
-.btn-navy{background:#0f2248;color:#fff;}
-.btn-out{background:#f8f9fb;border:1.5px solid #e2e6ed;color:#64748b;}
-.btn-red{background:#fef2f2;border:1.5px solid #fecaca;color:#dc2626;}
+/* ── Dept pill ── */
+.dept-pill{display:flex;align-items:center;gap:8px;padding:10px 14px;background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:12px;margin-bottom:16px;}
+.dp-dot{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0;}
+.dp-txt{font-size:12px;color:#166534;}
+.dp-val{font-size:13px;font-weight:700;color:#15803d;margin-left:auto;}
+
+/* ── Preview ── */
+.hero-banner{background:var(--navy);border-radius:22px;padding:36px 24px;margin:16px 0 20px;text-align:center;}
+.hero-eyebrow{font-size:11px;font-weight:500;color:rgba(255,255,255,.45);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px;}
+.hero-title{font-size:32px;font-weight:700;color:#fff;letter-spacing:-.8px;line-height:1.1;margin-bottom:4px;}
+.hero-title em{font-style:normal;color:#60a5fa;}
+.hero-chips{display:flex;justify-content:center;gap:6px;margin-top:16px;}
+.hc{font-size:9px;font-weight:600;padding:4px 10px;border-radius:20px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.75);border:1px solid rgba(255,255,255,.15);letter-spacing:.3px;}
+.ev-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:24px;}
+.ev-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px 10px;text-align:center;}
+.ev-ico{font-size:20px;margin-bottom:5px;}
+.ev-lbl{font-size:8px;font-weight:600;color:var(--muted);letter-spacing:.6px;text-transform:uppercase;margin-bottom:3px;}
+.ev-val{font-size:12px;font-weight:700;color:var(--text);}
+.cd-wrap{text-align:center;margin-bottom:22px;}
+.cd-ring{width:52px;height:52px;margin:0 auto 8px;position:relative;}
+.cd-ring svg{transform:rotate(-90deg);}
+.cd-ring circle{fill:none;stroke:var(--border);stroke-width:3;}
+.cd-prog{stroke:var(--navy);stroke-linecap:round;stroke-dasharray:113;stroke-dashoffset:113;transition:stroke-dashoffset .9s linear;}
+.cd-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:var(--navy);}
+.cd-lbl{font-size:11px;color:var(--muted);}
+.btn-preview{width:100%;padding:14px;background:var(--navy);border:none;border-radius:14px;color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;opacity:0;transition:opacity .5s;pointer-events:none;}
+.btn-preview.show{opacity:1;pointer-events:auto;}
+
+/* ── Page header ── */
+.pg-header{padding:24px 0 20px;display:flex;align-items:center;gap:12px;}
+.back-ico{width:36px;height:36px;border-radius:12px;background:var(--bg2);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--navy);cursor:pointer;flex-shrink:0;}
+.pg-titles .ptitle{font-size:17px;font-weight:700;color:var(--navy);letter-spacing:-.3px;}
+.pg-titles .psub{font-size:12px;color:var(--muted);margin-top:1px;}
+
+/* Step */
+.step-row{display:flex;align-items:center;gap:6px;margin-bottom:24px;}
+.step{width:24px;height:24px;border-radius:50%;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.step.done{background:var(--navy);color:#fff;}
+.step.active{background:var(--accent);color:#fff;}
+.step-lbl{font-size:11px;color:var(--muted);}
+.step-lbl.active{color:var(--navy);font-weight:600;}
+.step-line{flex:1;height:1px;background:var(--border);}
+
+/* ── Home ── */
+.home-top{padding:28px 0 16px;}
+.home-greet{font-size:13px;color:var(--muted);margin-bottom:3px;}
+.home-name{font-size:26px;font-weight:700;color:var(--navy);letter-spacing:-.5px;}
+.home-dept{display:inline-block;font-size:11px;font-weight:600;color:var(--accent);background:var(--blue-light);border:1px solid #bfdbfe;padding:4px 10px;border-radius:20px;margin-top:5px;}
+.rank-card{background:var(--navy);border-radius:20px;padding:20px 22px;margin-bottom:14px;display:flex;align-items:center;gap:16px;}
+.rc-ring{width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.2);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;}
+.rc-lbl{font-size:8px;color:rgba(255,255,255,.5);font-weight:600;letter-spacing:.5px;}
+.rc-num{font-size:22px;font-weight:700;color:#fff;line-height:1.1;}
+.rc-info{flex:1;}
+.rc-sl{font-size:11px;color:rgba(255,255,255,.45);margin-bottom:3px;}
+.rc-score{font-size:32px;font-weight:700;color:#fff;line-height:1;}
+.rc-sub{font-size:11px;color:rgba(255,255,255,.35);margin-top:2px;}
+.rc-refresh{font-size:18px;color:rgba(255,255,255,.25);background:none;border:none;cursor:pointer;padding:4px;}
+.tl-pill{display:flex;align-items:center;gap:8px;background:var(--blue-light);border:1px solid #bfdbfe;border-radius:12px;padding:10px 14px;margin-bottom:18px;}
+.tl-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;animation:pulse 1.5s ease infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.tl-txt{font-size:11px;color:#1d4ed8;font-weight:600;flex:1;}
+.tl-time{font-size:10px;color:#60a5fa;font-weight:600;}
+.sec-lbl{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px;}
+.st-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:22px;}
+.st-card{background:var(--bg);border:1.5px solid var(--border);border-radius:18px;padding:18px 12px;text-align:center;cursor:pointer;position:relative;overflow:hidden;transition:.2s;box-shadow:0 1px 4px rgba(0,30,80,.05);}
+.st-card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,30,80,.09);}
+.st-card:active{transform:scale(.97);}
+.st-card.done{border-color:#bfdbfe;background:#f5f9ff;}
+.st-card.pending .st-ico{opacity:.3;filter:grayscale(1);}
+.st-stamp{position:absolute;top:8px;right:9px;width:18px;height:18px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:700;}
+.st-ico{font-size:28px;margin-bottom:8px;display:block;}
+.st-id{font-size:14px;font-weight:700;color:var(--navy);}
+.st-id.dc{color:var(--accent);}
+.st-lbl2{font-size:9px;color:var(--muted);margin-top:1px;}
+.st-act{font-size:9px;color:var(--sub);margin-top:4px;line-height:1.4;}
+.st-pts{font-size:11px;color:var(--border2);margin-top:5px;}
+.st-pts-done{font-size:11px;font-weight:600;border-radius:6px;padding:2px 8px;margin-top:5px;display:inline-block;}
+.lb-box{background:var(--bg);border:1.5px solid var(--border);border-radius:18px;overflow:hidden;margin-bottom:18px;}
+.lb-item{display:flex;align-items:center;gap:11px;padding:12px 16px;border-bottom:1px solid var(--bg2);}
+.lb-item:last-child{border-bottom:none;}
+.lb-item.me{background:var(--blue-light);}
+.lb-rank{width:22px;text-align:center;font-size:13px;flex-shrink:0;}
+.lb-name{font-size:13px;font-weight:600;color:var(--navy);flex:1;}
+.lb-sub{font-size:10px;color:var(--muted);}
+.lb-score{font-size:14px;font-weight:700;color:var(--navy);}
+.me-tag{font-size:9px;background:var(--blue-light);color:var(--accent);border-radius:4px;padding:1px 6px;margin-left:4px;font-weight:700;}
+
+/* ── Popup ── */
+.popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);animation:fadeIn .2s;}
+.popup-sheet{background:var(--bg);border-radius:24px 24px 0 0;padding:24px 24px 48px;width:100%;max-width:420px;animation:slideUp .3s cubic-bezier(.34,1.3,.64,1);}
+.popup-drag{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px;}
+.ptags{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:20px;}
+.ptag{border-radius:20px;padding:4px 11px;font-size:11px;font-weight:600;}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+
+/* ── Station (admin) ── */
+.st-banner{border-radius:18px;padding:22px 20px;text-align:center;margin-bottom:18px;}
+.field-single{background:var(--bg);border:1.5px solid var(--border2);border-radius:14px;overflow:hidden;margin-bottom:12px;transition:.18s;}
+.field-single:focus-within{border-color:var(--navy);}
+.field-single input{width:100%;padding:14px 16px;background:transparent;border:none;outline:none;font-size:15px;color:var(--text);font-family:inherit;}
+.log-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--bg2);font-size:13px;}
+.log-row:last-child{border-bottom:none;}
+
+/* ── Admin ── */
+.tabs{display:flex;gap:8px;margin-bottom:16px;}
+.tab{flex:1;padding:11px;border-radius:12px;border:1.5px solid var(--border);cursor:pointer;font-weight:600;font-size:13px;background:transparent;color:var(--muted);font-family:inherit;transition:.18s;}
+.tab.active{background:var(--navy);color:#fff;border-color:transparent;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.stat-box{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:18px;text-align:center;}
+.member-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--bg2);}
+.member-row:last-child{border-bottom:none;}
+.av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
+.chip{display:inline-block;font-size:10px;padding:2px 6px;border-radius:5px;font-weight:600;margin-right:3px;}
+.pts-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.pts-row input[type=number]{width:68px;text-align:center;padding:9px;background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-family:inherit;font-size:14px;outline:none;}
+
+/* ── Coming Soon ── */
+.coming-wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 0;}
+.cd-box{background:var(--bg2);border:1.5px solid var(--border);border-radius:20px;padding:24px 28px;width:100%;max-width:320px;margin:0 auto 24px;}
+.cd-row{display:flex;justify-content:center;align-items:flex-end;gap:4px;}
+.cd-unit{text-align:center;min-width:52px;}
+.cd-unit-num{font-size:32px;font-weight:700;color:var(--navy);line-height:1;font-variant-numeric:tabular-nums;}
+@keyframes elSpin{to{transform:rotate(360deg)}}
+.cd-unit-num.accent{color:var(--accent);}
+.cd-unit-lbl{font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-top:4px;}
+.cd-sep{font-size:26px;font-weight:300;color:var(--border2);padding-bottom:8px;}
+
+/* ══════════════════════════════════════
+   ── QUIZ (ใหม่) ──
+══════════════════════════════════════ */
+.q-badge{display:flex;align-items:center;gap:10px;border-radius:14px;padding:14px 18px;margin-bottom:20px;}
+.q-badge-icon{font-size:26px;}
+.q-badge-name{color:#fff;font-size:15px;font-weight:700;}
+.q-badge-sub{color:rgba(255,255,255,.5);font-size:11px;margin-top:1px;}
+.q-progress-row{display:flex;justify-content:space-between;margin-bottom:6px;}
+.q-progress-bar{height:4px;background:var(--border);border-radius:2px;margin-bottom:18px;}
+.q-progress-fill{height:100%;background:var(--accent);border-radius:2px;transition:.3s;}
+.q-timer-wrap{text-align:center;margin-bottom:18px;}
+.q-timer-ring{display:inline-block;position:relative;width:60px;height:60px;}
+.q-timer-ring svg{transform:rotate(-90deg);}
+.q-timer-ring circle{fill:none;stroke:var(--border);stroke-width:4;}
+.q-timer-prog{stroke:var(--accent);stroke-linecap:round;stroke-dasharray:163;transition:stroke-dashoffset .1s linear,stroke .3s;}
+.q-timer-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:var(--navy);}
+.q-bonus-badge{display:inline-block;margin-top:5px;font-size:11px;font-weight:600;color:var(--accent);background:var(--blue-light);border:1px solid #bfdbfe;border-radius:20px;padding:3px 10px;}
+.q-card{background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:14px;}
+.q-num{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:7px;}
+.q-text{font-size:15px;font-weight:500;line-height:1.65;}
+.q-choices{display:flex;flex-direction:column;gap:8px;margin-bottom:18px;}
+.q-choice{background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:12px 15px;font-size:14px;color:var(--text);cursor:pointer;text-align:left;font-family:inherit;transition:.15s;display:flex;align-items:center;gap:10px;}
+.q-choice:hover{border-color:var(--accent);background:#f5f8ff;}
+.q-choice.sel{border-color:var(--accent);background:var(--blue-light);color:var(--accent);}
+.q-choice.correct{border-color:var(--green);background:#f0fdf4;color:var(--green);}
+.q-choice.wrong{border-color:var(--red);background:#fef2f2;color:var(--red);}
+.q-choice.disabled{cursor:default;pointer-events:none;}
+.q-letter{width:24px;height:24px;border-radius:50%;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+.q-choice.sel .q-letter{background:var(--accent);color:#fff;}
+.q-choice.correct .q-letter{background:var(--green);color:#fff;}
+.q-choice.wrong .q-letter{background:var(--red);color:#fff;}
+.q-result-row{background:var(--bg);border:1.5px solid var(--border);border-radius:13px;padding:13px 15px;margin-bottom:14px;display:flex;align-items:center;gap:12px;}
+.q-result-ic{font-size:22px;}
+.q-result-txt{font-size:13px;font-weight:500;}
+.q-result-bonus{font-size:12px;color:var(--accent);margin-top:2px;}
+.q-final{background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:26px 22px;text-align:center;}
+.q-final-score{font-size:48px;font-weight:800;color:var(--navy);line-height:1;}
+.q-score-row{display:flex;justify-content:center;gap:22px;margin:18px 0;padding:16px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.q-score-item{text-align:center;}
+.q-score-val{font-size:20px;font-weight:700;color:var(--navy);}
+.q-score-lbl{font-size:10px;color:var(--muted);margin-top:2px;}
+
+/* ── Admin QR grid ── */
+.qr-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+.qr-card{background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:16px 12px;text-align:center;}
+.qr-card-ic{font-size:22px;margin-bottom:4px;}
+.qr-card-nm{font-size:13px;font-weight:700;color:var(--navy);}
+.qr-card-dp{font-size:9px;color:var(--muted);}
+.qr-card-tag{display:inline-block;font-size:10px;font-weight:700;color:var(--accent);background:var(--blue-light);border:1px solid #bfdbfe;border-radius:20px;padding:2px 10px;margin:6px 0 10px;}
+.qr-box{display:flex;justify-content:center;margin-bottom:6px;}
+.qr-code-lbl{font-size:9px;color:var(--muted);font-family:monospace;}
+
+/* ── Scan bonus (user) ── */
+.me-bar{display:flex;align-items:center;gap:10px;background:var(--blue-light);border:1px solid #bfdbfe;border-radius:12px;padding:11px 14px;margin-bottom:16px;}
+.me-av{width:34px;height:34px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;}
+.me-nm{flex:1;}
+.me-nm .n{font-size:14px;font-weight:700;color:var(--navy);}
+.me-nm .s{font-size:11px;color:var(--muted);}
+.me-tot .v{font-size:18px;font-weight:800;color:var(--accent);line-height:1;text-align:right;}
+.me-tot .l{font-size:10px;color:var(--muted);text-align:right;}
+#scan-reader{border-radius:14px;overflow:hidden;border:1px solid var(--border);}
+.scan-hint{text-align:center;font-size:12px;color:var(--muted);margin:10px 0;}
+.scan-result{border-radius:13px;padding:15px;margin-bottom:14px;text-align:center;}
+.scan-result.ok{background:#f0fdf4;border:1px solid #bbf7d0;}
+.scan-result.bad{background:#fef2f2;border:1px solid #fecaca;}
+.scan-result .sic{font-size:30px;}
+.scan-result .stitle{font-size:14px;font-weight:700;margin-top:5px;}
+.scan-result.ok .stitle{color:var(--green);}
+.scan-result.bad .stitle{color:var(--red);}
+.scan-result .sdesc{font-size:12px;color:var(--muted);margin-top:3px;}
 </style>
 </head>
 <body>
 
-<!-- USER PHONE -->
-<div>
-  <div class="phone-label">📱 หน้าจอ User</div>
-  <div class="phone" id="userPhone">
+<!-- LOADING -->
+<div id="loading"><div class="spin"></div></div>
 
-    <div class="toast" id="toast">
-      <span style="font-size:16px;">⚠️</span>
-      <span id="toastTxt"></span>
-    </div>
-
-    <!-- preview page -->
-    <div class="pg active" id="pg-preview">
-      <div class="body" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;">
-        <div class="prev-title">Engineering<br><span style="color:#2563eb;">Synergy</span></div>
-        <div class="prev-sub">The Core of Future Industry · 2026</div>
-        <button class="btn btn-navy" onclick="userLogin()" style="max-width:240px;">เข้าร่วมกิจกรรม →</button>
-      </div>
-    </div>
-
-    <!-- home page -->
-    <div class="pg" id="pg-home">
-      <div class="head" style="display:flex;justify-content:space-between;align-items:center;">
-        <div style="font-size:15px;font-weight:700;color:#0f2248;">สวัสดี 👋 วิสูตร</div>
-        <button onclick="userLogin()" style="font-size:11px;color:#64748b;background:none;border:none;cursor:pointer;font-family:inherit;">ออกจากระบบ</button>
-      </div>
-      <div class="body">
-        <!-- rank card -->
-        <div class="rank-card">
-          <div class="rank-ring"><span>RANK</span><strong id="userRank">3</strong></div>
-          <div style="flex:1;">
-            <div style="font-size:10px;color:rgba(255,255,255,.45);margin-bottom:2px;">คะแนนสะสม</div>
-            <div id="userScore" style="font-size:26px;font-weight:700;color:#fff;line-height:1;">18</div>
-          </div>
-          <button onclick="refreshData()" id="refreshBtn" style="background:rgba(255,255,255,.1);border:0.5px solid rgba(255,255,255,.2);border-radius:8px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;" aria-label="รีเฟรช">
-            <svg id="refreshIco" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.7)" stroke-width="2" stroke-linecap="round"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
-          </button>
-        </div>
-
-        <!-- poll status -->
-        <div style="background:#f8f9fb;border:1px solid #e2e6ed;border-radius:10px;padding:10px 12px;margin-bottom:12px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-            <div style="font-size:11px;color:#64748b;font-weight:600;">ตรวจสอบ session ทุก 30 วิ</div>
-            <div id="pollCountdown" style="font-size:11px;font-weight:700;color:#2563eb;">30 วิ</div>
-          </div>
-          <div class="poll-bar"><div class="poll-fill" id="pollFill" style="width:100%;"></div></div>
-        </div>
-
-        <!-- leaderboard skeleton / data -->
-        <div id="lb" style="background:#fff;border:1px solid #e2e6ed;border-radius:12px;overflow:hidden;">
-          <div style="padding:10px 14px;border-bottom:1px solid #f1f4f9;display:flex;align-items:center;gap:10px;">
-            <span style="font-size:14px;">🥇</span>
-            <div style="flex:1;"><div style="font-size:13px;font-weight:600;color:#0f2248;">สมชาย ใจดี</div><div style="font-size:10px;color:#94a3b8;">ME</div></div>
-            <div style="font-size:14px;font-weight:700;color:#0f2248;" id="s1">28</div>
-          </div>
-          <div style="padding:10px 14px;border-bottom:1px solid #f1f4f9;display:flex;align-items:center;gap:10px;">
-            <span style="font-size:14px;">🥈</span>
-            <div style="flex:1;"><div style="font-size:13px;font-weight:600;color:#0f2248;">สมศรี มีสุข</div><div style="font-size:10px;color:#94a3b8;">EE</div></div>
-            <div style="font-size:14px;font-weight:700;color:#0f2248;" id="s2">22</div>
-          </div>
-          <div style="padding:10px 14px;background:#eff6ff;display:flex;align-items:center;gap:10px;">
-            <span style="font-size:14px;">🥉</span>
-            <div style="flex:1;"><div style="font-size:13px;font-weight:600;color:#0f2248;">วิสูตร ฉัตรสุกาญจน์ <span style="font-size:9px;background:#bfdbfe;color:#1d4ed8;border-radius:4px;padding:1px 6px;margin-left:3px;">คุณ</span></div><div style="font-size:10px;color:#94a3b8;">PM</div></div>
-            <div style="font-size:14px;font-weight:700;color:#0f2248;" id="s3">18</div>
-          </div>
-        </div>
-
-        <div style="margin-top:10px;text-align:center;font-size:11px;color:#94a3b8;" id="lastRefresh">อัปเดตล่าสุด: --:--</div>
-      </div>
-    </div>
-
-    <!-- kicked overlay -->
-    <div class="kick-overlay" id="kickOverlay">
-      <div class="kick-sheet">
-        <div style="font-size:28px;margin-bottom:8px;">🔒</div>
-        <div style="font-size:16px;font-weight:700;color:#0f2248;margin-bottom:4px;">ถูกออกจากระบบ</div>
-        <div style="font-size:13px;color:#64748b;line-height:1.6;margin-bottom:20px;" id="kickReason">Admin ได้ reset session ของคุณ<br>กรุณาเข้าสู่ระบบใหม่อีกครั้ง</div>
-        <button class="btn btn-navy" onclick="afterKick()">รับทราบ เข้าสู่ระบบใหม่</button>
-      </div>
-    </div>
-
+<!-- SPLASH -->
+<div id="pg-splash">
+  <div class="splash-logo">
+    <img src="https://www.smpcplc.com/wp-content/uploads/2020/01/Group@3x.png" alt="SMPC"
+      onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+    <span style="display:none;font-size:22px;font-weight:800;color:var(--navy);letter-spacing:-1px;">SMPC</span>
   </div>
+  <div class="splash-title">Engineering Synergy</div>
+  <div class="splash-sub">2026</div>
+  <div class="splash-bar"><div class="splash-fill"></div></div>
 </div>
 
-<!-- ADMIN PHONE -->
-<div>
-  <div class="phone-label">🛠️ หน้าจอ Admin</div>
-  <div class="phone">
-    <div class="head">
-      <div style="font-size:15px;font-weight:700;color:#0f2248;">Admin — สมาชิก</div>
-    </div>
-    <div class="body">
-      <div style="font-size:11px;color:#64748b;margin-bottom:12px;">กด Kick เพื่อ reset session ของ user</div>
-      <div style="background:#fff;border:1px solid #e2e6ed;border-radius:12px;padding:0 14px;margin-bottom:16px;">
-        <div style="display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid #f1f4f9;">
-          <div style="flex:1;"><div style="font-size:13px;font-weight:600;color:#0f2248;">สมชาย ใจดี</div><div style="font-size:10px;color:#94a3b8;">ME</div></div>
-          <div style="font-size:15px;font-weight:700;color:#0f2248;">28</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid #f1f4f9;">
-          <div style="flex:1;"><div style="font-size:13px;font-weight:600;color:#0f2248;">สมศรี มีสุข</div><div style="font-size:10px;color:#94a3b8;">EE</div></div>
-          <div style="font-size:15px;font-weight:700;color:#0f2248;">22</div>
-        </div>
-        <!-- วิสูตร — online + kick -->
-        <div style="display:flex;align-items:center;gap:10px;padding:12px 0;">
-          <div style="flex:1;">
-            <div style="display:flex;align-items:center;gap:6px;">
-              <div style="font-size:13px;font-weight:600;color:#0f2248;">วิสูตร ฉัตรสุกาญจน์</div>
-              <span id="onlineBadge" style="font-size:9px;font-weight:700;color:#16a34a;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:20px;padding:1px 7px;">● ออนไลน์</span>
-            </div>
-            <div style="font-size:10px;color:#94a3b8;">PM</div>
-          </div>
-          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
-            <div style="font-size:15px;font-weight:700;color:#0f2248;">18</div>
-            <button id="kickBtn" onclick="adminKick()" style="font-size:10px;font-weight:600;color:#dc2626;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:3px 10px;cursor:pointer;font-family:inherit;">Kick</button>
-          </div>
-        </div>
-      </div>
+<div class="wrap">
 
-      <div id="kickStatus" style="display:none;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:10px 14px;font-size:12px;color:#166534;font-weight:600;">
-        ✅ Kick สำเร็จ — user จะถูกออกจากระบบภายใน 30 วิ
+<!-- PREVIEW + REGISTER (รวมเป็นหน้าเดียว) -->
+<div id="pg-preview" class="page active" style="min-height:100vh;position:relative;overflow:hidden;">
+
+  <!-- Confirm popup -->
+  <div id="confirm-popup" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:400;align-items:flex-end;justify-content:center;">
+    <div style="background:var(--bg);border-radius:24px 24px 0 0;padding:24px 24px 48px;width:100%;max-width:420px;">
+      <div style="width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px;"></div>
+      <div id="cp-normal">
+        <div style="font-size:32px;margin-bottom:10px;">🙋</div>
+        <div style="font-size:18px;font-weight:700;color:var(--navy);margin-bottom:4px;">ใช่คุณใช่ไหม?</div>
+        <div id="cp-name" style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:3px;"></div>
+        <div id="cp-pos" style="font-size:12px;color:var(--muted);margin-bottom:20px;"></div>
+        <button class="btn btn-navy" onclick="confirmEnter()">ใช่ เข้าร่วมเลย →</button>
+        <button class="btn btn-outline" style="margin-top:10px;" onclick="closeConfirm()">ไม่ใช่ ค้นหาใหม่</button>
+      </div>
+      <div id="cp-blocked" style="display:none;">
+        <div style="font-size:32px;margin-bottom:10px;">🔒</div>
+        <div style="font-size:18px;font-weight:700;color:var(--navy);margin-bottom:4px;">มีผู้ใช้งานอยู่แล้ว</div>
+        <div id="cp-blocked-name" style="font-size:14px;color:var(--sub);margin-bottom:4px;"></div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:20px;">ชื่อนี้มีคนเข้าสู่ระบบไว้แล้ว<br>หากเป็นคุณ กรุณาติดต่อ Admin เพื่อขอ reset</div>
+        <button class="btn btn-outline" onclick="closeConfirm()">รับทราบ</button>
       </div>
     </div>
   </div>
+
+  <!-- Title + countdown ring -->
+  <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center;padding:0 24px;">
+    <div style="font-size:54px;font-weight:700;color:var(--navy);letter-spacing:-2px;line-height:1.05;">Engineering</div>
+    <div style="font-size:54px;font-weight:700;color:var(--accent);letter-spacing:-2px;line-height:1.05;margin-bottom:14px;">Synergy</div>
+    <div style="font-size:15px;color:var(--sub);">The Core of Future Industry</div>
+    <div style="font-size:13px;color:var(--muted);margin-top:4px;">2026</div>
+    <div id="pv-ring-wrap" style="margin-top:32px;display:flex;flex-direction:column;align-items:center;gap:8px;transition:opacity .5s,transform .5s;">
+      <svg width="48" height="48" viewBox="0 0 48 48" style="transform:rotate(-90deg);">
+        <circle cx="24" cy="24" r="18" fill="none" stroke="var(--border)" stroke-width="2.5"/>
+        <circle id="pvRingProg" cx="24" cy="24" r="18" fill="none" stroke="var(--navy)" stroke-width="2.5"
+          stroke-linecap="round" stroke-dasharray="113" stroke-dashoffset="113"
+          style="transition:stroke-dashoffset .9s linear,stroke .3s;"/>
+      </svg>
+      <div id="pvRingLbl" style="font-size:12px;color:var(--muted);">กำลังโหลด...</div>
+    </div>
+  </div>
+
+  <!-- Loading overlay — แสดงหลังกดยืนยัน -->
+  <div id="entry-loading" style="position:absolute;inset:0;background:#fff;z-index:20;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;border-radius:0;">
+    <div style="position:relative;width:36px;height:36px;">
+      <div id="el-spinner" style="width:36px;height:36px;border:2.5px solid var(--border);border-top-color:#1e3a5f;border-radius:50%;animation:elSpin .7s linear infinite;"></div>
+      <svg id="el-check" style="display:none;position:absolute;inset:0;" viewBox="0 0 36 36" fill="none">
+        <circle cx="18" cy="18" r="17" stroke="#16a34a" stroke-width="2"/>
+        <polyline points="10,18 15,24 26,12" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div id="el-txt" style="font-size:13px;color:var(--muted);">กำลังเข้าสู่ระบบ...</div>
+  </div>
+  <div id="entry-panel" style="position:absolute;bottom:0;left:0;right:0;background:#fff;border-radius:22px 22px 0 0;padding:20px 24px 44px;border-top:0.5px solid var(--border);transform:translateY(100%);transition:transform .45s cubic-bezier(.34,1.1,.64,1);">
+    <div style="width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 18px;"></div>
+    <div style="font-size:17px;font-weight:700;color:var(--navy);margin-bottom:3px;">สวัสดี 👋</div>
+    <div style="font-size:13px;color:var(--sub);margin-bottom:16px;">พิมพ์ชื่อเพื่อเข้าร่วมกิจกรรม</div>
+    <div id="reg-err" class="err"></div>
+    <div class="lbl">ชื่อ – นามสกุล</div>
+    <div class="sug-wrap">
+      <div class="input-box"><input id="reg-name" class="fi" placeholder="พิมพ์ชื่อเพื่อค้นหา..." autocomplete="off" oninput="onRegInput()" onkeydown="onRegKey(event)"></div>
+      <div id="reg-suggest" class="sug-list" style="display:none"></div>
+    </div>
+    <div id="reg-dept-pill" class="dept-pill" style="display:none">
+      <div class="dp-dot"></div><span class="dp-txt">พบในระบบ · ฝ่าย</span><span class="dp-val" id="reg-dept-val">—</span>
+    </div>
+    <button id="reg-submit" onclick="onRegSubmit()" style="width:100%;padding:15px;background:#1e3a5f;border:none;border-radius:14px;color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;opacity:0;transform:translateY(8px);transition:opacity .35s,transform .35s;pointer-events:none;">เข้าร่วมกิจกรรม →</button>
+  </div>
+
+  <!-- Admin password slide-up panel -->
+  <div id="admin-entry-panel" style="position:absolute;inset:0;background:#fff;display:flex;flex-direction:column;justify-content:center;padding:40px 28px;opacity:0;pointer-events:none;transition:opacity .35s ease;z-index:10;">
+    <div style="font-size:12px;font-weight:600;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">Admin</div>
+    <div style="font-size:22px;font-weight:700;color:var(--navy);margin-bottom:4px;">เข้าสู่ระบบ</div>
+    <div style="font-size:13px;color:var(--sub);margin-bottom:28px;">Engineering Synergy 2026</div>
+    <div id="al-err" class="err"></div>
+    <div class="lbl">รหัสผ่าน</div>
+    <div class="input-box" style="margin-bottom:16px;">
+      <input id="al-pass" class="fi" type="password" placeholder="กรอกรหัสผ่าน Admin" onkeydown="if(event.key==='Enter')doAdminLogin()">
+    </div>
+    <button class="btn btn-navy" onclick="doAdminLogin()" style="background:#1e3a5f;margin-bottom:10px;">เข้าสู่ระบบ Admin</button>
+    <button class="btn btn-outline" onclick="closeAdminEntry()">← กลับ</button>
+    <div style="margin-top:14px;text-align:center;">
+      <button class="btn-ghost-sm" style="color:var(--muted);font-size:12px" onclick="go('reset-pass')">ลืมรหัสผ่าน?</button>
+    </div>
+  </div>
+
 </div>
+
+
+<!-- REGISTER (stub สำหรับ backward compat) -->
+<div id="pg-register" class="page"></div>
+
+<!-- LOGIN (stub) -->
+<div id="pg-login" class="page"></div>
+
+<!-- ADMIN LOGIN (เดิม — ยังคงไว้สำหรับ go('admin-login') จากที่อื่น) -->
+<div id="pg-admin-login" class="page">
+  <div class="pg-header">
+    <div class="back-ico" onclick="go('preview')">←</div>
+    <div class="pg-titles"><div class="ptitle">Admin Login</div><div class="psub">Engineering Synergy 2026</div></div>
+  </div>
+  <div id="al-err2" class="err"></div>
+  <div class="lbl">รหัสผ่าน Admin</div>
+  <div class="input-box" style="margin-bottom:16px">
+    <input id="al-pass2" class="fi" type="password" placeholder="กรอกรหัสผ่าน" onkeydown="if(event.key==='Enter')doAdminLogin2()">
+  </div>
+  <button class="btn btn-navy" onclick="doAdminLogin2()">เข้าสู่ระบบ Admin</button>
+  <div style="margin-top:14px;text-align:center">
+    <button class="btn-ghost-sm" style="color:var(--muted);font-size:12px" onclick="go('reset-pass')">ลืมรหัสผ่าน?</button>
+  </div>
+</div>
+
+<!-- RESET PASSWORD -->
+<div id="pg-reset-pass" class="page">
+  <div class="pg-header">
+    <div class="back-ico" onclick="go('admin-login')">←</div>
+    <div class="pg-titles"><div class="ptitle">รีเซ็ตรหัสผ่าน</div><div class="psub">ตอบคำถามความปลอดภัย</div></div>
+  </div>
+  <div id="rp-err" class="err"></div>
+  <div id="rp-ok" class="ok-box"></div>
+  <div class="lbl">ชื่อโรงเรียนประถมของคุณชื่ออะไร<br><span style="font-weight:400;color:var(--muted)">(ไม่มีคำว่าโรงเรียน)</span></div>
+  <div class="input-box" style="margin-bottom:16px"><input id="rp-ans" class="fi" placeholder="กรอกคำตอบ"></div>
+  <div id="rp-new-wrap" style="display:none">
+    <div class="lbl" style="margin-top:14px">รหัสผ่านใหม่</div>
+    <div class="input-box" style="margin-bottom:16px"><input id="rp-new" class="fi" type="password" placeholder="กรอกรหัสผ่านใหม่"></div>
+  </div>
+  <button class="btn btn-navy" onclick="doResetPass()">ยืนยัน</button>
+</div>
+
+
+<!-- COMING SOON -->
+<div id="pg-coming" class="page">
+  <div class="coming-wrap">
+    <div style="font-size:13px;font-weight:600;color:var(--accent);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;">Engineering Synergy 2026</div>
+    <div style="font-size:28px;font-weight:700;color:var(--navy);letter-spacing:-.5px;margin-bottom:8px;">Coming Soon</div>
+    <div style="font-size:14px;color:var(--muted);line-height:1.85;margin-bottom:20px;">แล้วพบกัน<br>วันศุกร์ที่ 10 กรกฎาคม 2569 เวลา 09:00 น.<br>ณ Shop floor ฝ่ายวิศวกรรม</div>
+    <div class="cd-box">
+      <div style="font-size:10px;font-weight:600;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;margin-bottom:16px;">เหลือเวลา</div>
+      <div class="cd-row">
+        <div class="cd-unit"><div class="cd-unit-num" id="cd-days">--</div><div class="cd-unit-lbl">วัน</div></div>
+        <div class="cd-sep">:</div>
+        <div class="cd-unit"><div class="cd-unit-num" id="cd-hours">--</div><div class="cd-unit-lbl">ชม.</div></div>
+        <div class="cd-sep">:</div>
+        <div class="cd-unit"><div class="cd-unit-num" id="cd-mins">--</div><div class="cd-unit-lbl">นาที</div></div>
+        <div class="cd-sep">:</div>
+        <div class="cd-unit"><div class="cd-unit-num accent" id="cd-secs">--</div><div class="cd-unit-lbl">วินาที</div></div>
+      </div>
+    </div>
+    <button onclick="addToCalendar()" style="width:100%;max-width:240px;padding:13px;background:var(--navy);border:none;border-radius:13px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:8px;">📅 บันทึกเข้าปฏิทิน</button>
+    <button class="btn-outline" style="max-width:240px;margin:0 auto;" onclick="goPreview()">← กลับหน้าหลัก</button>
+  </div>
+</div>
+
+<!-- HOME -->
+<div id="pg-home" class="page">
+  <div id="st-popup" style="display:none">
+    <div class="popup-overlay" onclick="closePopup(event)">
+      <div class="popup-sheet" onclick="event.stopPropagation()">
+        <div class="popup-drag"></div>
+        <div id="popup-icon" style="font-size:38px;margin-bottom:10px"></div>
+        <div id="popup-title" style="font-size:18px;font-weight:700;color:var(--navy);letter-spacing:-.3px;margin-bottom:3px"></div>
+        <div id="popup-sub" style="font-size:12px;color:var(--muted);margin-bottom:14px"></div>
+        <div id="popup-body" style="font-size:14px;line-height:1.75;color:var(--sub);margin-bottom:16px"></div>
+        <div id="popup-tags" class="ptags"></div>
+        <button id="popup-btn" class="btn btn-navy" onclick="dismissPopup()">ถัดไป →</button>
+      </div>
+    </div>
+  </div>
+  <div class="home-top">
+    <div class="home-greet">สวัสดี 👋</div>
+    <div class="home-name" id="home-name">—</div>
+    <div class="home-dept" id="home-dept">—</div>
+  </div>
+  <div class="rank-card">
+    <div class="rc-ring"><div class="rc-lbl">RANK</div><div class="rc-num" id="home-rank">—</div></div>
+    <div class="rc-info">
+      <div class="rc-sl">คะแนนสะสม</div>
+      <div class="rc-score" id="home-score">0</div>
+      <div class="rc-sub" id="home-rank-sub">จาก — คน</div>
+    </div>
+    <button class="rc-refresh" onclick="loadHome()">↻</button>
+  </div>
+  <div class="tl-pill">
+    <div class="tl-dot"></div>
+    <div class="tl-txt">Booth Rotation กำลังดำเนินการ</div>
+    <div class="tl-time">09:45–11:30</div>
+  </div>
+  <div class="sec-lbl">ฐานกิจกรรม</div>
+  <div class="st-grid" id="home-stations"></div>
+
+  <!-- ── Quiz + สแกน bonus (ใหม่) ── -->
+  <div class="sec-lbl">กิจกรรมเพิ่มเติม</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:22px;">
+    <button onclick="go('quiz')" style="background:var(--navy);border:none;border-radius:18px;padding:18px 12px;text-align:center;cursor:pointer;color:#fff;font-family:inherit;">
+      <div style="font-size:26px;margin-bottom:6px;">📋</div>
+      <div style="font-size:13px;font-weight:700;">Quiz</div>
+      <div style="font-size:9px;opacity:.6;margin-top:3px;">ทำแบบทดสอบ</div>
+    </button>
+    <button onclick="go('scan-bonus')" style="background:linear-gradient(135deg,#1e40af,#2563eb);border:none;border-radius:18px;padding:18px 12px;text-align:center;cursor:pointer;color:#fff;font-family:inherit;">
+      <div style="font-size:26px;margin-bottom:6px;">📷</div>
+      <div style="font-size:13px;font-weight:700;">สแกน Bonus</div>
+      <div style="font-size:9px;opacity:.6;margin-top:3px;">รับคะแนนพิเศษ</div>
+    </button>
+  </div>
+
+  <div class="sec-lbl">Leaderboard</div>
+  <div id="home-lb" style="margin-bottom:20px"></div>
+  <button class="btn btn-outline" style="font-size:12px;padding:10px;margin-bottom:10px" onclick="go('admin')">⚙️ Admin</button>
+  <div style="display:flex;justify-content:center;padding-top:4px">
+    <button class="btn-danger-sm" onclick="doLogout()">↩ ออกจากระบบ</button>
+  </div>
+  <div style="height:20px"></div>
+</div>
+
+<!-- STATION (Admin) -->
+<div id="pg-station" class="page">
+  <div style="padding-top:20px">
+    <button class="btn-ghost-sm" onclick="stopQR();go('admin')" style="color:var(--muted);margin-bottom:16px">← Admin</button>
+  </div>
+  <div id="st-banner" class="st-banner">
+    <div id="st-icon" style="font-size:36px;margin-bottom:8px;position:relative;z-index:1"></div>
+    <div id="st-title" style="font-size:19px;font-weight:700;color:#fff;letter-spacing:-.3px;position:relative;z-index:1"></div>
+  </div>
+  <div id="st-err" class="err"></div>
+  <div id="st-ok" class="ok-box"></div>
+  <div id="qr-reader" style="margin-bottom:14px;border-radius:14px;overflow:hidden"></div>
+  <div class="lbl">หรือกรอก UID เอง</div>
+  <div class="field-single"><input id="st-uid" placeholder="กรอก UID" onkeydown="if(event.key==='Enter')doGiveScore()"></div>
+  <button id="st-btn" class="btn btn-navy" onclick="doGiveScore()">ให้คะแนน</button>
+  <div id="st-log-wrap" style="display:none;margin-top:22px">
+    <div class="sec-lbl">บันทึกล่าสุด</div>
+    <div id="st-log"></div>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div id="pg-admin" class="page">
+
+  <!-- Exit confirm popup -->
+  <div id="admin-exit-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);">
+    <div style="background:var(--bg);border-radius:24px 24px 0 0;padding:24px 24px 48px;width:100%;max-width:420px;">
+      <div style="width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px;"></div>
+      <div style="font-size:28px;margin-bottom:10px;">🚪</div>
+      <div style="font-size:18px;font-weight:700;color:var(--navy);margin-bottom:6px;">ออกจากหน้า Admin?</div>
+      <div style="font-size:13px;color:var(--sub);line-height:1.6;margin-bottom:24px;">ระบบจะกลับไปหน้าหลัก</div>
+      <button class="btn btn-navy" onclick="confirmAdminExit()" style="margin-bottom:10px;">ยืนยัน ออกจาก Admin</button>
+      <button class="btn btn-outline" onclick="document.getElementById('admin-exit-overlay').style.display='none'">ยกเลิก อยู่ต่อ</button>
+    </div>
+  </div>
+
+  <div style="padding-top:22px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center">
+    <div>
+      <div style="font-size:20px;font-weight:700;color:var(--navy);letter-spacing:-.4px">Admin</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px">Engineering Synergy 2026</div>
+    </div>
+    <button class="btn-ghost-sm" style="color:var(--muted);font-size:12px" onclick="document.getElementById('admin-exit-overlay').style.display='flex'">← ออก</button>
+  </div>
+
+  <!-- 4 tabs -->
+  <div style="display:flex;gap:6px;margin-bottom:16px;overflow-x:auto;padding-bottom:2px;">
+    <button class="tab active" id="atab-overview" onclick="switchAdminTab('overview')">📊 ภาพรวม</button>
+    <button class="tab" id="atab-members"  onclick="switchAdminTab('members')">👥 สมาชิก</button>
+    <button class="tab" id="atab-stations" onclick="switchAdminTab('stations')">🏭 ฐาน</button>
+    <button class="tab" id="atab-settings" onclick="switchAdminTab('settings')">⚙️ ตั้งค่า</button>
+  </div>
+
+  <!-- ── OVERVIEW ── -->
+  <div id="apanel-overview">
+    <div class="sec-lbl">สถิติวันนี้</div>
+    <div class="grid2" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px;">
+      <div class="stat-box"><div style="font-size:18px;margin-bottom:4px;">👥</div><div id="stat-count" style="font-size:22px;font-weight:700;color:var(--accent)">0</div><div style="font-size:10px;color:var(--muted);margin-top:2px">ลงทะเบียน</div></div>
+      <div class="stat-box"><div style="font-size:18px;margin-bottom:4px;">🏆</div><div id="stat-top" style="font-size:22px;font-weight:700;color:var(--navy)">0</div><div style="font-size:10px;color:var(--muted);margin-top:2px">คะแนนสูงสุด</div></div>
+      <div class="stat-box"><div style="font-size:18px;margin-bottom:4px;">🟢</div><div id="stat-online" style="font-size:22px;font-weight:700;color:var(--green)">0</div><div style="font-size:10px;color:var(--muted);margin-top:2px">Online</div></div>
+    </div>
+    <div class="sec-lbl">Leaderboard</div>
+    <div id="admin-lb" style="background:var(--bg);border:1.5px solid var(--border);border-radius:16px;padding:0 16px;">
+      <div style="text-align:center;color:var(--muted);padding:22px;font-size:13px;">กำลังโหลด...</div>
+    </div>
+  </div>
+
+  <!-- ── MEMBERS ── -->
+  <div id="apanel-members" style="display:none;">
+    <div id="admin-list" style="background:var(--bg);border:1.5px solid var(--border);border-radius:16px;padding:0 16px;">
+      <div style="text-align:center;color:var(--muted);padding:28px;font-size:13px;">กำลังโหลด...</div>
+    </div>
+    <div style="margin-top:10px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;">
+      <div style="font-size:12px;color:var(--muted);line-height:1.6;">🔒 การลบข้อมูลสมาชิกทั้งหมดไม่สามารถทำได้จากแอป กรุณาแก้ไขจาก Google Sheet โดยตรง</div>
+    </div>
+  </div>
+
+  <!-- ── STATIONS ── -->
+  <div id="apanel-stations" style="display:none;">
+    <div class="sec-lbl">เปิดฐานสแกน QR (ให้คะแนน)</div>
+    <div class="grid2" style="margin-bottom:20px;">
+      <button class="btn btn-outline" style="font-size:13px;padding:11px" onclick="go('station','EE')">⚡ EE</button>
+      <button class="btn btn-outline" style="font-size:13px;padding:11px" onclick="go('station','ME')">⚙️ ME</button>
+      <button class="btn btn-outline" style="font-size:13px;padding:11px;margin-top:0" onclick="go('station','TO')">🔬 TO</button>
+      <button class="btn btn-outline" style="font-size:13px;padding:11px;margin-top:0" onclick="go('station','PM')">📳 PM</button>
+    </div>
+    <div class="sec-lbl">สถิติประจำฐาน</div>
+    <div id="station-stats"><div style="text-align:center;color:var(--muted);padding:22px;font-size:13px;">กำลังโหลด...</div></div>
+    <div class="sec-lbl" style="margin-top:16px;">QR Bonus ประจำฐาน</div>
+    <div style="font-size:12px;color:var(--muted);background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:10px 14px;margin-bottom:12px;line-height:1.6;">
+      เปิดหน้านี้ไว้ที่เครื่องเจ้าหน้าที่ · ผู้เข้าร่วมสแกนจากแท็บ "สแกน Bonus" ในแอปของตัวเอง · รับได้ <strong>1 ครั้ง/ฐาน</strong>
+    </div>
+    <div class="qr-grid" id="adminQrGrid"><div style="text-align:center;color:var(--muted);padding:20px;font-size:13px;grid-column:span 2">กำลังโหลด...</div></div>
+  </div>
+
+  <!-- ── SETTINGS ── -->
+  <div id="apanel-settings" style="display:none;">
+    <!-- Coming Soon toggle -->
+    <div class="sec-lbl">โหมดระบบ</div>
+    <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:14px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+        <div>
+          <div style="font-size:14px;font-weight:600;color:var(--navy);">Coming Soon Mode</div>
+          <div style="font-size:12px;color:var(--sub);margin-top:3px;line-height:1.55;">เปิด = ทุกคนเห็นหน้า Coming Soon<br>ปิด = เข้า Home ได้เลย</div>
+          <div id="cs-pill" style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;margin-top:6px;background:#fff7ed;color:#c2410c;border:1px solid #fed7aa;">● กำลังแสดง Coming Soon</div>
+        </div>
+        <label style="position:relative;width:44px;height:26px;flex-shrink:0;">
+          <input type="checkbox" id="cs-toggle" style="opacity:0;width:0;height:0;" onchange="onCsToggle()">
+          <span id="cs-track" style="position:absolute;inset:0;background:var(--border);border-radius:13px;cursor:pointer;transition:.3s;">
+            <span id="cs-knob" style="position:absolute;width:20px;height:20px;background:#fff;border-radius:50%;top:3px;left:3px;transition:.3s;box-shadow:0 1px 4px rgba(0,0,0,.15);"></span>
+          </span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Bypass list -->
+    <div class="sec-lbl">Bypass Coming Soon</div>
+    <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:14px;padding:12px 16px;margin-bottom:14px;">
+      <div style="font-size:12px;color:var(--sub);margin-bottom:10px;line-height:1.6;">รายชื่อนี้เข้า Home ได้เลยโดยไม่ติด Coming Soon</div>
+      <div id="bypass-list-wrap">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bg2);">
+          <div style="font-size:13px;font-weight:600;color:var(--navy);">วัชรพล มีดี</div>
+          <span style="font-size:10px;font-weight:700;color:var(--green);background:#f0fdf4;border:1px solid #bbf7d0;border-radius:20px;padding:2px 10px;">Bypass</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Station points/bonus -->
+    <div class="sec-lbl">คะแนนแต่ละฐาน</div>
+    <div id="admin-ok" class="ok-box"></div>
+    <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:16px;padding:14px 16px;margin-bottom:10px;">
+      <div style="display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;margin-bottom:10px;">
+        <div style="font-size:11px;font-weight:700;color:var(--muted);">ฐาน</div>
+        <div style="font-size:11px;font-weight:700;color:var(--muted);text-align:center;width:68px;">points</div>
+        <div style="font-size:11px;font-weight:700;color:var(--muted);text-align:center;width:68px;">bonus QR</div>
+      </div>
+      <div class="pts-row"><label style="margin:0;font-size:13px;font-weight:600;color:var(--navy)">⚡ EE</label><input type="number" id="pts-EE" min="0" max="100" value="1"><input type="number" id="bon-EE" min="0" max="100" value="0"></div>
+      <div class="pts-row"><label style="margin:0;font-size:13px;font-weight:600;color:var(--navy)">⚙️ ME</label><input type="number" id="pts-ME" min="0" max="100" value="1"><input type="number" id="bon-ME" min="0" max="100" value="0"></div>
+      <div class="pts-row"><label style="margin:0;font-size:13px;font-weight:600;color:var(--navy)">🔬 TO</label><input type="number" id="pts-TO" min="0" max="100" value="1"><input type="number" id="bon-TO" min="0" max="100" value="0"></div>
+      <div class="pts-row" style="margin-bottom:0"><label style="margin:0;font-size:13px;font-weight:600;color:var(--navy)">📳 PM</label><input type="number" id="pts-PM" min="0" max="100" value="1"><input type="number" id="bon-PM" min="0" max="100" value="0"></div>
+    </div>
+    <button class="btn btn-navy" onclick="doSaveSettings()">💾 บันทึกการตั้งค่า</button>
+  </div>
+
+</div>
+
+
+<!-- ═══════════════════════════════════════
+     QUIZ — Station Select + Quiz
+═══════════════════════════════════════ -->
+<div id="pg-quiz" class="page">
+
+  <!-- Quiz flash overlay -->
+  <div id="quiz-flash" style="position:fixed;inset:0;background:rgba(220,38,38,.18);pointer-events:none;opacity:0;z-index:400;"></div>
+
+  <!-- Station select view -->
+  <div id="quiz-select-view">
+    <div style="padding:20px 0 16px;display:flex;align-items:center;gap:10px;">
+      <div class="back-ico" onclick="go('home')">←</div>
+      <div class="pg-titles"><div class="ptitle">Quiz</div><div class="psub">ทำตามลำดับ · 5 ข้อ/ฐาน · ข้อละ 15 วินาที</div></div>
+    </div>
+
+    <!-- overall progress -->
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:18px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;">
+        <span style="font-size:12px;font-weight:600;color:var(--sub);">ความคืบหน้าทั้งหมด</span>
+        <span id="qs-overall-val" style="font-size:12px;font-weight:700;color:var(--accent);">0 / 4 ฐาน</span>
+      </div>
+      <div style="height:5px;background:var(--border);border-radius:3px;overflow:hidden;">
+        <div id="qs-overall-fill" style="height:100%;background:var(--accent);border-radius:3px;transition:.4s;width:0%;"></div>
+      </div>
+    </div>
+
+    <!-- station list -->
+    <div id="qs-list" style="display:flex;flex-direction:column;gap:0;"></div>
+  </div>
+
+  <!-- Quiz active view (hidden until station selected) -->
+  <div id="quiz-active-view" style="display:none;">
+    <div style="padding:14px 0 10px;display:flex;align-items:center;gap:10px;">
+      <div class="back-ico" onclick="stopQuizTimer();showQuizSelect()">←</div>
+      <div style="flex:1;">
+        <div style="font-size:14px;font-weight:700;color:var(--navy);" id="qa-station-name">—</div>
+        <div style="font-size:10px;color:var(--muted);">Quiz · 5 ข้อ · ข้อละ 15 วินาที</div>
+      </div>
+      <div id="qa-counter" style="font-size:12px;font-weight:700;color:var(--accent);flex-shrink:0;">1 / 5</div>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;margin-bottom:5px;font-size:11px;">
+      <span style="color:var(--sub);">ความคืบหน้า</span>
+      <span id="qa-score" style="color:var(--accent);font-weight:700;">0 คะแนน</span>
+    </div>
+    <div style="height:3px;background:var(--border);border-radius:2px;margin-bottom:12px;overflow:hidden;">
+      <div id="qa-prog" style="height:100%;border-radius:2px;transition:.3s;background:#10b981;width:0%;"></div>
+    </div>
+
+    <!-- timer row compact -->
+    <div id="qa-timer-row" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding:8px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;transition:.3s;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div id="qa-ring" style="position:relative;width:44px;height:44px;flex-shrink:0;">
+          <svg width="44" height="44" viewBox="0 0 44 44" style="transform:rotate(-90deg);">
+            <circle cx="22" cy="22" r="18" fill="none" stroke="var(--border)" stroke-width="3.5"/>
+            <circle id="qa-ring-prog" cx="22" cy="22" r="18" fill="none" stroke="#10b981" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="113" stroke-dashoffset="113" style="transition:stroke-dashoffset .15s linear,stroke .3s;"/>
+          </svg>
+          <div id="qa-ring-num" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:var(--navy);transition:color .3s;">15</div>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--muted);font-weight:600;">เวลาที่เหลือ</div>
+          <div id="qa-timer-lbl" style="font-size:13px;font-weight:700;color:var(--navy);transition:color .3s;">15 วินาที</div>
+        </div>
+      </div>
+      <div id="qa-bonus-pill" style="font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid #86efac;color:#10b981;background:#f0fdf4;transition:.3s;">⚡ +5.0</div>
+    </div>
+
+    <!-- question -->
+    <div id="qa-qcard" style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:13px 14px;margin-bottom:10px;transition:border-color .3s,background .3s;">
+      <div id="qa-qnum" style="font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:5px;">คำถามที่ 1</div>
+      <div id="qa-qtext" style="font-size:14px;font-weight:600;line-height:1.6;color:var(--navy);"></div>
+    </div>
+
+    <!-- choices -->
+    <div id="qa-choices" style="display:flex;flex-direction:column;gap:7px;margin-bottom:10px;"></div>
+
+    <!-- confirm btn -->
+    <button id="qa-confirm" onclick="confirmQuizAnswer()" style="width:100%;padding:12px;background:#2563eb;border:none;border-radius:11px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:10px;display:none;">✓ ยืนยันคำตอบ</button>
+
+    <!-- result -->
+    <div id="qa-result" style="display:none;border-radius:11px;padding:10px 13px;margin-bottom:10px;border:1.5px solid;display:none;align-items:center;gap:9px;font-size:13px;"></div>
+
+    <!-- next btn -->
+    <button id="qa-next" onclick="nextQuizQ()" disabled style="width:100%;padding:12px;background:var(--navy);border:none;border-radius:11px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;opacity:.3;">ข้อถัดไป →</button>
+  </div>
+
+  <!-- Quiz result view -->
+  <div id="quiz-result-view" style="display:none;text-align:center;padding:32px 0;">
+    <div style="font-size:44px;margin-bottom:12px;">🏅</div>
+    <div id="qr-score" style="font-size:34px;font-weight:800;color:var(--navy);line-height:1;"></div>
+    <div id="qr-station" style="font-size:13px;color:var(--muted);margin-top:4px;margin-bottom:20px;"></div>
+    <div style="display:flex;justify-content:center;gap:28px;padding:16px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:22px;">
+      <div style="text-align:center;"><div id="qr-base" style="font-size:22px;font-weight:700;color:var(--navy);">0</div><div style="font-size:11px;color:var(--muted);">ตอบถูก</div></div>
+      <div style="text-align:center;"><div id="qr-bonus" style="font-size:22px;font-weight:700;color:#10b981;">0</div><div style="font-size:11px;color:var(--muted);">Bonus ความเร็ว</div></div>
+    </div>
+    <button onclick="showQuizSelect()" class="btn btn-navy">← กลับหน้า Quiz</button>
+  </div>
+
+</div>
+
+
+<!-- ═══════════════════════════════════════
+     SCAN BONUS (ใหม่)
+═══════════════════════════════════════ -->
+<div id="pg-scan-bonus" class="page">
+  <div style="padding-top:20px;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
+    <div class="back-ico" onclick="stopBonusScanner();go('home')">←</div>
+    <div class="pg-titles"><div class="ptitle">สแกน Bonus</div><div class="psub">รับคะแนนพิเศษจากฐาน</div></div>
+  </div>
+  <div class="me-bar">
+    <div class="me-av" id="sb-av">?</div>
+    <div class="me-nm"><div class="n" id="sb-name">—</div><div class="s" id="sb-uid">—</div></div>
+    <div class="me-tot"><div class="v" id="sb-total">0</div><div class="l">คะแนนรวม</div></div>
+  </div>
+  <div id="sb-result"></div>
+  <div style="background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:18px 16px;">
+    <div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:4px;">📷 สแกน QR ของฐาน</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6;">เล็งกล้องไปที่ QR code ที่เจ้าหน้าที่ประจำฐานเปิดไว้</div>
+    <div id="scan-reader" style="margin-bottom:10px;"></div>
+    <div class="scan-hint" id="scan-hint">กำลังเปิดกล้อง…</div>
+  </div>
+</div>
+
+</div><!-- /wrap -->
 
 <script>
-var isLoggedIn=false, kicked=false;
-var pollSecs=30, pollInterval=null, countInterval=null;
+/* ═══════════════════════════════════════════
+   CONFIG + STATE
+═══════════════════════════════════════════ */
+var API='https://script.google.com/macros/s/AKfycbx8jJ-Mq3mLAwWS_ZhAxiUKbibP_qBbV2WUIUGQvGoIzduY3C-UI12aRGh6D4aFew9h/exec';
+var ADMIN_PASS='engineer_1997';
+var adminPassOverride=null;
 
-function pad(n){return String(n).padStart(2,'0');}
-function nowStr(){var d=new Date();return pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());}
+var STATIONS=[
+  {id:'EE',icon:'⚡',label:'Electrical Eng.',activity:'Logic Master',color:'#1e40af',accent:'#3b82f6'},
+  {id:'ME',icon:'⚙️',label:'Mechanical Eng.',activity:'Force & Flow',color:'#065f46',accent:'#10b981'},
+  {id:'TO',icon:'🔬',label:'Tooling Eng.',activity:'Micrometer Pro',color:'#92400e',accent:'#f59e0b'},
+  {id:'PM',icon:'📳',label:'Preventive Maint.',activity:'Diagnostic Challenge',color:'#4c1d95',accent:'#8b5cf6'},
+];
+var STATION_MAP={
+  EE:{name:'Electrical Eng.',icon:'⚡',color:'#1e40af'},
+  ME:{name:'Mechanical Eng.',icon:'⚙️',color:'#065f46'},
+  TO:{name:'Tooling Eng.',icon:'🔬',color:'#92400e'},
+  PM:{name:'Preventive Maint.',icon:'📳',color:'#4c1d95'},
+};
+var STATION_INFO={
+  EE:{title:'Electrical Engineering',sub:'วิศวกรรมไฟฟ้าและระบบควบคุม',body:'ฝ่าย EE ดูแลระบบไฟฟ้ากำลัง วงจรควบคุม และระบบอัตโนมัติ ครอบคลุมการออกแบบวงจร ติดตั้ง PLC และบำรุงรักษาระบบ Drive และ Inverter',tags:['PLC / SCADA','ระบบไฟฟ้ากำลัง','Automation','Inverter & Drive'],accent:'#3b82f6',color:'#1e40af'},
+  ME:{title:'Mechanical Engineering',sub:'วิศวกรรมเครื่องกลและเครื่องจักร',body:'ฝ่าย ME รับผิดชอบระบบเครื่องจักรกล ไฮดรอลิกส์ นิวแมติกส์ และระบบ HVAC ทั่วโรงงาน ดูแลการติดตั้ง ปรับแต่ง และซ่อมบำรุงเครื่องจักร',tags:['Hydraulics','Pneumatics','HVAC','Mechanical System'],accent:'#10b981',color:'#065f46'},
+  TO:{title:'Tooling Engineering',sub:'วิศวกรรมแม่พิมพ์และการวัดละเอียด',body:'ฝ่าย TO เชี่ยวชาญด้านการออกแบบและซ่อมบำรุงแม่พิมพ์ งานกลึง CNC และการวัดละเอียดด้วยเครื่องมือความแม่นยำสูง',tags:['CNC Machining','Mold & Die','CMM Measurement','Surface Roughness'],accent:'#f59e0b',color:'#92400e'},
+  PM:{title:'Preventive Maintenance',sub:'งานซ่อมบำรุงเชิงป้องกัน',body:'ฝ่าย PM วางแผนและดำเนินการบำรุงรักษาเครื่องจักรเชิงป้องกัน ด้วยการวิเคราะห์ข้อมูล ตรวจสอบตามรอบ และใช้เทคโนโลยี Predictive Maintenance',tags:['PM Schedule','Predictive Maintenance','Downtime Reduction','Condition Monitoring'],accent:'#8b5cf6',color:'#4c1d95'},
+};
 
-function showPage(id){
-  document.querySelectorAll('.pg').forEach(function(p){p.classList.remove('active');});
-  document.getElementById(id).classList.add('active');
-}
+var currentStation=null,currentUid=null,currentToken=null,employeeDB=[],settingsCache={};
+var appSettings={coming_soon:true,bypass_list:['วัชรพล มีดี'],quiz_order:['TO','ME','EE','PM']};
+var seenPopup={},qrScanner=null,stLog={EE:[],ME:[],TO:[],PM:[]};
+var selectedReg=null;
+var EVENT_OPEN=new Date('2026-07-10T09:00:00+07:00');
 
-function userLogin(){
-  isLoggedIn=true; kicked=false;
-  showPage('pg-home');
-  document.getElementById('lastRefresh').textContent='อัปเดตล่าสุด: '+nowStr();
-  startPoll();
-}
+/* ── API helpers ── */
+function apiGet(a,cb){fetch(API+'?action='+a+'&t='+Date.now()).then(function(r){return r.json();}).then(cb).catch(function(e){cb({error:e.message});});}
+function apiPost(b,cb){fetch(API,{method:'POST',body:JSON.stringify(b)}).then(function(r){return r.json();}).then(cb).catch(function(e){cb({error:e.message});});}
+function showLoad(){document.getElementById('loading').classList.add('show');}
+function hideLoad(){document.getElementById('loading').classList.remove('show');}
+function showErr(el,msg){el.textContent=msg;el.style.display='block';}
 
-function startPoll(){
-  if(pollInterval) clearInterval(pollInterval);
-  if(countInterval) clearInterval(countInterval);
-  var remaining=pollSecs;
-  updatePollUI(remaining);
-  countInterval=setInterval(function(){
-    remaining--;
-    updatePollUI(remaining);
-    if(remaining<=0){
-      remaining=pollSecs;
-      checkSession();
+/* ── Nav ── */
+function go(page,param){
+  stopQR();
+  stopBonusScanner();
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  if(page==='preview'){
+    document.getElementById('pg-preview').classList.add('active');
+  }
+  else if(page==='station'){currentStation=param;loadStation(param);document.getElementById('pg-station').classList.add('active');}
+  else if(page==='admin'){loadAdmin();document.getElementById('pg-admin').classList.add('active');}
+  else if(page==='register'||page==='login'){
+    if(employeeDB.length===0){
+      apiGet('getEmployees',function(res){
+        var employees=(res&&res.employees)||[];
+        employeeDB=employees.map(function(e){return{firstName:e.firstName,lastName:e.lastName,dept:e.dept,position:e.position||''};});
+      });
     }
+    document.getElementById('pg-register').classList.add('active');
+  }
+  else if(page==='quiz'){stopQuizTimer();showQuizSelect();document.getElementById('pg-quiz').classList.add('active');}
+  else if(page==='scan-bonus'){enterScanBonus();document.getElementById('pg-scan-bonus').classList.add('active');}
+  else{var el=document.getElementById('pg-'+page);if(el)el.classList.add('active');}
+  window.scrollTo(0,0);
+}
+function goHome(){loadHome();go('home');}
+
+/* ── Session storage ── */
+function saveSession(uid,token){try{localStorage.setItem('eoh_uid',uid);localStorage.setItem('eoh_token',token);}catch(e){}}
+function loadSessionUid(){try{return localStorage.getItem('eoh_uid');}catch(e){return null;}}
+function loadSessionToken(){try{return localStorage.getItem('eoh_token');}catch(e){return null;}}
+function clearSession(){try{localStorage.removeItem('eoh_uid');localStorage.removeItem('eoh_token');}catch(e){}}
+
+/* ── Countdown (coming soon) ── */
+function updateCountdown(){
+  var diff=EVENT_OPEN-new Date();
+  if(diff<=0){['days','hours','mins','secs'].forEach(function(k){document.getElementById('cd-'+k).textContent='00';});return;}
+  var d=Math.floor(diff/86400000),h=Math.floor((diff%86400000)/3600000),m=Math.floor((diff%3600000)/60000),s=Math.floor((diff%60000)/1000);
+  document.getElementById('cd-days').textContent=String(d).padStart(2,'0');
+  document.getElementById('cd-hours').textContent=String(h).padStart(2,'0');
+  document.getElementById('cd-mins').textContent=String(m).padStart(2,'0');
+  document.getElementById('cd-secs').textContent=String(s).padStart(2,'0');
+}
+
+/* ── Fuzzy match ── */
+function lev(a,b){var m=a.length,n=b.length,dp=[];for(var i=0;i<=m;i++){dp[i]=[i];}for(var j=0;j<=n;j++){dp[0][j]=j;}for(var i=1;i<=m;i++)for(var j=1;j<=n;j++)dp[i][j]=a[i-1]===b[j-1]?dp[i-1][j-1]:1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);return dp[m][n];}
+function scoreEmp(e,q){var full=(e.firstName+' '+e.lastName).toLowerCase();var fq=q.toLowerCase();if(full===fq)return 1;if(full.startsWith(fq)||e.firstName.toLowerCase().startsWith(fq))return 0.92;if(full.includes(fq))return 0.85;var d=lev(fq,full.slice(0,fq.length+2));return Math.max(0,1-d/Math.max(fq.length,3));}
+function searchEmp(q){if(q.trim().length<1)return[];var scored=employeeDB.map(function(e){return{e:e,s:scoreEmp(e,q)};}).filter(function(x){return x.s>0.4;}).sort(function(a,b){return b.s-a.s;});return scored.length?[scored[0].e]:[];}
+
+/* ── Entry panel (preview page) ── */
+function startPreviewRing(totalSecs){
+  var circ=2*Math.PI*18;
+  var prog=document.getElementById('pvRingProg');
+  var lbl=document.getElementById('pvRingLbl');
+  var wrap=document.getElementById('pv-ring-wrap');
+  if(!prog) return;
+  var secs=totalSecs;
+  prog.style.strokeDashoffset=circ;
+  function tick(){
+    prog.style.strokeDashoffset=circ*(secs/totalSecs);
+    lbl.textContent=secs>0?secs+' วินาที...':'พร้อมแล้ว ✓';
+    if(secs<=0){
+      prog.style.stroke='var(--accent)';
+      // รอแสดง "พร้อมแล้ว ✓" ก่อน 600ms แล้ว fade ring ออก
+      setTimeout(function(){
+        wrap.style.opacity='0';
+        wrap.style.transform='translateY(-6px)';
+        // หลัง ring fade จบ (500ms) ค่อย slide popup ขึ้น
+        setTimeout(function(){
+          openEntryPanel();
+        },500);
+      },600);
+      return;
+    }
+    secs--;
+    setTimeout(tick,1000);
+  }
+  setTimeout(tick,500);
+}
+function openEntryPanel(){
+  var p=document.getElementById('entry-panel');
+  if(p) p.style.transform='translateY(0)';
+  setTimeout(function(){
+    var n=document.getElementById('reg-name');
+    if(n) n.focus();
+  },450);
+}
+function closeAdminEntry(){
+  var adm=document.getElementById('admin-entry-panel');
+  adm.style.opacity='0';adm.style.pointerEvents='none';
+  setTimeout(function(){
+    var n=document.getElementById('reg-name');
+    if(n){n.value='';n.focus();}
+    document.getElementById('reg-dept-pill').style.display='none';
+    var btn=document.getElementById('reg-submit');
+    if(btn){btn.style.opacity='0';btn.style.transform='translateY(8px)';btn.style.pointerEvents='none';btn.textContent='เข้าร่วมกิจกรรม →';btn.dataset.isAdmin='0';}
+    document.getElementById('entry-panel').style.transform='translateY(0)';
+  },300);
+}
+function doAdminLogin2(){
+  var pass=document.getElementById('al-pass2').value;
+  var correct=adminPassOverride||ADMIN_PASS;
+  if(pass===correct){document.getElementById('al-pass2').value='';document.getElementById('al-err2').style.display='none';go('admin');}
+  else{showErr(document.getElementById('al-err2'),'รหัสผ่านไม่ถูกต้อง');}
+}
+function onRegSubmit(){
+  var btn=document.getElementById('reg-submit');
+  if(btn&&btn.dataset.isAdmin==='1'){
+    document.getElementById('entry-panel').style.transform='translateY(100%)';
+    setTimeout(function(){
+      var adm=document.getElementById('admin-entry-panel');
+      adm.style.opacity='1';adm.style.pointerEvents='auto';
+      var p=document.getElementById('al-pass');if(p)p.focus();
+    },300);
+  } else {
+    showConfirmPopup();
+  }
+}
+var regSugIdx=-1,regSugResults=[];
+function onRegInput(){
+  var q=document.getElementById('reg-name').value;
+  var btn=document.getElementById('reg-submit');
+  if(q.trim().toLowerCase()==='admin'){
+    document.getElementById('reg-suggest').style.display='none';
+    document.getElementById('reg-dept-pill').style.display='none';
+    btn.textContent='เข้าสู่ระบบ Admin →';
+    btn.dataset.isAdmin='1';
+    btn.style.opacity='1';btn.style.transform='translateY(0)';btn.style.pointerEvents='auto';
+    return;
+  }
+  btn.dataset.isAdmin='0';
+  btn.textContent='เข้าร่วมกิจกรรม →';
+  var res=searchEmp(q);
+  var box=document.getElementById('reg-suggest');
+  regSugIdx=-1;regSugResults=res;selectedReg=null;
+  document.getElementById('reg-dept-pill').style.display='none';
+  btn.style.opacity='0';btn.style.transform='translateY(8px)';btn.style.pointerEvents='none';
+  if(!res.length){box.style.display='none';return;}
+  box.innerHTML=res.map(function(e,i){
+    return'<div class="sug-item" onclick="selectReg('+i+')"><span class="sug-name">'+e.firstName+' '+e.lastName+'</span><span class="sug-dept">'+e.dept+'</span></div>';
+  }).join('');
+  box.style.display='block';
+}
+function selectReg(i){
+  var e=regSugResults[i];if(!e)return;
+  selectedReg=e;
+  document.getElementById('reg-name').value=e.firstName+' '+e.lastName;
+  document.getElementById('reg-dept-val').textContent=e.position||e.dept;
+  document.getElementById('reg-dept-pill').style.display='flex';
+  document.getElementById('reg-suggest').style.display='none';
+  setTimeout(function(){
+    var btn=document.getElementById('reg-submit');
+    btn.style.opacity='1';btn.style.transform='translateY(0)';btn.style.pointerEvents='auto';
+  },50);
+}
+function onRegKey(ev){
+  var box=document.getElementById('reg-suggest');if(box.style.display==='none')return;
+  if(ev.key==='ArrowDown'){ev.preventDefault();regSugIdx=Math.min(regSugIdx+1,regSugResults.length-1);box.querySelectorAll('.sug-item').forEach(function(el,i){el.classList.toggle('sel',i===regSugIdx);});}
+  else if(ev.key==='ArrowUp'){ev.preventDefault();regSugIdx=Math.max(regSugIdx-1,0);box.querySelectorAll('.sug-item').forEach(function(el,i){el.classList.toggle('sel',i===regSugIdx);});}
+  else if(ev.key==='Enter'&&regSugIdx>=0){ev.preventDefault();selectReg(regSugIdx);}
+  else if(ev.key==='Escape'){box.style.display='none';}
+}
+document.addEventListener('click',function(e){if(!e.target.closest('.sug-wrap')){var b=document.getElementById('reg-suggest');if(b)b.style.display='none';}});
+
+/* ── Confirm popup ── */
+function showConfirmPopup(){
+  if(!selectedReg)return;
+  var popup=document.getElementById('confirm-popup');
+  document.getElementById('cp-normal').style.display='block';
+  document.getElementById('cp-blocked').style.display='none';
+  document.getElementById('cp-name').textContent=selectedReg.firstName+' '+selectedReg.lastName;
+  document.getElementById('cp-pos').textContent=(selectedReg.position||'')+' · ฝ่าย '+selectedReg.dept;
+  popup.style.display='flex';
+}
+function closeConfirm(){
+  document.getElementById('confirm-popup').style.display='none';
+  document.getElementById('reg-name').value='';
+  document.getElementById('reg-suggest').style.display='none';
+  document.getElementById('reg-dept-pill').style.display='none';
+  var btn=document.getElementById('reg-submit');
+  btn.disabled=false;
+  btn.style.opacity='0';
+  btn.style.transform='translateY(8px)';
+  btn.style.pointerEvents='none';
+  btn.textContent='เข้าร่วมกิจกรรม →';
+  btn.dataset.isAdmin='0';
+  btn.onclick=function(){onRegSubmit();};
+  selectedReg=null;
+}
+function showBlockedPopup(name,dept){
+  var popup=document.getElementById('confirm-popup');
+  document.getElementById('cp-normal').style.display='none';
+  document.getElementById('cp-blocked').style.display='block';
+  document.getElementById('cp-blocked-name').textContent=name+' · ฝ่าย '+(dept||'');
+  popup.style.display='flex';
+}
+
+/* ── Confirm → enterSession ── */
+function showEntryLoading(success){
+  var el=document.getElementById('entry-loading');
+  el.style.display='flex';
+  if(success){
+    document.getElementById('el-spinner').style.display='none';
+    document.getElementById('el-check').style.display='block';
+    document.getElementById('el-txt').textContent='เข้าสู่ระบบสำเร็จ';
+    document.getElementById('el-txt').style.color='#16a34a';
+  }
+}
+function hideEntryLoading(){
+  var el=document.getElementById('entry-loading');
+  el.style.display='none';
+  document.getElementById('el-spinner').style.display='block';
+  document.getElementById('el-check').style.display='none';
+  document.getElementById('el-txt').textContent='กำลังเข้าสู่ระบบ...';
+  document.getElementById('el-txt').style.color='';
+}
+function confirmEnter(){
+  if(!selectedReg)return;
+  document.getElementById('confirm-popup').style.display='none';
+  document.getElementById('entry-panel').style.transform='translateY(100%)';
+  showEntryLoading(false);
+  var fullName=selectedReg.firstName+' '+selectedReg.lastName;
+  var dept=selectedReg.dept;
+  var errEl=document.getElementById('reg-err');
+  errEl.style.display='none';
+  apiPost({action:'enterSession',full_name:fullName,department:dept},function(res){
+    if(res.error==='session_active'){
+      hideEntryLoading();
+      document.getElementById('entry-panel').style.transform='translateY(0)';
+      showBlockedPopup(res.full_name,res.department);return;
+    }
+    if(res.error){
+      hideEntryLoading();
+      document.getElementById('entry-panel').style.transform='translateY(0)';
+      showErr(errEl,res.error);return;
+    }
+    currentUid=res.uid;currentToken=res.token;
+    saveSession(res.uid,res.token);
+    document.getElementById('reg-name').value='';
+    document.getElementById('reg-dept-pill').style.display='none';
+    selectedReg=null;
+    showEntryLoading(true);
+    setTimeout(function(){hideEntryLoading();afterAuth();},600);
+  });
+}
+function afterAuth(){
+  // โหลด app settings ก่อนตัดสินใจ
+  apiGet('getAppSettings',function(res){
+    if(res&&!res.error) appSettings=res;
+    var bypassList=appSettings.bypass_list||[];
+    var fullName='';
+    // หาชื่อจาก members
+    apiGet('getMembers',function(mr){
+      var m=(mr.members||[]).find(function(x){return x.uid===currentUid;});
+      if(m) fullName=m.full_name;
+      // เช็ค bypass
+      var isBypass=bypassList.indexOf(fullName)>=0;
+      // เช็ค coming soon
+      var cs=appSettings.coming_soon;
+      if(cs&&!isBypass){
+        updateCountdown();setInterval(updateCountdown,1000);go('coming');
+      } else {
+        goHome();
+      }
+    });
+  });
+}
+
+/* ── Admin Login ── */
+function doAdminLogin(){
+  var passEl=document.getElementById('al-pass');
+  var errEl=document.getElementById('al-err');
+  if(!passEl||!errEl) return;
+  var pass=passEl.value;
+  var correct=adminPassOverride||ADMIN_PASS;
+  if(pass===correct){
+    passEl.value='';
+    errEl.style.display='none';
+    document.getElementById('admin-entry-panel').style.opacity='0';
+    document.getElementById('admin-entry-panel').style.pointerEvents='none';
+    go('admin');
+  } else {
+    showErr(errEl,'รหัสผ่านไม่ถูกต้อง');
+  }
+}
+
+/* ── Reset Password ── */
+var rpStep=1;
+function doResetPass(){
+  var errEl=document.getElementById('rp-err'),okEl=document.getElementById('rp-ok');
+  errEl.style.display='none';okEl.style.display='none';
+  if(rpStep===1){var ans=document.getElementById('rp-ans').value.trim();if(ans==='ราษฎร์เจริญ'){rpStep=2;document.getElementById('rp-new-wrap').style.display='block';okEl.textContent='✅ ตอบถูกต้อง กรุณากรอกรหัสผ่านใหม่';okEl.style.display='block';}else{showErr(errEl,'คำตอบไม่ถูกต้อง');}}
+  else{var newPass=document.getElementById('rp-new').value.trim();if(newPass.length<4){showErr(errEl,'รหัสผ่านต้องมีอย่างน้อย 4 ตัวอักษร');return;}adminPassOverride=newPass;rpStep=1;document.getElementById('rp-new-wrap').style.display='none';document.getElementById('rp-ans').value='';document.getElementById('rp-new').value='';okEl.textContent='✅ เปลี่ยนรหัสผ่านสำเร็จ';okEl.style.display='block';setTimeout(function(){go('admin-login');},1500);}
+}
+
+/* ── Home ── */
+function loadHome(){
+  renderStations(null);showLoad();
+  apiGet('getMembers',function(res){
+    hideLoad();if(res.error)return;
+    var members=res.members;
+    var m=currentUid?members.find(function(x){return x.uid===currentUid;}):null;
+    var sorted=members.slice().sort(function(a,b){return b.total_score-a.total_score;});
+    var rank=m?sorted.findIndex(function(x){return x.uid===m.uid;})+1:'—';
+    document.getElementById('home-name').textContent=m?m.full_name.split(' ')[0]:'—';
+    document.getElementById('home-dept').textContent=m?m.department:'—';
+    document.getElementById('home-rank').textContent=rank;
+    document.getElementById('home-score').textContent=m?m.total_score:0;
+    document.getElementById('home-rank-sub').textContent='จาก '+members.length+' คน';
+    renderStations(m);
+    var lbEl=document.getElementById('home-lb');
+    if(!sorted.length){lbEl.innerHTML='<div class="lb-box" style="text-align:center;color:var(--muted);padding:22px;font-size:13px">ยังไม่มีผู้ลงทะเบียน</div>';return;}
+    var medals=['🥇','🥈','🥉'];
+    lbEl.innerHTML='<div class="lb-box">'+sorted.slice(0,10).map(function(mem,i){
+      var isMe=mem.uid===currentUid;
+      return'<div class="lb-item'+(isMe?' me':'')+'">'
+        +'<div class="lb-rank">'+(medals[i]||(i+1))+'</div>'
+        +'<div style="flex:1"><div class="lb-name">'+mem.full_name+(isMe?'<span class="me-tag">คุณ</span>':'')+'</div>'
+        +'<div class="lb-sub">'+mem.department+' · '+Object.keys(mem.scores).length+'/4 ฐาน</div></div>'
+        +'<div class="lb-score">'+mem.total_score+'</div></div>';
+    }).join('')+'</div>';
+  });
+}
+function renderStations(m){
+  document.getElementById('home-stations').innerHTML=STATIONS.map(function(s){
+    var done=m&&!!m.scores[s.id],pts=(settingsCache[s.id]&&settingsCache[s.id].points)||settingsCache[s.id]||10;
+    return'<div class="st-card '+(done?'done':'pending')+'" style="'+(done?'border-color:'+s.accent+'44;':'')+'\" onclick="onStationClick(\''+s.id+'\')">'
+      +(done?'<div class="st-stamp">✓</div>':'')
+      +'<span class="st-ico">'+s.icon+'</span>'
+      +'<div class="st-id'+(done?' dc':'')+'" style="'+(done?'color:'+s.accent:'')+'">'+s.id+'</div>'
+      +'<div class="st-lbl2">'+s.label+'</div>'
+      +'<div class="st-act">'+s.activity+'</div>'
+      +(done?'<div class="st-pts-done" style="color:'+s.accent+';background:'+s.accent+'18">+'+m.scores[s.id]+' pts</div>':'<div class="st-pts">+'+pts+' pts</div>')
+      +'</div>';
+  }).join('');
+}
+
+/* ── Popup ── */
+function onStationClick(id){if(seenPopup[id])return;var info=STATION_INFO[id],st=STATIONS.find(function(s){return s.id===id;});document.getElementById('popup-icon').textContent=st.icon;document.getElementById('popup-title').textContent=info.title;document.getElementById('popup-sub').textContent=info.sub;document.getElementById('popup-body').textContent=info.body;document.getElementById('popup-tags').innerHTML=info.tags.map(function(t){return'<span class="ptag" style="background:'+info.accent+'18;color:'+info.accent+';border:1px solid '+info.accent+'30">'+t+'</span>';}).join('');document.getElementById('popup-btn').style.background=info.color;document.getElementById('popup-btn').dataset.stId=id;document.getElementById('st-popup').style.display='block';}
+function dismissPopup(){seenPopup[document.getElementById('popup-btn').dataset.stId]=true;document.getElementById('st-popup').style.display='none';}
+function closePopup(e){if(e.target===e.currentTarget)dismissPopup();}
+
+/* ── Station (admin give score) ── */
+function loadStation(id){
+  var s=STATIONS.find(function(x){return x.id===id;});
+  var b=document.getElementById('st-banner');
+  b.style.background='linear-gradient(135deg,'+s.color+','+s.accent+')';
+  document.getElementById('st-icon').textContent=s.icon;
+  document.getElementById('st-title').textContent='ฐาน '+s.id+' — '+s.label;
+  document.getElementById('st-btn').style.background=s.color;
+  document.getElementById('st-uid').value='';
+  document.getElementById('st-err').style.display='none';
+  document.getElementById('st-ok').style.display='none';
+  renderLog(id);startQR();
+}
+function startQR(){
+  if(qrScanner)return;
+  try{qrScanner=new Html5Qrcode('qr-reader');qrScanner.start({facingMode:'environment'},{fps:10,qrbox:{width:200,height:200}},function(decoded){document.getElementById('st-uid').value=decoded;doGiveScore();},function(){}).catch(function(){qrScanner=null;});}
+  catch(e){qrScanner=null;}
+}
+function stopQR(){if(qrScanner){try{qrScanner.stop().then(function(){qrScanner=null;});}catch(e){qrScanner=null;}}}
+function doGiveScore(){
+  var uid=document.getElementById('st-uid').value.trim().toUpperCase();
+  var errEl=document.getElementById('st-err'),okEl=document.getElementById('st-ok');
+  errEl.style.display='none';okEl.style.display='none';
+  if(!uid){showErr(errEl,'กรุณากรอก UID');return;}
+  showLoad();
+  apiPost({action:'giveScore',uid:uid,station:currentStation},function(res){
+    hideLoad();
+    if(res.error){showErr(errEl,res.error);return;}
+    okEl.textContent='✅ '+res.full_name+' +'+res.pts+' pts · รวม '+res.total_score+' pts';
+    okEl.style.display='block';
+    stLog[currentStation].unshift({name:res.full_name,pts:res.pts,time:new Date().toLocaleTimeString('th-TH')});
+    if(stLog[currentStation].length>5)stLog[currentStation].pop();
+    document.getElementById('st-uid').value='';
+    renderLog(currentStation);
+  });
+}
+function renderLog(id){var logs=stLog[id],wrap=document.getElementById('st-log-wrap');if(!logs.length){wrap.style.display='none';return;}wrap.style.display='block';document.getElementById('st-log').innerHTML=logs.map(function(l){return'<div class="log-row"><span style="font-weight:500">'+l.name+'</span><span style="color:var(--green);font-weight:600">+'+l.pts+' · '+l.time+'</span></div>';}).join('');}
+
+/* ── Admin ── */
+var adminQrBuilt=false;
+function loadAdmin(){
+  showLoad();
+  apiGet('getMembers',function(res){
+    hideLoad();
+    var sorted=(res.members||[]).slice().sort(function(a,b){return b.total_score-a.total_score;});
+    var online=sorted.filter(function(m){return m.has_session;}).length;
+    if(document.getElementById('stat-count')) document.getElementById('stat-count').textContent=sorted.length;
+    if(document.getElementById('stat-top')) document.getElementById('stat-top').textContent=sorted.length?sorted[0].total_score:0;
+    if(document.getElementById('stat-online')) document.getElementById('stat-online').textContent=online;
+    var medals=['#ffd700','#c0c0c0','#cd7f32'];
+    // Leaderboard (overview)
+    var lbEl=document.getElementById('admin-lb');
+    if(lbEl){
+      if(!sorted.length){lbEl.innerHTML='<div style="text-align:center;color:var(--muted);padding:22px;font-size:13px">ยังไม่มีผู้ลงทะเบียน</div>';}
+      else{lbEl.innerHTML='<div style="padding:0 14px;">'+sorted.slice(0,5).map(function(m,i){
+        return'<div class="member-row">'
+          +'<div class="av" style="background:'+(medals[i]||'#eef1f8')+';color:'+(i<3?'#000':'var(--navy)')+'">'+( i+1)+'</div>'
+          +'<div style="flex:1;padding:0 8px;"><div style="font-size:13px;font-weight:600;">'+m.full_name+'</div><div style="font-size:11px;color:var(--muted);">'+m.department+'</div></div>'
+          +'<div style="font-weight:700;font-size:16px;color:var(--navy);">'+m.total_score+'</div></div>';
+      }).join('')+'</div>';}
+    }
+    var listEl=document.getElementById('admin-list');
+    if(listEl){
+      if(!sorted.length){listEl.innerHTML='<div style="text-align:center;color:var(--muted);padding:28px;font-size:13px">ยังไม่มีผู้ลงทะเบียน</div>';}
+      else{listEl.innerHTML=sorted.map(function(m,i){
+        var hasSession=m.has_session;
+        return'<div class="member-row">'
+          +'<div style="display:flex;gap:10px;align-items:center;flex:1;">'
+          +'<div class="av" style="background:'+(medals[i]||'#eef1f8')+';color:'+(i<3?'#000':'var(--navy)')+'">'+( i+1)+'</div>'
+          +'<div style="flex:1;"><div style="display:flex;align-items:center;gap:6px;">'
+          +'<span style="font-weight:600;font-size:14px">'+m.full_name+'</span>'
+          +(hasSession?'<span style="font-size:9px;font-weight:700;color:#16a34a;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:20px;padding:1px 7px;">● ออนไลน์</span>':'')
+          +'</div>'
+          +'<div style="font-size:11px;color:var(--muted)">'+m.department+'</div>'
+          +'<div style="margin-top:4px">'+STATIONS.map(function(s){
+            return'<span class="chip" style="background:'+(m.scores&&m.scores[s.id]?s.color+'22':'var(--bg3)')+';color:'+(m.scores&&m.scores[s.id]?s.accent:'var(--muted)')+';border:1px solid '+(m.scores&&m.scores[s.id]?s.accent+'44':'var(--border)')+'">'+s.id+'</span>';
+          }).join('')+'</div></div></div>'
+          +'<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">'
+          +'<div style="font-weight:700;font-size:18px;color:var(--navy)">'+m.total_score+'</div>'
+          +(hasSession?'<button onclick="doKickSession(\''+m.uid+'\',\''+m.full_name+'\')" style="font-size:10px;font-weight:600;color:var(--red);background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:3px 10px;cursor:pointer;font-family:inherit;">Kick</button>':'')
+          +'</div></div>';
+      }).join('');}
+    }
+  });
+  apiGet('getSettings',function(res){
+    if(res.settings){
+      settingsCache=res.settings;
+      ['EE','ME','TO','PM'].forEach(function(id){
+        var pts=document.getElementById('pts-'+id);
+        var bon=document.getElementById('bon-'+id);
+        var st=res.settings[id];
+        if(pts) pts.value=(st&&st.points!=null?st.points:st)||1;
+        if(bon) bon.value=(st&&st.bonus!=null?st.bonus:0);
+      });
+    }
+  });
+  // โหลด app settings สำหรับ coming soon toggle
+  apiGet('getAppSettings',function(res){
+    if(res&&!res.error){
+      appSettings=res;
+      var tog=document.getElementById('cs-toggle');
+      var pill=document.getElementById('cs-pill');
+      var track=document.getElementById('cs-track');
+      var knob=document.getElementById('cs-knob');
+      var on=res.coming_soon;
+      if(tog) tog.checked=on;
+      if(pill){pill.textContent=on?'● กำลังแสดง Coming Soon':'● เปิดใช้งานปกติ';pill.style.background=on?'#fff7ed':'#f0fdf4';pill.style.color=on?'#c2410c':'#16a34a';pill.style.borderColor=on?'#fed7aa':'#bbf7d0';}
+      if(track) track.style.background=on?'var(--navy)':'var(--border)';
+      if(knob) knob.style.transform=on?'translateX(18px)':'translateX(0)';
+    }
+  });
+}
+function confirmAdminExit(){
+  document.getElementById('admin-exit-overlay').style.display='none';
+  goPreview();
+}
+function goPreview(){
+  // ซ่อน entry-panel ก่อน แล้วค่อยให้ ring เรียก openEntryPanel เอง
+  var ep=document.getElementById('entry-panel');
+  if(ep) ep.style.transform='translateY(100%)';
+  var n=document.getElementById('reg-name');
+  if(n) n.value='';
+  var pill=document.getElementById('reg-dept-pill');
+  if(pill) pill.style.display='none';
+  var btn=document.getElementById('reg-submit');
+  if(btn){btn.style.opacity='0';btn.style.transform='translateY(8px)';btn.style.pointerEvents='none';btn.textContent='เข้าร่วมกิจกรรม →';btn.dataset.isAdmin='0';}
+  var adm=document.getElementById('admin-entry-panel');
+  if(adm){adm.style.opacity='0';adm.style.pointerEvents='none';}
+  // reset ring
+  var wrap=document.getElementById('pv-ring-wrap');
+  var prog=document.getElementById('pvRingProg');
+  var lbl=document.getElementById('pvRingLbl');
+  if(wrap){wrap.style.opacity='1';wrap.style.transform='translateY(0)';}
+  if(prog){prog.style.stroke='var(--navy)';prog.style.strokeDashoffset=String(2*Math.PI*18);}
+  if(lbl) lbl.textContent='กำลังโหลด...';
+  selectedReg=null;
+  go('preview');
+  startPreviewRing(3);
+}
+function doKickSession(uid,name){
+  if(!confirm('Kick session ของ '+name+'?\nคนนี้จะถูกออกจากระบบและเข้าใหม่ได้'))return;
+  showLoad();
+  apiPost({action:'kickSession',uid:uid},function(res){
+    hideLoad();
+    if(res.success){loadAdmin();}
+  });
+}
+function switchAdminTab(t){
+  ['overview','members','stations','settings'].forEach(function(n){
+    var panel=document.getElementById('apanel-'+n);
+    var tab=document.getElementById('atab-'+n);
+    if(panel) panel.style.display=n===t?'block':'none';
+    if(tab) tab.classList.toggle('active',n===t);
+  });
+  if(t==='overview'||t==='members') loadAdmin();
+  if(t==='stations'){loadAdmin();loadStationStats();}
+}
+function switchTab(t){switchAdminTab(t);}
+
+function onCsToggle(){
+  var on=document.getElementById('cs-toggle').checked;
+  var pill=document.getElementById('cs-pill');
+  var track=document.getElementById('cs-track');
+  var knob=document.getElementById('cs-knob');
+  pill.textContent=on?'● กำลังแสดง Coming Soon':'● เปิดใช้งานปกติ';
+  pill.style.background=on?'#fff7ed':'#f0fdf4';
+  pill.style.color=on?'#c2410c':'#16a34a';
+  pill.style.borderColor=on?'#fed7aa':'#bbf7d0';
+  track.style.background=on?'var(--navy)':'var(--border)';
+  knob.style.transform=on?'translateX(18px)':'translateX(0)';
+  appSettings.coming_soon=on;
+  apiPost({action:'saveAppSettings',settings:{coming_soon:on}},function(){});
+}
+
+function loadStationStats(){
+  var el=document.getElementById('station-stats');
+  if(!el)return;
+  apiGet('getMembers',function(res){
+    var members=res.members||[];
+    var total=members.length;
+    var ORDER=['EE','ME','TO','PM'];
+    var medals=['#ffd700','#c0c0c0','#cd7f32'];
+    var html='';
+    ORDER.forEach(function(k){
+      var s=STATION_MAP[k];
+      // สมาชิกที่ผ่านฐาน k
+      var passed=members.filter(function(m){return m.scores&&m.scores[k];});
+      var pct=total?Math.round(passed.length/total*100):0;
+      // เรียงตามคะแนน
+      var sorted=passed.slice().sort(function(a,b){return b.total_score-a.total_score;});
+      var top3=sorted.slice(0,3);
+      html+='<div style="border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:12px;">';
+      // head
+      html+='<div style="display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid var(--border);">';
+      html+='<div style="width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;background:var(--bg2);">'+s.icon+'</div>';
+      html+='<div><div style="font-size:13px;font-weight:700;color:var(--navy);">ฐาน '+k+'</div><div style="font-size:10px;color:var(--muted);">'+s.name+'</div></div>';
+      html+='</div>';
+      // body
+      html+='<div style="padding:11px 14px;">';
+      // count row
+      html+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">';
+      html+='<div style="font-size:20px;font-weight:700;color:var(--navy);">'+passed.length+'</div>';
+      html+='<div style="font-size:12px;color:var(--sub);">คน / '+total+' คนทั้งหมด</div>';
+      html+='</div>';
+      // progress bar
+      html+='<div style="height:5px;background:var(--border);border-radius:3px;margin-bottom:12px;overflow:hidden;">'
+        +'<div style="height:100%;width:'+pct+'%;background:'+s.color+';border-radius:3px;"></div></div>';
+      // top 3
+      if(top3.length){
+        html+='<div style="font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px;">คะแนนสูงสุด 3 อันดับ</div>';
+        top3.forEach(function(m,i){
+          html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">'
+            +'<div style="width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;background:'+(medals[i]||'#eef1f8')+';flex-shrink:0;">'+(i+1)+'</div>'
+            +'<div style="flex:1;"><div style="font-size:13px;color:var(--navy);">'+m.full_name+'</div><div style="font-size:10px;color:var(--muted);">'+m.department+'</div></div>'
+            +'<div style="font-size:13px;font-weight:700;color:var(--navy);">'+m.total_score+'</div>'
+            +'</div>';
+        });
+      } else {
+        html+='<div style="font-size:12px;color:var(--muted);">ยังไม่มีผู้เข้าทำ</div>';
+      }
+      html+='</div></div>';
+    });
+    el.innerHTML=html;
+  });
+}
+
+buildAdminQR=function(){
+  apiGet('getSettings',function(res){
+    var s=res.settings||{};
+    var ORDER=['EE','ME','TO','PM'];
+    var html='';
+    ORDER.forEach(function(k){
+      var info=STATION_MAP[k];
+      var bonus=(s[k]&&s[k].bonus!=null?s[k].bonus:0);
+      html+='<div class="qr-card">'
+        +'<div class="qr-card-ic">'+info.icon+'</div>'
+        +'<div class="qr-card-nm">ฐาน '+k+'</div>'
+        +'<div class="qr-card-dp">'+info.name+'</div>'
+        +'<div class="qr-card-tag">+'+bonus+' bonus</div>'
+        +'<div class="qr-box" id="adqr-'+k+'"></div>'
+        +'<div class="qr-code-lbl">EOH-BONUS-'+k+'</div>'
+        +'</div>';
+    });
+    document.getElementById('adminQrGrid').innerHTML=html;
+    ORDER.forEach(function(k){
+      new QRCode(document.getElementById('adqr-'+k),{
+        text:'EOH-BONUS-'+k,width:110,height:110,
+        colorDark:'#0f2248',colorLight:'#ffffff',
+        correctLevel:QRCode.CorrectLevel.H
+      });
+    });
+    adminQrBuilt=true;
+  });
+}
+function doSaveSettings(){
+  var s={};
+  ['EE','ME','TO','PM'].forEach(function(id){
+    s[id]={
+      points:parseInt(document.getElementById('pts-'+id).value)||1,
+      bonus:parseInt(document.getElementById('bon-'+id).value)||0
+    };
+  });
+  showLoad();
+  apiPost({action:'saveSettings',settings:s},function(res){
+    hideLoad();
+    if(res.success){
+      settingsCache=s;adminQrBuilt=false;
+      var ok=document.getElementById('admin-ok');ok.textContent='✅ บันทึกแล้ว';ok.style.display='block';
+      setTimeout(function(){ok.style.display='none';},2000);
+    }
+  });
+}
+// doClear ถูกลบออก — ไม่สามารถลบข้อมูลจากแอปได้ ต้องทำจาก Google Sheet โดยตรง
+
+/* ── Logout ── */
+function doLogout(){
+  if(!confirm('ออกจากระบบ?\nข้อมูลคะแนนของคุณจะยังถูกบันทึกไว้'))return;
+  if(currentUid&&currentToken){
+    apiPost({action:'logoutSession',uid:currentUid,token:currentToken},function(){});
+  }
+  currentUid=null;currentToken=null;clearSession();goPreview();
+}
+
+/* ═══════════════════════════════════════════
+   QUIZ — New Flow
+═══════════════════════════════════════════ */
+var DEMO_QUESTIONS={
+  EE:[
+    {q:'PLC ย่อมาจากอะไร?',choices:['Programmable Logic Controller','Power Line Current','Process Logic Computer','Pulse Load Control'],ans:0},
+    {q:'Inverter ในระบบไฟฟ้าโรงงานทำหน้าที่อะไร?',choices:['แปลง AC เป็น DC','ควบคุมความเร็วรอบมอเตอร์','สำรองไฟฉุกเฉิน','วัดกระแสไฟฟ้า'],ans:1},
+    {q:'HMI คืออะไร?',choices:['อุปกรณ์วัดแรงดัน','หน้าจอโต้ตอบระหว่างคนกับเครื่องจักร','สายไฟแรงสูง','มอเตอร์ไฟฟ้า'],ans:1},
+    {q:'ถ้า motor ทำงานที่ 50 Hz ต้องการลดความเร็วลง 50% ควรตั้ง frequency เท่าไหร่?',choices:['100 Hz','25 Hz','75 Hz','50 Hz'],ans:1},
+    {q:'สัญลักษณ์ใน PLC Ladder Diagram ที่แทน Coil คือ?',choices:['---[ ]---','---( )---','---[/]---','---[P]---'],ans:1},
+  ],
+  ME:[
+    {q:'Laser Shaft Alignment ใช้แก้ปัญหาอะไร?',choices:['เพลาไม่ตรงแนว','สายพานขาด','ลูกปืนร้อนเกิน','น้ำมันรั่ว'],ans:0},
+    {q:'ค่า Misalignment แบบใดอันตรายกว่า?',choices:['Parallel','Angular','ทั้งสองแบบเท่ากัน','ขึ้นอยู่กับความเร็วรอบ'],ans:2},
+    {q:'ก่อนทำ Shaft Alignment ต้องทำอะไรก่อน?',choices:['เปิดเครื่องทิ้งไว้','ล็อก Lockout/Tagout','เติมน้ำมัน','วัดอุณหภูมิ'],ans:1},
+    {q:'หน่วยที่ใช้วัดค่า Misalignment คืออะไร?',choices:['mm หรือ inch','RPM','Ampere','Pascal'],ans:0},
+    {q:'ค่า Alignment เป็นสีเขียวในซอฟต์แวร์ หมายความว่าอะไร?',choices:['ต้องปรับเพิ่ม','อยู่ในเกณฑ์ที่ยอมรับได้','เครื่องมือขัดข้อง','ต้องรีเซ็ตใหม่'],ans:1},
+  ],
+  TO:[
+    {q:'Transition Fit คืออะไร?',choices:['มีช่องว่างเสมอ','อาจมีช่องว่างหรือรัดแน่นก็ได้','รัดแน่นเสมอ','ใช้กาวยึด'],ans:1},
+    {q:'Vernier Caliper 50 ขีด อ่านค่าได้ละเอียดถึงเท่าไหร่?',choices:['0.1 mm','0.05 mm','0.02 mm','0.01 mm'],ans:2},
+    {q:'ก่อนวัดงานด้วย Vernier Caliper ต้องทำอะไรก่อน?',choices:['Zero ค่าให้เป็น 0','ทาน้ำมัน','อุ่นเครื่องมือ','ล้างชิ้นงาน'],ans:0},
+    {q:'Clearance Fit เหมาะกับงานประเภทใด?',choices:['ชิ้นส่วนที่ต้องถอดประกอบบ่อย','ชิ้นส่วนที่ต้องรับแรงมาก','งานที่ต้องการความแน่นสูง','งานเชื่อม'],ans:0},
+    {q:'การกลึงให้ได้ Transition Fit ต้องควบคุมอะไรมากที่สุด?',choices:['ความเร็วรอบ','Tolerance ขนาดชิ้นงาน','อุณหภูมิห้อง','ประเภทน้ำมัน'],ans:1},
+  ],
+  PM:[
+    {q:'Vibration สูงผิดปกติในมอเตอร์มักบ่งบอกถึงอะไร?',choices:['ลูกปืนเสื่อมสภาพ','ไฟฟ้าแรงดันต่ำ','น้ำมันมากเกิน','อุณหภูมิห้องสูง'],ans:0},
+    {q:'หน่วยวัด Vibration คืออะไร?',choices:['Ampere','mm/s หรือ g','Pascal','RPM'],ans:1},
+    {q:'Ultrasonic ตรวจสอบลูกปืนโดยใช้หลักการอะไร?',choices:['วัดอุณหภูมิ','ตรวจจับเสียงความถี่สูง','วัดความสั่นสะเทือน','ส่งคลื่นแม่เหล็ก'],ans:1},
+    {q:'ควรวัด Vibration ที่จุดใดของมอเตอร์?',choices:['สายไฟ','ฐานมอเตอร์','ตัวลูกปืน(Housing)','ปลายเพลา'],ans:2},
+    {q:'PM ย่อมาจากอะไร?',choices:['Power Management','Preventive Maintenance','Process Monitoring','Pressure Measurement'],ans:1},
+  ]
+};
+
+// ลำดับการทำ quiz (TO→ME→EE→PM)
+var QUIZ_ORDER=['TO','ME','EE','PM'];
+var QZ_TIME=15, QZ_BONUS_MAX=5;
+var qzInterval=null, qzTimer=QZ_TIME, qzConfirmed=false, qzSelectedIdx=-1;
+var qzCur=0, qzBaseScore=0, qzBonusScore=0, qzQuestions=[], qzStation='';
+var qzDoneMap={}; // {TO:true, ME:true, ...}
+
+function calcQzBonus(t){return Math.round((t/QZ_TIME)*QZ_BONUS_MAX*10)/10;}
+
+function showQuizSelect(){
+  stopQuizTimer();
+  document.getElementById('quiz-select-view').style.display='block';
+  document.getElementById('quiz-active-view').style.display='none';
+  document.getElementById('quiz-result-view').style.display='none';
+  renderQzSelect();
+}
+
+function renderQzSelect(){
+  // นับว่าผ่านกี่ฐาน
+  var done=QUIZ_ORDER.filter(function(k){return qzDoneMap[k];}).length;
+  document.getElementById('qs-overall-val').textContent=done+' / '+QUIZ_ORDER.length+' ฐาน';
+  document.getElementById('qs-overall-fill').style.width=(done/QUIZ_ORDER.length*100)+'%';
+
+  var html='';
+  QUIZ_ORDER.forEach(function(k,i){
+    var s=STATION_MAP[k];
+    var isDone=!!qzDoneMap[k];
+    var isActive=!isDone&&(i===0||qzDoneMap[QUIZ_ORDER[i-1]]);
+    var isLocked=!isDone&&!isActive;
+    var prevName=i>0?QUIZ_ORDER[i-1]:'';
+
+    // step connector
+    if(i>0){
+      var prevDone=!!qzDoneMap[QUIZ_ORDER[i-1]];
+      html+='<div style="display:flex;justify-content:center;height:10px;">'
+        +'<div style="width:2px;background:'+(prevDone?'#86efac':'var(--border)')+'border-radius:1px;"></div></div>';
+    }
+
+    var borderColor=isDone?'#86efac':isActive?'var(--navy)':'var(--border)';
+    var bg=isDone?'#f0fdf4':isActive?'var(--bg)':'var(--bg2)';
+    var opacity=isLocked?'.55':'1';
+    var cursor=isLocked?'not-allowed':isActive?'pointer':'default';
+
+    html+='<div onclick="'+(isActive?'startQzStation(\''+k+'\')':isLocked?'alert(\'ต้องทำ '+prevName+' ก่อน\')':'')
+      +'" style="border:1.5px solid '+borderColor+';background:'+bg+';border-radius:16px;padding:14px;display:flex;align-items:center;gap:12px;opacity:'+opacity+';cursor:'+cursor+';position:relative;'+(isActive?'box-shadow:0 4px 14px rgba(15,34,72,.08);':'')+'margin-bottom:0;">';
+
+    // icon
+    var iconBg=isDone?'#dcfce7':isActive?'var(--bg2)':'var(--border)';
+    html+='<div style="width:48px;height:48px;border-radius:12px;background:'+iconBg+';display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;">'+s.icon+'</div>';
+
+    // info
+    html+='<div style="flex:1;">';
+    var nameColor=isDone?'#16a34a':isActive?'var(--navy)':'var(--muted)';
+    html+='<div style="font-size:15px;font-weight:700;color:'+nameColor+';">'+k+' — '+s.name+'</div>';
+    if(isDone) html+='<div style="font-size:11px;color:#16a34a;margin-top:2px;">✓ ทำเสร็จแล้ว</div>';
+    else if(isActive) html+='<div style="font-size:11px;color:var(--accent);margin-top:2px;font-weight:600;">→ ถึงคิวของคุณแล้ว!</div>';
+    else html+='<div style="font-size:11px;color:var(--muted);margin-top:2px;">ปลดล็อกหลังทำ '+prevName+'</div>';
+    html+='</div>';
+
+    // right badge
+    if(isDone) html+='<div style="font-size:10px;font-weight:700;color:#16a34a;background:#dcfce7;border:1px solid #86efac;border-radius:20px;padding:3px 10px;">✓ เสร็จ</div>';
+    else if(isActive) html+='<div style="font-size:10px;font-weight:700;color:var(--navy);background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:3px 10px;">ถัดไป</div>';
+    else html+='<div style="font-size:11px;font-weight:600;color:var(--muted);">🔒</div>';
+
+    html+='<div style="position:absolute;top:10px;right:12px;font-size:10px;font-weight:700;color:var(--muted);">'+(i+1)+'</div>';
+    html+='</div>';
+  });
+  document.getElementById('qs-list').innerHTML=html;
+}
+
+function startQzStation(station){
+  qzStation=station;
+  qzCur=0; qzBaseScore=0; qzBonusScore=0;
+  document.getElementById('quiz-select-view').style.display='none';
+  document.getElementById('quiz-active-view').style.display='block';
+  document.getElementById('quiz-result-view').style.display='none';
+
+  var s=STATION_MAP[station];
+  document.getElementById('qa-station-name').textContent=s.icon+' '+station+' — '+s.name;
+  document.getElementById('qa-prog').style.background=s.color||'#10b981';
+
+  // fetch questions
+  fetch(API+'?action=getQuestions&station='+station)
+    .then(function(r){return r.json();})
+    .then(function(res){qzQuestions=(res&&res.length)?res:DEMO_QUESTIONS[station];renderQzQ();})
+    .catch(function(){qzQuestions=DEMO_QUESTIONS[station];renderQzQ();});
+}
+
+function renderQzQ(){
+  var q=qzQuestions[qzCur];
+  document.getElementById('qa-counter').textContent=(qzCur+1)+' / '+qzQuestions.length;
+  document.getElementById('qa-prog').style.width=(qzCur/qzQuestions.length*100)+'%';
+  document.getElementById('qa-qnum').textContent='คำถามที่ '+(qzCur+1);
+  document.getElementById('qa-qtext').textContent=q.q;
+  document.getElementById('qa-result').style.display='none';
+  document.getElementById('qa-confirm').style.display='none';
+  document.getElementById('qa-next').disabled=true;
+  document.getElementById('qa-next').style.opacity='.3';
+  setQzUrgent(false);
+
+  var L=['A','B','C','D'];
+  document.getElementById('qa-choices').innerHTML=(q.choices||q.c).map(function(c,i){
+    return'<button onclick="selectQzChoice('+i+')" style="background:var(--bg);border:1.5px solid var(--border);border-radius:11px;padding:10px 13px;font-size:13px;color:var(--navy);cursor:pointer;text-align:left;font-family:inherit;display:flex;align-items:center;gap:9px;transition:.15s;">'
+      +'<div style="width:22px;height:22px;border-radius:50%;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;">'+L[i]+'</div>'
+      +'<span>'+c+'</span></button>';
+  }).join('');
+
+  qzConfirmed=false; qzSelectedIdx=-1;
+  startQzTimer();
+}
+
+function startQzTimer(){
+  stopQuizTimer(); qzTimer=QZ_TIME; updateQzTimer();
+  qzInterval=setInterval(function(){
+    if(qzConfirmed) return;
+    qzTimer--; updateQzTimer();
+    if(qzTimer<=5&&qzTimer>0){
+      setQzUrgent(true);
+      if(navigator.vibrate)navigator.vibrate(60);
+    }
+    if(qzTimer<=0){stopQuizTimer();if(!qzConfirmed)qzTimeout();}
   },1000);
 }
 
-function updatePollUI(remaining){
-  document.getElementById('pollCountdown').textContent=remaining+' วิ';
-  document.getElementById('pollFill').style.width=(remaining/pollSecs*100)+'%';
+function stopQuizTimer(){clearInterval(qzInterval);}
+
+function updateQzTimer(){
+  var circ=113, offset=circ*(qzTimer/QZ_TIME);
+  document.getElementById('qa-ring-prog').style.strokeDashoffset=circ-offset;
+  document.getElementById('qa-ring-num').textContent=qzTimer;
+  document.getElementById('qa-timer-lbl').textContent=qzTimer+' วินาที';
+  var urg=qzTimer<=5;
+  document.getElementById('qa-ring-prog').style.stroke=urg?'#dc2626':'#10b981';
+  document.getElementById('qa-ring-num').style.color=urg?'#dc2626':'var(--navy)';
+  document.getElementById('qa-timer-lbl').style.color=urg?'#dc2626':'var(--navy)';
+  var bp=document.getElementById('qa-bonus-pill');
+  bp.textContent='⚡ +'+calcQzBonus(qzTimer).toFixed(1);
+  if(urg){bp.style.color='#dc2626';bp.style.borderColor='#fca5a5';bp.style.background='#fef2f2';}
+  else{bp.style.color='#10b981';bp.style.borderColor='#86efac';bp.style.background='#f0fdf4';}
 }
 
-function checkSession(){
-  // simulate API checkSession
-  if(kicked){
-    clearInterval(countInterval);
-    showKickPopup('Admin ได้ reset session ของคุณ\nกรุณาเข้าสู่ระบบใหม่อีกครั้ง');
+function setQzUrgent(on){
+  var ring=document.getElementById('qa-ring');
+  var row=document.getElementById('qa-timer-row');
+  var card=document.getElementById('qa-qcard');
+  var fl=document.getElementById('quiz-flash');
+  if(on){
+    if(!ring._pint)ring._pint=setInterval(function(){ring.style.transform=ring.style.transform===''?'scale(1.08)':'';},225);
+    if(!fl._fint){fl.style.opacity='0.18';fl._fint=setInterval(function(){fl.style.opacity=fl.style.opacity==='0'?'0.18':'0';},450);}
+    row.style.borderColor='#fca5a5';row.style.background='#fff5f5';
+    card.style.borderColor='#fca5a5';card.style.background='#fff5f5';
+  } else {
+    if(ring._pint){clearInterval(ring._pint);ring._pint=null;ring.style.transform='';}
+    if(fl._fint){clearInterval(fl._fint);fl._fint=null;fl.style.opacity='0';}
+    row.style.borderColor='';row.style.background='';
+    card.style.borderColor='';card.style.background='';
   }
-  // ถ้า hard refresh — restore session จาก localStorage
 }
 
-function refreshData(){
-  var ico=document.getElementById('refreshIco');
-  ico.style.transition='transform .6s linear';
-  ico.style.transform='rotate(360deg)';
-  setTimeout(function(){
-    ico.style.transition='none';ico.style.transform='';
-    document.getElementById('userScore').textContent=Math.floor(18+Math.random()*5);
-    document.getElementById('lastRefresh').textContent='อัปเดตล่าสุด: '+nowStr();
-  },700);
+function selectQzChoice(i){
+  if(qzConfirmed)return;
+  qzSelectedIdx=i;
+  document.getElementById('qa-choices').querySelectorAll('button').forEach(function(c,idx){
+    c.style.borderColor=idx===i?'#2563eb':'var(--border)';
+    c.style.background=idx===i?'#eff6ff':'var(--bg)';
+    c.style.color=idx===i?'#2563eb':'var(--navy)';
+    c.querySelector('div').style.background=idx===i?'#2563eb':'var(--bg2)';
+    c.querySelector('div').style.color=idx===i?'#fff':'';
+  });
+  document.getElementById('qa-confirm').style.display='block';
 }
 
-function showKickPopup(reason){
-  document.getElementById('kickReason').textContent=reason;
-  document.getElementById('kickOverlay').style.display='flex';
+function confirmQuizAnswer(){
+  if(qzConfirmed||qzSelectedIdx<0)return;
+  qzConfirmed=true; stopQuizTimer(); setQzUrgent(false);
+  document.getElementById('qa-confirm').style.display='none';
+  var q=qzQuestions[qzCur]; var ans=q.ans!=null?q.ans:q.a;
+  var correct=(qzSelectedIdx===ans), bonus=0;
+  var L=['A','B','C','D'];
+  document.getElementById('qa-choices').querySelectorAll('button').forEach(function(c,idx){
+    c.onclick=null; c.style.cursor='default';
+    if(idx===ans){c.style.borderColor='#16a34a';c.style.background='#f0fdf4';c.style.color='#16a34a';c.querySelector('div').style.background='#16a34a';c.querySelector('div').style.color='#fff';}
+    else if(idx===qzSelectedIdx){c.style.borderColor='#dc2626';c.style.background='#fef2f2';c.style.color='#dc2626';c.querySelector('div').style.background='#dc2626';c.querySelector('div').style.color='#fff';}
+    else{c.style.borderColor='var(--border)';c.style.background='var(--bg)';}
+  });
+  if(correct){qzBaseScore+=1;bonus=calcQzBonus(qzTimer);qzBonusScore+=bonus;}
+  var totalScore=Math.round((qzBaseScore+qzBonusScore)*10)/10;
+  document.getElementById('qa-score').textContent=totalScore+' คะแนน';
+  document.getElementById('qa-timer-lbl').textContent=qzTimer+' วินาที (หยุด)';
+  var rr=document.getElementById('qa-result');
+  rr.style.cssText='display:flex;border-radius:11px;padding:10px 13px;margin-bottom:10px;align-items:center;gap:9px;font-size:13px;border:1.5px solid '+(correct?'#86efac':'#fca5a5')+';background:'+(correct?'#f0fdf4':'#fef2f2')+';';
+  rr.innerHTML='<span style="font-size:20px;">'+(correct?'✅':'❌')+'</span>'
+    +'<div><div style="font-size:13px;font-weight:600;">'+(correct?'ถูกต้อง! +1':'ไม่ถูกต้อง')+'</div>'
+    +(correct&&bonus>0?'<div style="font-size:11px;color:#10b981;margin-top:1px;">⚡ Bonus +'+bonus.toFixed(1)+'</div>':'')+'</div>';
+  document.getElementById('qa-next').disabled=false;
+  document.getElementById('qa-next').style.opacity='1';
+  document.getElementById('qa-next').textContent=qzCur<qzQuestions.length-1?'ข้อถัดไป →':'ดูผลคะแนน →';
 }
 
-function afterKick(){
-  document.getElementById('kickOverlay').style.display='none';
-  clearInterval(countInterval);
-  isLoggedIn=false;
-  showPage('pg-preview');
+function qzTimeout(){
+  qzConfirmed=true; setQzUrgent(false);
+  document.getElementById('qa-confirm').style.display='none';
+  var q=qzQuestions[qzCur]; var ans=q.ans!=null?q.ans:q.a;
+  document.getElementById('qa-choices').querySelectorAll('button').forEach(function(c,idx){
+    c.onclick=null;c.style.cursor='default';
+    if(idx===ans){c.style.borderColor='#16a34a';c.style.background='#f0fdf4';c.style.color='#16a34a';}
+    else{c.style.borderColor='var(--border)';c.style.background='var(--bg)';}
+  });
+  var rr=document.getElementById('qa-result');
+  rr.style.cssText='display:flex;border-radius:11px;padding:10px 13px;margin-bottom:10px;align-items:center;gap:9px;font-size:13px;border:1.5px solid #fca5a5;background:#fef2f2;';
+  rr.innerHTML='<span style="font-size:20px;">⏱</span><div style="font-size:13px;font-weight:600;color:#dc2626;">หมดเวลา! ไม่ได้คะแนน</div>';
+  document.getElementById('qa-next').disabled=false;
+  document.getElementById('qa-next').style.opacity='1';
+  document.getElementById('qa-next').textContent=qzCur<qzQuestions.length-1?'ข้อถัดไป →':'ดูผลคะแนน →';
 }
 
-// ── F5 / hard refresh simulation ──
-function simulateHardRefresh(){
-  // ปกติถ้ากด F5 — initApp() อ่านจาก localStorage
-  // ถ้ามี uid+token อยู่ → ตรวจ session → ถ้า valid → กลับหน้าเดิม
-  showToast('🔄 Hard refresh — กำลังตรวจสอบ session...');
-  setTimeout(function(){
-    if(isLoggedIn && !kicked){
-      showToast('✓ Session ยังอยู่ — กลับหน้า Home');
-      refreshData();
-    } else {
-      showPage('pg-preview');
+function nextQuizQ(){
+  qzCur++;
+  if(qzCur>=qzQuestions.length){showQzResult();return;}
+  qzConfirmed=false;qzSelectedIdx=-1;
+  renderQzQ();
+}
+
+function showQzResult(){
+  stopQuizTimer(); setQzUrgent(false);
+  qzDoneMap[qzStation]=true;
+  var total=Math.round((qzBaseScore+qzBonusScore)*10)/10;
+  document.getElementById('quiz-active-view').style.display='none';
+  document.getElementById('quiz-result-view').style.display='block';
+  document.getElementById('qr-score').textContent=total.toFixed(1);
+  document.getElementById('qr-station').textContent='คะแนนจาก '+qzStation+' Quiz';
+  document.getElementById('qr-base').textContent=qzBaseScore;
+  document.getElementById('qr-bonus').textContent=qzBonusScore.toFixed(1);
+}
+
+/* ═══════════════════════════════════════════
+   SCAN BONUS (ใหม่)
+═══════════════════════════════════════════ */
+var bonusScanner=null,bonusBusy=false,lastBonusScanAt=0;
+
+function enterScanBonus(){
+  // แสดงข้อมูลผู้ใช้ปัจจุบัน
+  var uid=currentUid;
+  if(!uid){
+    document.getElementById('sb-result').innerHTML='<div class="scan-result bad"><div class="sic">⚠️</div><div class="stitle">กรุณาเข้าสู่ระบบก่อน</div><div class="sdesc">กลับไปล็อกอินที่หน้าหลัก</div></div>';
+    return;
+  }
+  // ดึงข้อมูลจาก API
+  apiGet('getMembers',function(res){
+    var m=(res.members||[]).find(function(x){return x.uid===uid;});
+    if(m){
+      document.getElementById('sb-av').textContent=(m.full_name||'?').charAt(0);
+      document.getElementById('sb-name').textContent=m.full_name;
+      document.getElementById('sb-uid').textContent='UID: '+m.uid+(m.department?' · '+m.department:'');
+      document.getElementById('sb-total').textContent=m.total_score||0;
     }
-  },1500);
+  });
+  startBonusScanner();
 }
 
-function showToast(msg){
-  var t=document.getElementById('toast');
-  document.getElementById('toastTxt').textContent=msg;
-  t.style.display='flex';
-  setTimeout(function(){t.style.display='none';},2500);
+function startBonusScanner(){
+  if(bonusScanner)return;
+  // เช็คว่า element มีอยู่
+  var el=document.getElementById('scan-reader');
+  if(!el)return;
+  bonusScanner=new Html5Qrcode('scan-reader');
+  bonusScanner.start(
+    {facingMode:'environment'},
+    {fps:10,qrbox:{width:200,height:200}},
+    onBonusScan,
+    function(){}
+  ).then(function(){
+    document.getElementById('scan-hint').textContent='เล็งกล้องไปที่ QR ของฐาน';
+  }).catch(function(){
+    document.getElementById('scan-hint').innerHTML='<span style="color:var(--red)">เปิดกล้องไม่ได้ — กรุณาอนุญาตการใช้กล้อง</span>';
+    bonusScanner=null;
+  });
 }
 
-// ── Admin kick ──
-function adminKick(){
-  kicked=true;
-  document.getElementById('kickBtn').disabled=true;
-  document.getElementById('kickBtn').textContent='Kicked';
-  document.getElementById('kickBtn').style.opacity='.4';
-  document.getElementById('onlineBadge').textContent='● kicked';
-  document.getElementById('onlineBadge').style.background='#fef2f2';
-  document.getElementById('onlineBadge').style.color='#dc2626';
-  document.getElementById('onlineBadge').style.borderColor='#fecaca';
-  document.getElementById('kickStatus').style.display='block';
+function stopBonusScanner(){
+  if(bonusScanner){
+    try{bonusScanner.stop().catch(function(){});}catch(e){}
+    bonusScanner=null;
+  }
+}
+
+function onBonusScan(text){
+  var now=Date.now();
+  if(bonusBusy||(now-lastBonusScanAt)<2500)return;
+  var m=String(text).trim().toUpperCase().match(/^EOH-BONUS-(EE|ME|TO|PM)$/);
+  if(!m){
+    showBonusScanResult(false,'QR ไม่ถูกต้อง','ไม่ใช่ QR โบนัสประจำฐาน');
+    lastBonusScanAt=now;return;
+  }
+  lastBonusScanAt=now;bonusBusy=true;
+  document.getElementById('scan-hint').textContent='กำลังบันทึกคะแนน…';
+  apiPost({action:'bonusScan',uid:currentUid,station:m[1]},function(res){
+    bonusBusy=false;
+    document.getElementById('scan-hint').textContent='เล็งกล้องไปที่ QR ของฐาน';
+    if(res&&res.success){
+      document.getElementById('sb-total').textContent=res.total_score;
+      showBonusScanResult(true,'รับโบนัสฐาน '+res.station+' สำเร็จ!','+'+res.bonus+' คะแนน · รวม '+res.total_score+' คะแนน');
+      if(navigator.vibrate)navigator.vibrate([60,40,60]);
+    } else {
+      showBonusScanResult(false,'รับโบนัสไม่ได้',(res&&res.error)||'เกิดข้อผิดพลาด');
+    }
+  });
+}
+
+function showBonusScanResult(ok,title,desc){
+  document.getElementById('sb-result').innerHTML='<div class="scan-result '+(ok?'ok':'bad')+'">'
+    +'<div class="sic">'+(ok?'✅':'⚠️')+'</div>'
+    +'<div class="stitle">'+title+'</div>'
+    +'<div class="sdesc">'+desc+'</div></div>';
+}
+
+/* ═══════════════════════════════════════════
+   SPLASH + INIT
+═══════════════════════════════════════════ */
+window.addEventListener('load',function(){
+  var splash=document.getElementById('pg-splash');
+  splash.style.display='flex';
+  document.getElementById('pg-preview').classList.remove('active');
+  setTimeout(function(){
+    splash.classList.add('hide');
+    setTimeout(function(){splash.style.display='none';initApp();},600);
+  },2200);
+});
+
+function addToCalendar(){
+  var ics=[
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Engineering Synergy 2026//TH',
+    'BEGIN:VEVENT',
+    'UID:engineering-synergy-2026@smpc',
+    'DTSTAMP:20260614T000000Z',
+    'DTSTART:20260710T020000Z',
+    'DTEND:20260710T050000Z',
+    'SUMMARY:Engineering Synergy 2026',
+    'DESCRIPTION:กิจกรรม Engineer for a Day — ฝ่ายวิศวกรรม',
+    'LOCATION:Shop floor ฝ่ายวิศวกรรม',
+    'END:VEVENT',
+    'END:VCALENDAR'
+  ].join('\r\n');
+  var blob=new Blob([ics],{type:'text/calendar;charset=utf-8'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url;a.download='engineering-synergy-2026.ics';
+  document.body.appendChild(a);a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function initApp(){
+  apiGet('getSettings',function(res){if(res.settings)settingsCache=res.settings;});
+  var uid=loadSessionUid();
+  var token=loadSessionToken();
+  if(uid&&token){
+    apiGet('getMembers',function(res){
+      if(res.members&&res.members.find(function(m){return m.uid===uid;})){
+        currentUid=uid;currentToken=token;
+      }
+    });
+  }
+  go('preview');
+  // ซ่อน entry-panel ก่อนให้ ring เริ่ม
+  var ep=document.getElementById('entry-panel');
+  if(ep) ep.style.transform='translateY(100%)';
+  // โหลด employees + appSettings
+  apiGet('getEmployees',function(res){
+    var employees=(res&&res.employees)||[];
+    employeeDB=employees.map(function(e){return{firstName:e.firstName,lastName:e.lastName,dept:e.dept,position:e.position||''};});
+  });
+  apiGet('getAppSettings',function(res){if(res&&!res.error)appSettings=res;});
+  startPreviewRing(3);
 }
 </script>
 </body>
