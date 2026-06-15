@@ -292,6 +292,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
   <div class="splash-title">Engineering Synergy</div>
   <div class="splash-sub">2026</div>
   <div class="splash-bar"><div class="splash-fill"></div></div>
+  <div id="splash-status" style="font-size:11px;color:var(--muted);margin-top:16px;opacity:0;transition:opacity .3s;"></div>
 </div>
 
 <div class="wrap">
@@ -1870,9 +1871,63 @@ window.addEventListener('load',function(){
   var splash=document.getElementById('pg-splash');
   splash.style.display='flex';
   document.getElementById('pg-preview').classList.remove('active');
+
+  // โหลด background data และตรวจ session ระหว่าง splash
+  apiGet('getSettings',function(res){if(res.settings)settingsCache=res.settings;});
+  apiGet('getEmployees',function(res){
+    var employees=(res&&res.employees)||[];
+    employeeDB=employees.map(function(e){return{firstName:e.firstName,lastName:e.lastName,dept:e.dept,position:e.position||''};});
+  });
+  apiGet('getAppSettings',function(res){if(res&&!res.error)appSettings=res;});
+
+  var uid=loadSessionUid();
+  var token=loadSessionToken();
+  var sessionResult=null; // null=ไม่รู้, true=อยู่, false=หมด
+
+  if(uid&&token){
+    // มี session → ตรวจกับ server ระหว่าง splash
+    var statusEl=document.getElementById('splash-status');
+    setTimeout(function(){
+      if(statusEl){statusEl.style.opacity='1';statusEl.textContent='กำลังตรวจสอบ session...';}
+    },800);
+    apiGet('getMembers',function(res){
+      var m=(res.members||[]).find(function(x){return x.uid===uid;});
+      sessionResult=(m&&m.has_session)?'valid':'invalid';
+      currentUid=(sessionResult==='valid')?uid:null;
+      currentToken=(sessionResult==='valid')?token:null;
+      if(sessionResult==='invalid') clearSession();
+    });
+  }
+
+  // ซ่อน splash หลัง 2.2 วิ → navigate
   setTimeout(function(){
     splash.classList.add('hide');
-    setTimeout(function(){splash.style.display='none';initApp();},600);
+    setTimeout(function(){
+      splash.style.display='none';
+      if(sessionResult==='valid'){
+        // session ยังอยู่ → กลับหน้า Home
+        go('home');
+        loadHome();
+        startSessionPolling();
+      } else if(sessionResult==='invalid'){
+        // session หมด/โดน kick → Preview
+        goToPreview();
+      } else if(uid&&token&&sessionResult===null){
+        // API ยังไม่ตอบ → รอ แล้ว navigate
+        var wait=setInterval(function(){
+          if(sessionResult!==null){
+            clearInterval(wait);
+            if(sessionResult==='valid'){go('home');loadHome();startSessionPolling();}
+            else goToPreview();
+          }
+        },200);
+        // timeout 5 วิ ถ้า API ไม่ตอบ → Preview
+        setTimeout(function(){if(sessionResult===null){clearInterval(wait);goToPreview();}},5000);
+      } else {
+        // ไม่มี session → Preview
+        goToPreview();
+      }
+    },600);
   },2200);
 });
 
@@ -1901,38 +1956,7 @@ function addToCalendar(){
   URL.revokeObjectURL(url);
 }
 
-function initApp(){
-  apiGet('getSettings',function(res){if(res.settings)settingsCache=res.settings;});
-  apiGet('getEmployees',function(res){
-    var employees=(res&&res.employees)||[];
-    employeeDB=employees.map(function(e){return{firstName:e.firstName,lastName:e.lastName,dept:e.dept,position:e.position||''};});
-  });
-  apiGet('getAppSettings',function(res){if(res&&!res.error)appSettings=res;});
-
-  var uid=loadSessionUid();
-  var token=loadSessionToken();
-
-  if(uid&&token){
-    // มี session ใน localStorage — ตรวจสอบก่อน navigate
-    apiGet('getMembers',function(res){
-      var m=(res.members||[]).find(function(x){return x.uid===uid;});
-      if(m&&m.has_session){
-        // session ยังอยู่ → restore กลับหน้า home
-        currentUid=uid;currentToken=token;
-        go('home');
-        loadHome();
-        startSessionPolling();
-      } else {
-        // session หมดหรือโดน kick → กลับ preview
-        clearSession();
-        goToPreview();
-      }
-    });
-  } else {
-    goToPreview();
-  }
-}
-
+/* goToPreview ใช้แทน initApp */
 function goToPreview(){
   go('preview');
   var ep=document.getElementById('entry-panel');
