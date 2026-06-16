@@ -1040,9 +1040,6 @@ function loadHome(){
     if(res.error){renderHomeError();return;}
     var members=res.members||[];
     var m=currentUid?members.find(function(x){return x.uid===currentUid;}):null;
-    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-       FIX 4: reset + restore qzDoneMap จาก server เสมอ
-    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
     qzDoneMap={};
     if(m&&m.quiz_done){
       var arr=Array.isArray(m.quiz_done)?m.quiz_done
@@ -1179,7 +1176,6 @@ var _pendingQuizStation=null;
 function openStationQuiz(){
   var id=currentStationDetail;
   if(!id) return;
-  // ถ้าทำแล้ว → toast + ปิด detail
   if(qzDoneMap[id]){
     showStationToast('ทำ Quiz ฐาน '+id+' เสร็จแล้ว ✓');
     closeStationDetail();
@@ -1204,7 +1200,6 @@ function startConfirmedQuiz(){
   var id=_pendingQuizStation;
   _pendingQuizStation=null;
   if(!id) return;
-  // activate pg-quiz ตรงๆ ไม่ผ่าน showQuizSelect
   stopQR();stopBonusScanner();
   document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
   document.getElementById('pg-quiz').classList.add('active');
@@ -1223,7 +1218,6 @@ function cancelQuizStart(){
 }
 
 function confirmQuitQuiz(){
-  // ไม่อนุญาตให้ออกระหว่างทำ quiz
   showStationToast('ต้องทำ Quiz ให้จบก่อนกดกลับ');
 }
 
@@ -1525,8 +1519,8 @@ function backToStationFromQuiz(){
   var id=qzStation;
   stopQuizTimer();
   go('home');
-  loadHome();  // โหลด home ใน background
-  if(id) openStationDetail(id);  // เปิด Station Detail ทันทีเลย
+  loadHome();
+  if(id) openStationDetail(id);
 }
 function showQuizSelect(){
   stopQuizTimer();
@@ -1717,11 +1711,6 @@ function nextQuizQ(){
   renderQzQ();
 }
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   FIX 1: showQzResult() — บันทึกคะแนนจริง
-   เปลี่ยนจาก saveQuizDone → saveQuizScore
-   และส่ง base, bonus, total ไปด้วย
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 function showQzResult(){
   stopQuizTimer(); setQzUrgent(false);
   qzDoneMap[qzStation]=true;
@@ -1735,7 +1724,6 @@ function showQzResult(){
       bonus:Math.round(qzBonusScore*10)/10,
       total:total
     },function(res){
-      // อัปเดต score บน home ทันทีถ้า API ตอบกลับ
       if(res&&res.total_score){
         document.getElementById('home-score').textContent=res.total_score;
       }
