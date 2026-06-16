@@ -81,42 +81,11 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
 .dp-txt{font-size:12px;color:#166534;}
 .dp-val{font-size:13px;font-weight:700;color:#15803d;margin-left:auto;}
 
-/* ── Preview ── */
-.hero-banner{background:var(--navy);border-radius:22px;padding:36px 24px;margin:16px 0 20px;text-align:center;}
-.hero-eyebrow{font-size:11px;font-weight:500;color:rgba(255,255,255,.45);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px;}
-.hero-title{font-size:32px;font-weight:700;color:#fff;letter-spacing:-.8px;line-height:1.1;margin-bottom:4px;}
-.hero-title em{font-style:normal;color:#60a5fa;}
-.hero-chips{display:flex;justify-content:center;gap:6px;margin-top:16px;}
-.hc{font-size:9px;font-weight:600;padding:4px 10px;border-radius:20px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.75);border:1px solid rgba(255,255,255,.15);letter-spacing:.3px;}
-.ev-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:24px;}
-.ev-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px 10px;text-align:center;}
-.ev-ico{font-size:20px;margin-bottom:5px;}
-.ev-lbl{font-size:8px;font-weight:600;color:var(--muted);letter-spacing:.6px;text-transform:uppercase;margin-bottom:3px;}
-.ev-val{font-size:12px;font-weight:700;color:var(--text);}
-.cd-wrap{text-align:center;margin-bottom:22px;}
-.cd-ring{width:52px;height:52px;margin:0 auto 8px;position:relative;}
-.cd-ring svg{transform:rotate(-90deg);}
-.cd-ring circle{fill:none;stroke:var(--border);stroke-width:3;}
-.cd-prog{stroke:var(--navy);stroke-linecap:round;stroke-dasharray:113;stroke-dashoffset:113;transition:stroke-dashoffset .9s linear;}
-.cd-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:var(--navy);}
-.cd-lbl{font-size:11px;color:var(--muted);}
-.btn-preview{width:100%;padding:14px;background:var(--navy);border:none;border-radius:14px;color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;opacity:0;transition:opacity .5s;pointer-events:none;}
-.btn-preview.show{opacity:1;pointer-events:auto;}
-
 /* ── Page header ── */
 .pg-header{padding:24px 0 20px;display:flex;align-items:center;gap:12px;}
 .back-ico{width:36px;height:36px;border-radius:12px;background:var(--bg2);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--navy);cursor:pointer;flex-shrink:0;}
 .pg-titles .ptitle{font-size:17px;font-weight:700;color:var(--navy);letter-spacing:-.3px;}
 .pg-titles .psub{font-size:12px;color:var(--muted);margin-top:1px;}
-
-/* Step */
-.step-row{display:flex;align-items:center;gap:6px;margin-bottom:24px;}
-.step{width:24px;height:24px;border-radius:50%;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.step.done{background:var(--navy);color:#fff;}
-.step.active{background:var(--accent);color:#fff;}
-.step-lbl{font-size:11px;color:var(--muted);}
-.step-lbl.active{color:var(--navy);font-weight:600;}
-.step-line{flex:1;height:1px;background:var(--border);}
 
 /* ── Home ── */
 .home-top{padding:28px 0 16px;}
@@ -146,12 +115,6 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
 .st-card.pending .st-ico{opacity:.3;filter:grayscale(1);}
 .st-stamp{position:absolute;top:8px;right:9px;width:18px;height:18px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:700;}
 .st-ico{font-size:28px;margin-bottom:8px;display:block;}
-.st-id{font-size:14px;font-weight:700;color:var(--navy);}
-.st-id.dc{color:var(--accent);}
-.st-lbl2{font-size:9px;color:var(--muted);margin-top:1px;}
-.st-act{font-size:9px;color:var(--sub);margin-top:4px;line-height:1.4;}
-.st-pts{font-size:11px;color:var(--border2);margin-top:5px;}
-.st-pts-done{font-size:11px;font-weight:600;border-radius:6px;padding:2px 8px;margin-top:5px;display:inline-block;}
 .lb-box{background:var(--bg);border:1.5px solid var(--border);border-radius:18px;overflow:hidden;margin-bottom:18px;}
 .lb-item{display:flex;align-items:center;gap:11px;padding:12px 16px;border-bottom:1px solid var(--bg2);}
 .lb-item:last-child{border-bottom:none;}
@@ -205,27 +168,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
 .cd-unit-lbl{font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-top:4px;}
 .cd-sep{font-size:26px;font-weight:300;color:var(--border2);padding-bottom:8px;}
 
-/* ══════════════════════════════════════
-   ── QUIZ (ใหม่) ──
-══════════════════════════════════════ */
-.q-badge{display:flex;align-items:center;gap:10px;border-radius:14px;padding:14px 18px;margin-bottom:20px;}
-.q-badge-icon{font-size:26px;}
-.q-badge-name{color:#fff;font-size:15px;font-weight:700;}
-.q-badge-sub{color:rgba(255,255,255,.5);font-size:11px;margin-top:1px;}
-.q-progress-row{display:flex;justify-content:space-between;margin-bottom:6px;}
-.q-progress-bar{height:4px;background:var(--border);border-radius:2px;margin-bottom:18px;}
-.q-progress-fill{height:100%;background:var(--accent);border-radius:2px;transition:.3s;}
-.q-timer-wrap{text-align:center;margin-bottom:18px;}
-.q-timer-ring{display:inline-block;position:relative;width:60px;height:60px;}
-.q-timer-ring svg{transform:rotate(-90deg);}
-.q-timer-ring circle{fill:none;stroke:var(--border);stroke-width:4;}
-.q-timer-prog{stroke:var(--accent);stroke-linecap:round;stroke-dasharray:163;transition:stroke-dashoffset .1s linear,stroke .3s;}
-.q-timer-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:var(--navy);}
-.q-bonus-badge{display:inline-block;margin-top:5px;font-size:11px;font-weight:600;color:var(--accent);background:var(--blue-light);border:1px solid #bfdbfe;border-radius:20px;padding:3px 10px;}
-.q-card{background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:14px;}
-.q-num{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:7px;}
-.q-text{font-size:15px;font-weight:500;line-height:1.65;}
-.q-choices{display:flex;flex-direction:column;gap:8px;margin-bottom:18px;}
+/* ── QUIZ ── */
 .q-choice{background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:12px 15px;font-size:14px;color:var(--text);cursor:pointer;text-align:left;font-family:inherit;transition:.15s;display:flex;align-items:center;gap:10px;}
 .q-choice:hover{border-color:var(--accent);background:#f5f8ff;}
 .q-choice.sel{border-color:var(--accent);background:var(--blue-light);color:var(--accent);}
@@ -233,29 +176,10 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
 .q-choice.wrong{border-color:var(--red);background:#fef2f2;color:var(--red);}
 .q-choice.disabled{cursor:default;pointer-events:none;}
 .q-letter{width:24px;height:24px;border-radius:50%;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
-.q-choice.sel .q-letter{background:var(--accent);color:#fff;}
-.q-choice.correct .q-letter{background:var(--green);color:#fff;}
-.q-choice.wrong .q-letter{background:var(--red);color:#fff;}
-.q-result-row{background:var(--bg);border:1.5px solid var(--border);border-radius:13px;padding:13px 15px;margin-bottom:14px;display:flex;align-items:center;gap:12px;}
-.q-result-ic{font-size:22px;}
-.q-result-txt{font-size:13px;font-weight:500;}
-.q-result-bonus{font-size:12px;color:var(--accent);margin-top:2px;}
-.q-final{background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:26px 22px;text-align:center;}
-.q-final-score{font-size:48px;font-weight:800;color:var(--navy);line-height:1;}
-.q-score-row{display:flex;justify-content:center;gap:22px;margin:18px 0;padding:16px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
-.q-score-item{text-align:center;}
-.q-score-val{font-size:20px;font-weight:700;color:var(--navy);}
-.q-score-lbl{font-size:10px;color:var(--muted);margin-top:2px;}
 
 /* ── Admin QR grid ── */
 .qr-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
 .qr-card{background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:16px 12px;text-align:center;}
-.qr-card-ic{font-size:22px;margin-bottom:4px;}
-.qr-card-nm{font-size:13px;font-weight:700;color:var(--navy);}
-.qr-card-dp{font-size:9px;color:var(--muted);}
-.qr-card-tag{display:inline-block;font-size:10px;font-weight:700;color:var(--accent);background:var(--blue-light);border:1px solid #bfdbfe;border-radius:20px;padding:2px 10px;margin:6px 0 10px;}
-.qr-box{display:flex;justify-content:center;margin-bottom:6px;}
-.qr-code-lbl{font-size:9px;color:var(--muted);font-family:monospace;}
 
 /* ── Scan bonus (user) ── */
 .me-bar{display:flex;align-items:center;gap:10px;background:var(--blue-light);border:1px solid #bfdbfe;border-radius:12px;padding:11px 14px;margin-bottom:16px;}
@@ -297,10 +221,9 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
 
 <div class="wrap">
 
-<!-- PREVIEW + REGISTER (รวมเป็นหน้าเดียว) -->
+<!-- PREVIEW -->
 <div id="pg-preview" class="page active" style="min-height:100vh;position:relative;overflow:hidden;">
 
-  <!-- Confirm popup -->
   <div id="confirm-popup" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:400;align-items:flex-end;justify-content:center;">
     <div style="background:var(--bg);border-radius:24px 24px 0 0;padding:24px 24px 48px;width:100%;max-width:420px;">
       <div style="width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px;"></div>
@@ -322,7 +245,6 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
     </div>
   </div>
 
-  <!-- Title + countdown ring -->
   <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center;padding:0 24px;">
     <div style="font-size:54px;font-weight:700;color:var(--navy);letter-spacing:-2px;line-height:1.05;">Engineering</div>
     <div style="font-size:54px;font-weight:700;color:var(--accent);letter-spacing:-2px;line-height:1.05;margin-bottom:14px;">Synergy</div>
@@ -339,7 +261,6 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
     </div>
   </div>
 
-  <!-- Loading overlay — แสดงหลังกดยืนยัน -->
   <div id="entry-loading" style="position:absolute;inset:0;background:#fff;z-index:20;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;border-radius:0;">
     <div style="position:relative;width:36px;height:36px;">
       <div id="el-spinner" style="width:36px;height:36px;border:2.5px solid var(--border);border-top-color:#1e3a5f;border-radius:50%;animation:elSpin .7s linear infinite;"></div>
@@ -350,6 +271,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
     </div>
     <div id="el-txt" style="font-size:13px;color:var(--muted);">กำลังเข้าสู่ระบบ...</div>
   </div>
+
   <div id="entry-panel" style="position:absolute;bottom:0;left:0;right:0;background:#fff;border-radius:22px 22px 0 0;padding:20px 24px 44px;border-top:0.5px solid var(--border);transform:translateY(100%);transition:transform .45s cubic-bezier(.34,1.1,.64,1);">
     <div style="width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 18px;"></div>
     <div style="font-size:17px;font-weight:700;color:var(--navy);margin-bottom:3px;">สวัสดี 👋</div>
@@ -366,7 +288,6 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
     <button id="reg-submit" onclick="onRegSubmit()" style="width:100%;padding:15px;background:#1e3a5f;border:none;border-radius:14px;color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;opacity:0;transform:translateY(8px);transition:opacity .35s,transform .35s;pointer-events:none;">เข้าร่วมกิจกรรม →</button>
   </div>
 
-  <!-- Admin password slide-up panel -->
   <div id="admin-entry-panel" style="position:absolute;inset:0;background:#fff;display:flex;flex-direction:column;justify-content:center;padding:40px 28px;opacity:0;pointer-events:none;transition:opacity .35s ease;z-index:10;">
     <div style="font-size:12px;font-weight:600;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">Admin</div>
     <div style="font-size:22px;font-weight:700;color:var(--navy);margin-bottom:4px;">เข้าสู่ระบบ</div>
@@ -382,17 +303,12 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
       <button class="btn-ghost-sm" style="color:var(--muted);font-size:12px" onclick="go('reset-pass')">ลืมรหัสผ่าน?</button>
     </div>
   </div>
-
 </div>
 
-
-<!-- REGISTER (stub สำหรับ backward compat) -->
 <div id="pg-register" class="page"></div>
-
-<!-- LOGIN (stub) -->
 <div id="pg-login" class="page"></div>
 
-<!-- ADMIN LOGIN (เดิม — ยังคงไว้สำหรับ go('admin-login') จากที่อื่น) -->
+<!-- ADMIN LOGIN -->
 <div id="pg-admin-login" class="page">
   <div class="pg-header">
     <div class="back-ico" onclick="go('preview')">←</div>
@@ -426,7 +342,6 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
   <button class="btn btn-navy" onclick="doResetPass()">ยืนยัน</button>
 </div>
 
-
 <!-- COMING SOON -->
 <div id="pg-coming" class="page">
   <div class="coming-wrap">
@@ -453,7 +368,6 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
 <!-- HOME -->
 <div id="pg-home" class="page" style="position:relative;">
 
-  <!-- Kick overlay -->
   <div id="kick-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);z-index:300;align-items:flex-end;justify-content:center;">
     <div style="background:#fff;border-radius:24px 24px 0 0;padding:24px 24px 48px;width:100%;max-width:420px;">
       <div style="width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px;"></div>
@@ -477,6 +391,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
       </div>
     </div>
   </div>
+
   <div class="home-top">
     <div class="home-greet">สวัสดี 👋</div>
     <div class="home-name" id="home-name">—</div>
@@ -514,7 +429,6 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
         <div id="std-stamp" style="display:none;font-size:12px;font-weight:600;color:#16a34a;background:#f0fdf4;border:1px solid #86efac;border-radius:20px;padding:4px 14px;display:inline-block;"></div>
       </div>
       <div class="sec-lbl">กิจกรรมในฐานนี้</div>
-      <!-- Quiz card -->
       <div id="std-quiz-card" onclick="openStationQuiz()" style="border-radius:14px;padding:16px;margin-bottom:10px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:.15s;">
         <div style="font-size:28px;flex-shrink:0;">📋</div>
         <div style="flex:1;">
@@ -523,7 +437,6 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
         </div>
         <div style="font-size:18px;">→</div>
       </div>
-      <!-- Scan Bonus card -->
       <div onclick="openStationScan()" style="background:linear-gradient(135deg,#1e40af,#2563eb);border-radius:14px;padding:16px;display:flex;align-items:center;gap:12px;cursor:pointer;color:#fff;">
         <div style="font-size:28px;flex-shrink:0;">📷</div>
         <div style="flex:1;">
@@ -560,7 +473,6 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
 <!-- ADMIN -->
 <div id="pg-admin" class="page">
 
-  <!-- Exit confirm popup -->
   <div id="admin-exit-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);">
     <div style="background:var(--bg);border-radius:24px 24px 0 0;padding:24px 24px 48px;width:100%;max-width:420px;">
       <div style="width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px;"></div>
@@ -580,7 +492,6 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
     <button class="btn-ghost-sm" style="color:var(--muted);font-size:12px" onclick="document.getElementById('admin-exit-overlay').style.display='flex'">← ออก</button>
   </div>
 
-  <!-- 4 tabs -->
   <div style="display:flex;gap:6px;margin-bottom:16px;overflow-x:auto;padding-bottom:2px;">
     <button class="tab active" id="atab-overview" onclick="switchAdminTab('overview')">📊 ภาพรวม</button>
     <button class="tab" id="atab-members"  onclick="switchAdminTab('members')">👥 สมาชิก</button>
@@ -588,7 +499,6 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
     <button class="tab" id="atab-settings" onclick="switchAdminTab('settings')">⚙️ ตั้งค่า</button>
   </div>
 
-  <!-- ── OVERVIEW ── -->
   <div id="apanel-overview">
     <div class="sec-lbl">สถิติวันนี้</div>
     <div class="grid2" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px;">
@@ -602,7 +512,6 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
     </div>
   </div>
 
-  <!-- ── MEMBERS ── -->
   <div id="apanel-members" style="display:none;">
     <div id="admin-list" style="background:var(--bg);border:1.5px solid var(--border);border-radius:16px;padding:0 16px;">
       <div style="text-align:center;color:var(--muted);padding:28px;font-size:13px;">กำลังโหลด...</div>
@@ -612,7 +521,6 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
     </div>
   </div>
 
-  <!-- ── STATIONS ── -->
   <div id="apanel-stations" style="display:none;">
     <div class="sec-lbl">เปิดฐานสแกน QR (ให้คะแนน)</div>
     <div class="grid2" style="margin-bottom:20px;">
@@ -631,7 +539,6 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
       <div style="text-align:center;color:var(--muted);padding:20px;font-size:13px;grid-column:span 2">กำลังโหลด...</div>
     </div>
 
-    <!-- QR popup overlay -->
     <div id="qr-popup-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);z-index:500;align-items:flex-end;justify-content:center;">
       <div style="background:#fff;border-radius:22px 22px 0 0;padding:20px 22px 48px;width:100%;max-width:420px;text-align:center;">
         <div style="width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 18px;"></div>
@@ -645,9 +552,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
     </div>
   </div>
 
-  <!-- ── SETTINGS ── -->
   <div id="apanel-settings" style="display:none;">
-    <!-- Coming Soon toggle -->
     <div class="sec-lbl">โหมดระบบ</div>
     <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:14px;">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
@@ -664,8 +569,6 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
         </label>
       </div>
     </div>
-
-    <!-- Bypass list -->
     <div class="sec-lbl">Bypass Coming Soon</div>
     <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:14px;padding:12px 16px;margin-bottom:14px;">
       <div style="font-size:12px;color:var(--sub);margin-bottom:10px;line-height:1.6;">รายชื่อนี้เข้า Home ได้เลยโดยไม่ติด Coming Soon</div>
@@ -676,8 +579,6 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
         </div>
       </div>
     </div>
-
-    <!-- Station points/bonus -->
     <div class="sec-lbl">คะแนนแต่ละฐาน</div>
     <div id="admin-ok" class="ok-box"></div>
     <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:16px;padding:14px 16px;margin-bottom:10px;">
@@ -693,16 +594,12 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
     </div>
     <button class="btn btn-navy" onclick="doSaveSettings()">💾 บันทึกการตั้งค่า</button>
   </div>
-
 </div>
 
 
-<!-- ═══════════════════════════════════════
-     QUIZ — Station Select + Quiz
-═══════════════════════════════════════ -->
+<!-- QUIZ -->
 <div id="pg-quiz" class="page">
 
-  <!-- Quiz flash overlay -->
   <div id="quiz-flash" style="position:fixed;inset:0;background:rgba(220,38,38,.18);pointer-events:none;opacity:0;z-index:400;"></div>
 
   <!-- Station select view -->
@@ -711,8 +608,6 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
       <div class="back-ico" onclick="go('home')">←</div>
       <div class="pg-titles"><div class="ptitle">Quiz</div><div class="psub">ทำตามลำดับ · 5 ข้อ/ฐาน · ข้อละ 15 วินาที</div></div>
     </div>
-
-    <!-- overall progress -->
     <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:18px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;">
         <span style="font-size:12px;font-weight:600;color:var(--sub);">ความคืบหน้าทั้งหมด</span>
@@ -722,12 +617,10 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
         <div id="qs-overall-fill" style="height:100%;background:var(--accent);border-radius:3px;transition:.4s;width:0%;"></div>
       </div>
     </div>
-
-    <!-- station list -->
     <div id="qs-list" style="display:flex;flex-direction:column;gap:0;"></div>
   </div>
 
-  <!-- Quiz active view (hidden until station selected) -->
+  <!-- Quiz active view -->
   <div id="quiz-active-view" style="display:none;">
     <div style="padding:14px 0 10px;display:flex;align-items:center;gap:10px;">
       <div class="back-ico" onclick="stopQuizTimer();showQuizSelect()">←</div>
@@ -746,7 +639,6 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
       <div id="qa-prog" style="height:100%;border-radius:2px;transition:.3s;background:#10b981;width:0%;"></div>
     </div>
 
-    <!-- timer row compact -->
     <div id="qa-timer-row" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding:8px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;transition:.3s;">
       <div style="display:flex;align-items:center;gap:10px;">
         <div id="qa-ring" style="position:relative;width:44px;height:44px;flex-shrink:0;">
@@ -764,22 +656,17 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
       <div id="qa-bonus-pill" style="font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid #86efac;color:#10b981;background:#f0fdf4;transition:.3s;">⚡ +5.0</div>
     </div>
 
-    <!-- question -->
     <div id="qa-qcard" style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:13px 14px;margin-bottom:10px;transition:border-color .3s,background .3s;">
       <div id="qa-qnum" style="font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:5px;">คำถามที่ 1</div>
       <div id="qa-qtext" style="font-size:14px;font-weight:600;line-height:1.6;color:var(--navy);"></div>
     </div>
 
-    <!-- choices -->
     <div id="qa-choices" style="display:flex;flex-direction:column;gap:7px;margin-bottom:10px;"></div>
 
-    <!-- confirm btn -->
     <button id="qa-confirm" onclick="confirmQuizAnswer()" style="width:100%;padding:12px;background:#2563eb;border:none;border-radius:11px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:10px;display:none;">✓ ยืนยันคำตอบ</button>
 
-    <!-- result -->
-    <div id="qa-result" style="display:none;border-radius:11px;padding:10px 13px;margin-bottom:10px;border:1.5px solid;display:none;align-items:center;gap:9px;font-size:13px;"></div>
+    <div id="qa-result" style="display:none;border-radius:11px;padding:10px 13px;margin-bottom:10px;border:1.5px solid;align-items:center;gap:9px;font-size:13px;"></div>
 
-    <!-- next btn -->
     <button id="qa-next" onclick="nextQuizQ()" disabled style="width:100%;padding:12px;background:var(--navy);border:none;border-radius:11px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;opacity:.3;">ข้อถัดไป →</button>
   </div>
 
@@ -798,9 +685,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
 </div>
 
 
-<!-- ═══════════════════════════════════════
-     SCAN BONUS (ใหม่)
-═══════════════════════════════════════ -->
+<!-- SCAN BONUS -->
 <div id="pg-scan-bonus" class="page">
   <div style="padding-top:20px;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
     <div class="back-ico" onclick="stopBonusScanner();go('home')">←</div>
@@ -886,7 +771,6 @@ function go(page,param){
   else{var el=document.getElementById('pg-'+page);if(el)el.classList.add('active');}
   window.scrollTo(0,0);
 }
-/* goHome defined in afterAuth section */
 
 /* ── Session storage ── */
 function saveSession(uid,token){try{localStorage.setItem('eoh_uid',uid);localStorage.setItem('eoh_token',token);}catch(e){}}
@@ -894,7 +778,7 @@ function loadSessionUid(){try{return localStorage.getItem('eoh_uid');}catch(e){r
 function loadSessionToken(){try{return localStorage.getItem('eoh_token');}catch(e){return null;}}
 function clearSession(){try{localStorage.removeItem('eoh_uid');localStorage.removeItem('eoh_token');}catch(e){}}
 
-/* ── Countdown (coming soon) ── */
+/* ── Countdown ── */
 function updateCountdown(){
   var diff=EVENT_OPEN-new Date();
   if(diff<=0){['days','hours','mins','secs'].forEach(function(k){document.getElementById('cd-'+k).textContent='00';});return;}
@@ -910,7 +794,7 @@ function lev(a,b){var m=a.length,n=b.length,dp=[];for(var i=0;i<=m;i++){dp[i]=[i
 function scoreEmp(e,q){var full=(e.firstName+' '+e.lastName).toLowerCase();var fq=q.toLowerCase();if(full===fq)return 1;if(full.startsWith(fq)||e.firstName.toLowerCase().startsWith(fq))return 0.92;if(full.includes(fq))return 0.85;var d=lev(fq,full.slice(0,fq.length+2));return Math.max(0,1-d/Math.max(fq.length,3));}
 function searchEmp(q){if(q.trim().length<1)return[];var scored=employeeDB.map(function(e){return{e:e,s:scoreEmp(e,q)};}).filter(function(x){return x.s>0.4;}).sort(function(a,b){return b.s-a.s;});return scored.length?[scored[0].e]:[];}
 
-/* ── Entry panel (preview page) ── */
+/* ── Entry panel ── */
 function startPreviewRing(totalSecs){
   var circ=2*Math.PI*18;
   var prog=document.getElementById('pvRingProg');
@@ -924,14 +808,10 @@ function startPreviewRing(totalSecs){
     lbl.textContent=secs>0?secs+' วินาที...':'พร้อมแล้ว ✓';
     if(secs<=0){
       prog.style.stroke='var(--accent)';
-      // รอแสดง "พร้อมแล้ว ✓" ก่อน 600ms แล้ว fade ring ออก
       setTimeout(function(){
         wrap.style.opacity='0';
         wrap.style.transform='translateY(-6px)';
-        // หลัง ring fade จบ (500ms) ค่อย slide popup ขึ้น
-        setTimeout(function(){
-          openEntryPanel();
-        },500);
+        setTimeout(function(){openEntryPanel();},500);
       },600);
       return;
     }
@@ -943,10 +823,7 @@ function startPreviewRing(totalSecs){
 function openEntryPanel(){
   var p=document.getElementById('entry-panel');
   if(p) p.style.transform='translateY(0)';
-  setTimeout(function(){
-    var n=document.getElementById('reg-name');
-    if(n) n.focus();
-  },450);
+  setTimeout(function(){var n=document.getElementById('reg-name');if(n) n.focus();},450);
 }
 function closeAdminEntry(){
   var adm=document.getElementById('admin-entry-panel');
@@ -1058,7 +935,7 @@ function showBlockedPopup(name,dept){
   popup.style.display='flex';
 }
 
-/* ── Confirm → enterSession ── */
+/* ── Entry loading ── */
 function showEntryLoading(success){
   var el=document.getElementById('entry-loading');
   el.style.display='flex';
@@ -1107,16 +984,8 @@ function confirmEnter(){
   });
 }
 function afterAuth(){
-  // navigate ทันที ไม่รอ API
-  var cs=appSettings.coming_soon;
-  var bypassList=appSettings.bypass_list||[];
-  // ถ้ายังไม่รู้ชื่อ ให้ดึง background แล้วเช็คทีหลัง
-  apiGet('getAppSettings',function(res){
-    if(res&&!res.error) appSettings=res;
-  });
-  // navigate ก่อนเลย แล้วโหลดข้อมูลใน background
-  if(cs){
-    // เช็ค bypass จาก members background
+  apiGet('getAppSettings',function(res){if(res&&!res.error) appSettings=res;});
+  if(appSettings.coming_soon){
     apiGet('getMembers',function(mr){
       var m=(mr.members||[]).find(function(x){return x.uid===currentUid;});
       var fullName=m?m.full_name:'';
@@ -1129,7 +998,7 @@ function afterAuth(){
   }
 }
 
-/* ── Polling — ตรวจ session ทุก 30 วิ ── */
+/* ── Polling ── */
 var pollInterval=null;
 function startSessionPolling(){
   stopSessionPolling();
@@ -1138,49 +1007,41 @@ function startSessionPolling(){
     apiGet('getMembers',function(res){
       if(res.error)return;
       var m=(res.members||[]).find(function(x){return x.uid===currentUid;});
-      if(!m||!m.has_session){
-        stopSessionPolling();
-        showKickNotification();
-      }
+      if(!m||!m.has_session){stopSessionPolling();showKickNotification();}
     });
   },30000);
 }
-function stopSessionPolling(){
-  if(pollInterval){clearInterval(pollInterval);pollInterval=null;}
-}
-function showKickNotification(){
-  var overlay=document.getElementById('kick-overlay');
-  if(overlay) overlay.style.display='flex';
-}
+function stopSessionPolling(){if(pollInterval){clearInterval(pollInterval);pollInterval=null;}}
+function showKickNotification(){var overlay=document.getElementById('kick-overlay');if(overlay) overlay.style.display='flex';}
 function dismissKick(){
   var overlay=document.getElementById('kick-overlay');
   if(overlay) overlay.style.display='none';
-  currentUid=null;currentToken=null;clearSession();
-  goPreview();
+  currentUid=null;currentToken=null;clearSession();goPreview();
 }
 
 /* ── Home ── */
 function goHome(){go('home');loadHome();startSessionPolling();}
 function loadHome(){
-  // แสดง skeleton ทันที
   renderHomeSkeleton();
   var lastEl=document.getElementById('home-last-refresh');
   apiGet('getMembers',function(res){
-    if(res.error){
-      renderHomeError();return;
-    }
+    if(res.error){renderHomeError();return;}
     var members=res.members||[];
     var m=currentUid?members.find(function(x){return x.uid===currentUid;}):null;
-    // restore qzDoneMap จาก sheet
-    if(m&&m.quiz_done&&m.quiz_done.length){
-      m.quiz_done.forEach(function(k){qzDoneMap[k]=true;});
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       FIX 4: reset + restore qzDoneMap จาก server เสมอ
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    qzDoneMap={};
+    if(m&&m.quiz_done){
+      var arr=Array.isArray(m.quiz_done)?m.quiz_done
+             :(typeof m.quiz_done==='string'&&m.quiz_done.length?m.quiz_done.split(','):[]);
+      arr.forEach(function(k){if(k.trim())qzDoneMap[k.trim()]=true;});
     }
     var sorted=members.slice().sort(function(a,b){return b.total_score-a.total_score;});
     var rank=m?sorted.findIndex(function(x){return x.uid===m.uid;})+1:'—';
     document.getElementById('home-name').textContent=m?m.full_name.split(' ')[0]:'—';
-    // หา position จาก employeeDB
-    var emp=employeeDB.find(function(e){return (e.firstName+' '+e.lastName)===m.full_name;});
-    document.getElementById('home-dept').textContent=emp&&emp.position?emp.position:m.department||'—';
+    var emp=employeeDB.find(function(e){return (e.firstName+' '+e.lastName)===(m?m.full_name:'');});
+    document.getElementById('home-dept').textContent=emp&&emp.position?emp.position:m?(m.department||'—'):'—';
     document.getElementById('home-rank').textContent=rank;
     document.getElementById('home-score').textContent=m?m.total_score:0;
     renderStations(m);
@@ -1192,9 +1053,7 @@ function renderHomeSkeleton(){
   var el=document.getElementById('home-name');if(el)el.innerHTML=s;
 }
 function renderHomeError(){
-  // แสดง error ผ่านปุ่ม retry บน rank card
-  var el=document.getElementById('home-score');
-  if(el) el.textContent='—';
+  var el=document.getElementById('home-score');if(el) el.textContent='—';
 }
 function doAdminLogin(){
   var passEl=document.getElementById('al-pass');
@@ -1203,8 +1062,7 @@ function doAdminLogin(){
   var pass=passEl.value;
   var correct=adminPassOverride||ADMIN_PASS;
   if(pass===correct){
-    passEl.value='';
-    errEl.style.display='none';
+    passEl.value='';errEl.style.display='none';
     document.getElementById('admin-entry-panel').style.opacity='0';
     document.getElementById('admin-entry-panel').style.pointerEvents='none';
     go('admin');
@@ -1222,7 +1080,7 @@ function doResetPass(){
   else{var newPass=document.getElementById('rp-new').value.trim();if(newPass.length<4){showErr(errEl,'รหัสผ่านต้องมีอย่างน้อย 4 ตัวอักษร');return;}adminPassOverride=newPass;rpStep=1;document.getElementById('rp-new-wrap').style.display='none';document.getElementById('rp-ans').value='';document.getElementById('rp-new').value='';okEl.textContent='✅ เปลี่ยนรหัสผ่านสำเร็จ';okEl.style.display='block';setTimeout(function(){go('admin-login');},1500);}
 }
 
-/* ── Station grid 2x2 + detail view ── */
+/* ── Station grid ── */
 var currentStationDetail=null;
 var QUIZ_ORDER_HOME=['TO','ME','EE','PM'];
 
@@ -1289,7 +1147,7 @@ function openStationDetail(id){
   if(qzDone){
     qCard.style.cssText='border-radius:14px;padding:16px;margin-bottom:10px;display:flex;align-items:center;gap:12px;cursor:pointer;background:#f0fdf4;border:1.5px solid #86efac;';
     qTitle.style.color='#16a34a'; qTitle.textContent='✓ Quiz เสร็จแล้ว';
-    qSub.textContent='กดเพื่อดูหน้า Quiz'; qSub.style.color='#16a34a';
+    qSub.textContent='(ทำแล้ว ไม่สามารถทำซ้ำได้)'; qSub.style.color='#16a34a';
   } else {
     qCard.style.cssText='border-radius:14px;padding:16px;margin-bottom:10px;display:flex;align-items:center;gap:12px;cursor:pointer;background:var(--navy);';
     qTitle.style.color='#fff'; qTitle.textContent='ทำ Quiz';
@@ -1304,12 +1162,32 @@ function closeStationDetail(){
   currentStationDetail=null;
 }
 
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   FIX 2 + FIX 3: openStationQuiz()
+   - Guard ถ้าทำแล้ว (Fix 3)
+   - ข้าม select view, เริ่ม quiz ทันที (Fix 2)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 function openStationQuiz(){
   var id=currentStationDetail;
-  closeStationDetail();
   if(!id) return;
-  go('quiz');
-  setTimeout(function(){startQzStation(id);},150);
+  // FIX 3: ถ้าทำแล้ว → toast + ปิด detail เท่านั้น
+  if(qzDoneMap[id]){
+    showStationToast('ทำ Quiz ฐาน '+id+' เสร็จแล้ว ✓');
+    closeStationDetail();
+    return;
+  }
+  closeStationDetail();
+  // FIX 2: activate pg-quiz ตรงๆ ไม่ผ่าน showQuizSelect
+  stopQR();stopBonusScanner();
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  document.getElementById('pg-quiz').classList.add('active');
+  window.scrollTo(0,0);
+  stopQuizTimer();
+  // ซ่อนทุก view ก่อน แล้ว startQzStation จะแสดง active view เอง
+  document.getElementById('quiz-select-view').style.display='none';
+  document.getElementById('quiz-active-view').style.display='none';
+  document.getElementById('quiz-result-view').style.display='none';
+  setTimeout(function(){startQzStation(id);},100);
 }
 
 function openStationScan(){
@@ -1317,12 +1195,12 @@ function openStationScan(){
   go('scan-bonus');
 }
 
-/* ── Popup (station info) ── */
+/* ── Popup ── */
 function onStationClick(id){if(seenPopup[id])return;var info=STATION_INFO[id],st=STATIONS.find(function(s){return s.id===id;});document.getElementById('popup-icon').textContent=st.icon;document.getElementById('popup-title').textContent=info.title;document.getElementById('popup-sub').textContent=info.sub;document.getElementById('popup-body').textContent=info.body;document.getElementById('popup-tags').innerHTML=info.tags.map(function(t){return'<span class="ptag" style="background:'+info.accent+'18;color:'+info.accent+';border:1px solid '+info.accent+'30">'+t+'</span>';}).join('');document.getElementById('popup-btn').style.background=info.color;document.getElementById('popup-btn').dataset.stId=id;document.getElementById('st-popup').style.display='block';}
 function dismissPopup(){seenPopup[document.getElementById('popup-btn').dataset.stId]=true;document.getElementById('st-popup').style.display='none';}
 function closePopup(e){if(e.target===e.currentTarget)dismissPopup();}
 
-/* ── Station (admin give score) ── */
+/* ── Station Admin ── */
 function loadStation(id){
   var s=STATIONS.find(function(x){return x.id===id;});
   var b=document.getElementById('st-banner');
@@ -1372,7 +1250,6 @@ function loadAdmin(){
     if(document.getElementById('stat-top')) document.getElementById('stat-top').textContent=sorted.length?sorted[0].total_score:0;
     if(document.getElementById('stat-online')) document.getElementById('stat-online').textContent=online;
     var medals=['#ffd700','#c0c0c0','#cd7f32'];
-    // Leaderboard (overview)
     var lbEl=document.getElementById('admin-lb');
     if(lbEl){
       if(!sorted.length){lbEl.innerHTML='<div style="text-align:center;color:var(--muted);padding:22px;font-size:13px">ยังไม่มีผู้ลงทะเบียน</div>';}
@@ -1418,7 +1295,6 @@ function loadAdmin(){
       });
     }
   });
-  // โหลด app settings สำหรับ coming soon toggle
   apiGet('getAppSettings',function(res){
     if(res&&!res.error){
       appSettings=res;
@@ -1434,23 +1310,15 @@ function loadAdmin(){
     }
   });
 }
-function confirmAdminExit(){
-  document.getElementById('admin-exit-overlay').style.display='none';
-  goPreview();
-}
+function confirmAdminExit(){document.getElementById('admin-exit-overlay').style.display='none';goPreview();}
 function goPreview(){
-  // ซ่อน entry-panel ก่อน แล้วค่อยให้ ring เรียก openEntryPanel เอง
-  var ep=document.getElementById('entry-panel');
-  if(ep) ep.style.transform='translateY(100%)';
-  var n=document.getElementById('reg-name');
-  if(n) n.value='';
-  var pill=document.getElementById('reg-dept-pill');
-  if(pill) pill.style.display='none';
+  var ep=document.getElementById('entry-panel');if(ep) ep.style.transform='translateY(100%)';
+  var n=document.getElementById('reg-name');if(n) n.value='';
+  var pill=document.getElementById('reg-dept-pill');if(pill) pill.style.display='none';
   var btn=document.getElementById('reg-submit');
   if(btn){btn.style.opacity='0';btn.style.transform='translateY(8px)';btn.style.pointerEvents='none';btn.textContent='เข้าร่วมกิจกรรม →';btn.dataset.isAdmin='0';}
   var adm=document.getElementById('admin-entry-panel');
   if(adm){adm.style.opacity='0';adm.style.pointerEvents='none';}
-  // reset ring
   var wrap=document.getElementById('pv-ring-wrap');
   var prog=document.getElementById('pvRingProg');
   var lbl=document.getElementById('pvRingLbl');
@@ -1464,10 +1332,7 @@ function goPreview(){
 function doKickSession(uid,name){
   if(!confirm('Kick session ของ '+name+'?\nคนนี้จะถูกออกจากระบบและเข้าใหม่ได้'))return;
   showLoad();
-  apiPost({action:'kickSession',uid:uid},function(res){
-    hideLoad();
-    if(res.success){loadAdmin();}
-  });
+  apiPost({action:'kickSession',uid:uid},function(res){hideLoad();if(res.success){loadAdmin();}});
 }
 function switchAdminTab(t){
   ['overview','members','stations','settings'].forEach(function(n){
@@ -1480,7 +1345,6 @@ function switchAdminTab(t){
   if(t==='stations'){loadAdmin();loadStationStats();if(!adminQrBuilt)buildAdminQR();}
 }
 function switchTab(t){switchAdminTab(t);}
-
 function onCsToggle(){
   var on=document.getElementById('cs-toggle').checked;
   var pill=document.getElementById('cs-pill');
@@ -1495,7 +1359,6 @@ function onCsToggle(){
   appSettings.coming_soon=on;
   apiPost({action:'saveAppSettings',settings:{coming_soon:on}},function(){});
 }
-
 function loadStationStats(){
   var el=document.getElementById('station-stats');
   if(!el)return;
@@ -1507,47 +1370,28 @@ function loadStationStats(){
     var html='';
     ORDER.forEach(function(k){
       var s=STATION_MAP[k];
-      // สมาชิกที่ผ่านฐาน k
       var passed=members.filter(function(m){return m.scores&&m.scores[k];});
       var pct=total?Math.round(passed.length/total*100):0;
-      // เรียงตามคะแนน
       var sorted=passed.slice().sort(function(a,b){return b.total_score-a.total_score;});
       var top3=sorted.slice(0,3);
       html+='<div style="border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:12px;">';
-      // head
       html+='<div style="display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid var(--border);">';
       html+='<div style="width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;background:var(--bg2);">'+s.icon+'</div>';
-      html+='<div><div style="font-size:13px;font-weight:700;color:var(--navy);">ฐาน '+k+'</div><div style="font-size:10px;color:var(--muted);">'+s.name+'</div></div>';
-      html+='</div>';
-      // body
+      html+='<div><div style="font-size:13px;font-weight:700;color:var(--navy);">ฐาน '+k+'</div><div style="font-size:10px;color:var(--muted);">'+s.name+'</div></div></div>';
       html+='<div style="padding:11px 14px;">';
-      // count row
-      html+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">';
-      html+='<div style="font-size:20px;font-weight:700;color:var(--navy);">'+passed.length+'</div>';
-      html+='<div style="font-size:12px;color:var(--sub);">คน / '+total+' คนทั้งหมด</div>';
-      html+='</div>';
-      // progress bar
-      html+='<div style="height:5px;background:var(--border);border-radius:3px;margin-bottom:12px;overflow:hidden;">'
-        +'<div style="height:100%;width:'+pct+'%;background:'+s.color+';border-radius:3px;"></div></div>';
-      // top 3
+      html+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;"><div style="font-size:20px;font-weight:700;color:var(--navy);">'+passed.length+'</div><div style="font-size:12px;color:var(--sub);">คน / '+total+' คนทั้งหมด</div></div>';
+      html+='<div style="height:5px;background:var(--border);border-radius:3px;margin-bottom:12px;overflow:hidden;"><div style="height:100%;width:'+pct+'%;background:'+s.color+';border-radius:3px;"></div></div>';
       if(top3.length){
         html+='<div style="font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px;">คะแนนสูงสุด 3 อันดับ</div>';
         top3.forEach(function(m,i){
-          html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">'
-            +'<div style="width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;background:'+(medals[i]||'#eef1f8')+';flex-shrink:0;">'+(i+1)+'</div>'
-            +'<div style="flex:1;"><div style="font-size:13px;color:var(--navy);">'+m.full_name+'</div><div style="font-size:10px;color:var(--muted);">'+m.department+'</div></div>'
-            +'<div style="font-size:13px;font-weight:700;color:var(--navy);">'+m.total_score+'</div>'
-            +'</div>';
+          html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><div style="width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;background:'+(medals[i]||'#eef1f8')+';flex-shrink:0;">'+(i+1)+'</div><div style="flex:1;"><div style="font-size:13px;color:var(--navy);">'+m.full_name+'</div><div style="font-size:10px;color:var(--muted);">'+m.department+'</div></div><div style="font-size:13px;font-weight:700;color:var(--navy);">'+m.total_score+'</div></div>';
         });
-      } else {
-        html+='<div style="font-size:12px;color:var(--muted);">ยังไม่มีผู้เข้าทำ</div>';
-      }
+      } else {html+='<div style="font-size:12px;color:var(--muted);">ยังไม่มีผู้เข้าทำ</div>';}
       html+='</div></div>';
     });
     el.innerHTML=html;
   });
 }
-
 buildAdminQR=function(){
   apiGet('getSettings',function(res){
     var s=res.settings||{};
@@ -1567,7 +1411,6 @@ buildAdminQR=function(){
     adminQrBuilt=true;
   });
 }
-
 var qrPopupInstance=null;
 function showAdminQR(k){
   var info=STATION_MAP[k];
@@ -1577,50 +1420,30 @@ function showAdminQR(k){
   document.getElementById('qr-popup-label').textContent='ENS-BONUS-'+k;
   var box=document.getElementById('qr-popup-box');
   box.innerHTML='';
-  qrPopupInstance=new QRCode(box,{
-    text:'ENS-BONUS-'+k,width:180,height:180,
-    colorDark:'#0f2248',colorLight:'#ffffff',
-    correctLevel:QRCode.CorrectLevel.H
-  });
+  qrPopupInstance=new QRCode(box,{text:'ENS-BONUS-'+k,width:180,height:180,colorDark:'#0f2248',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H});
   document.getElementById('qr-popup-overlay').style.display='flex';
 }
-function closeQRPopup(){
-  document.getElementById('qr-popup-overlay').style.display='none';
-  document.getElementById('qr-popup-box').innerHTML='';
-  qrPopupInstance=null;
-}
+function closeQRPopup(){document.getElementById('qr-popup-overlay').style.display='none';document.getElementById('qr-popup-box').innerHTML='';qrPopupInstance=null;}
 function doSaveSettings(){
   var s={};
-  ['EE','ME','TO','PM'].forEach(function(id){
-    s[id]={
-      points:parseInt(document.getElementById('pts-'+id).value)||1,
-      bonus:parseInt(document.getElementById('bon-'+id).value)||0
-    };
-  });
+  ['EE','ME','TO','PM'].forEach(function(id){s[id]={points:parseInt(document.getElementById('pts-'+id).value)||1,bonus:parseInt(document.getElementById('bon-'+id).value)||0};});
   showLoad();
   apiPost({action:'saveSettings',settings:s},function(res){
     hideLoad();
-    if(res.success){
-      settingsCache=s;adminQrBuilt=false;
-      var ok=document.getElementById('admin-ok');ok.textContent='✅ บันทึกแล้ว';ok.style.display='block';
-      setTimeout(function(){ok.style.display='none';},2000);
-    }
+    if(res.success){settingsCache=s;adminQrBuilt=false;var ok=document.getElementById('admin-ok');ok.textContent='✅ บันทึกแล้ว';ok.style.display='block';setTimeout(function(){ok.style.display='none';},2000);}
   });
 }
-// doClear ถูกลบออก — ไม่สามารถลบข้อมูลจากแอปได้ ต้องทำจาก Google Sheet โดยตรง
 
 /* ── Logout ── */
 function doLogout(){
   if(!confirm('ออกจากระบบ?\nข้อมูลคะแนนของคุณจะยังถูกบันทึกไว้'))return;
   stopSessionPolling();
-  if(currentUid&&currentToken){
-    apiPost({action:'logoutSession',uid:currentUid,token:currentToken},function(){});
-  }
+  if(currentUid&&currentToken){apiPost({action:'logoutSession',uid:currentUid,token:currentToken},function(){});}
   currentUid=null;currentToken=null;clearSession();goPreview();
 }
 
 /* ═══════════════════════════════════════════
-   QUIZ — New Flow
+   QUIZ
 ═══════════════════════════════════════════ */
 var DEMO_QUESTIONS={
   EE:[
@@ -1653,24 +1476,20 @@ var DEMO_QUESTIONS={
   ]
 };
 
-// ลำดับการทำ quiz (TO→ME→EE→PM)
 var QUIZ_ORDER=['TO','ME','EE','PM'];
 var QZ_TIME=15, QZ_BONUS_MAX=5;
 var qzInterval=null, qzTimer=QZ_TIME, qzConfirmed=false, qzSelectedIdx=-1;
 var qzCur=0, qzBaseScore=0, qzBonusScore=0, qzQuestions=[], qzStation='';
-var qzDoneMap={}; // {TO:true, ME:true, ...}
+var qzDoneMap={};
 
 function calcQzBonus(t){return Math.round((t/QZ_TIME)*QZ_BONUS_MAX*10)/10;}
 
 function backToStationFromQuiz(){
-  var id=qzStation; // ฐานที่เพิ่งทำเสร็จ
+  var id=qzStation;
   stopQuizTimer();
   go('home');
   loadHome();
-  // กลับไปเปิด detail ของฐานนั้น
-  setTimeout(function(){
-    if(id) openStationDetail(id);
-  },300);
+  setTimeout(function(){if(id) openStationDetail(id);},300);
 }
 function showQuizSelect(){
   stopQuizTimer();
@@ -1679,13 +1498,10 @@ function showQuizSelect(){
   document.getElementById('quiz-result-view').style.display='none';
   renderQzSelect();
 }
-
 function renderQzSelect(){
-  // นับว่าผ่านกี่ฐาน
   var done=QUIZ_ORDER.filter(function(k){return qzDoneMap[k];}).length;
   document.getElementById('qs-overall-val').textContent=done+' / '+QUIZ_ORDER.length+' ฐาน';
   document.getElementById('qs-overall-fill').style.width=(done/QUIZ_ORDER.length*100)+'%';
-
   var html='';
   QUIZ_ORDER.forEach(function(k,i){
     var s=STATION_MAP[k];
@@ -1693,27 +1509,18 @@ function renderQzSelect(){
     var isActive=!isDone&&(i===0||qzDoneMap[QUIZ_ORDER[i-1]]);
     var isLocked=!isDone&&!isActive;
     var prevName=i>0?QUIZ_ORDER[i-1]:'';
-
-    // step connector
     if(i>0){
       var prevDone=!!qzDoneMap[QUIZ_ORDER[i-1]];
-      html+='<div style="display:flex;justify-content:center;height:10px;">'
-        +'<div style="width:2px;background:'+(prevDone?'#86efac':'var(--border)')+'border-radius:1px;"></div></div>';
+      html+='<div style="display:flex;justify-content:center;height:10px;"><div style="width:2px;background:'+(prevDone?'#86efac':'var(--border)')+'border-radius:1px;"></div></div>';
     }
-
     var borderColor=isDone?'#86efac':isActive?'var(--navy)':'var(--border)';
     var bg=isDone?'#f0fdf4':isActive?'var(--bg)':'var(--bg2)';
     var opacity=isLocked?'.55':'1';
     var cursor=isLocked?'not-allowed':isActive?'pointer':'default';
-
     html+='<div onclick="'+(isActive?'startQzStation(\''+k+'\')':isLocked?'alert(\'ต้องทำ '+prevName+' ก่อน\')':'')
       +'" style="border:1.5px solid '+borderColor+';background:'+bg+';border-radius:16px;padding:14px;display:flex;align-items:center;gap:12px;opacity:'+opacity+';cursor:'+cursor+';position:relative;'+(isActive?'box-shadow:0 4px 14px rgba(15,34,72,.08);':'')+'margin-bottom:0;">';
-
-    // icon
     var iconBg=isDone?'#dcfce7':isActive?'var(--bg2)':'var(--border)';
     html+='<div style="width:48px;height:48px;border-radius:12px;background:'+iconBg+';display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;">'+s.icon+'</div>';
-
-    // info
     html+='<div style="flex:1;">';
     var nameColor=isDone?'#16a34a':isActive?'var(--navy)':'var(--muted)';
     html+='<div style="font-size:15px;font-weight:700;color:'+nameColor+';">'+k+' — '+s.name+'</div>';
@@ -1721,12 +1528,9 @@ function renderQzSelect(){
     else if(isActive) html+='<div style="font-size:11px;color:var(--accent);margin-top:2px;font-weight:600;">→ ถึงคิวของคุณแล้ว!</div>';
     else html+='<div style="font-size:11px;color:var(--muted);margin-top:2px;">ปลดล็อกหลังทำ '+prevName+'</div>';
     html+='</div>';
-
-    // right badge
     if(isDone) html+='<div style="font-size:10px;font-weight:700;color:#16a34a;background:#dcfce7;border:1px solid #86efac;border-radius:20px;padding:3px 10px;">✓ เสร็จ</div>';
     else if(isActive) html+='<div style="font-size:10px;font-weight:700;color:var(--navy);background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:3px 10px;">ถัดไป</div>';
     else html+='<div style="font-size:11px;font-weight:600;color:var(--muted);">🔒</div>';
-
     html+='<div style="position:absolute;top:10px;right:12px;font-size:10px;font-weight:700;color:var(--muted);">'+(i+1)+'</div>';
     html+='</div>';
   });
@@ -1739,12 +1543,9 @@ function startQzStation(station){
   document.getElementById('quiz-select-view').style.display='none';
   document.getElementById('quiz-active-view').style.display='block';
   document.getElementById('quiz-result-view').style.display='none';
-
   var s=STATION_MAP[station];
   document.getElementById('qa-station-name').textContent=s.icon+' '+station+' — '+s.name;
   document.getElementById('qa-prog').style.background=s.color||'#10b981';
-
-  // fetch questions
   fetch(API+'?action=getQuestions&station='+station)
     .then(function(r){return r.json();})
     .then(function(res){qzQuestions=(res&&res.length)?res:DEMO_QUESTIONS[station];renderQzQ();})
@@ -1762,14 +1563,12 @@ function renderQzQ(){
   document.getElementById('qa-next').disabled=true;
   document.getElementById('qa-next').style.opacity='.3';
   setQzUrgent(false);
-
   var L=['A','B','C','D'];
   document.getElementById('qa-choices').innerHTML=(q.choices||q.c).map(function(c,i){
     return'<button onclick="selectQzChoice('+i+')" style="background:var(--bg);border:1.5px solid var(--border);border-radius:11px;padding:10px 13px;font-size:13px;color:var(--navy);cursor:pointer;text-align:left;font-family:inherit;display:flex;align-items:center;gap:9px;transition:.15s;">'
       +'<div style="width:22px;height:22px;border-radius:50%;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;">'+L[i]+'</div>'
       +'<span>'+c+'</span></button>';
   }).join('');
-
   qzConfirmed=false; qzSelectedIdx=-1;
   startQzTimer();
 }
@@ -1779,16 +1578,11 @@ function startQzTimer(){
   qzInterval=setInterval(function(){
     if(qzConfirmed) return;
     qzTimer--; updateQzTimer();
-    if(qzTimer<=5&&qzTimer>0){
-      setQzUrgent(true);
-      if(navigator.vibrate)navigator.vibrate(60);
-    }
+    if(qzTimer<=5&&qzTimer>0){setQzUrgent(true);if(navigator.vibrate)navigator.vibrate(60);}
     if(qzTimer<=0){stopQuizTimer();if(!qzConfirmed)qzTimeout();}
   },1000);
 }
-
 function stopQuizTimer(){clearInterval(qzInterval);}
-
 function updateQzTimer(){
   var circ=113, offset=circ*(qzTimer/QZ_TIME);
   document.getElementById('qa-ring-prog').style.strokeDashoffset=circ-offset;
@@ -1803,7 +1597,6 @@ function updateQzTimer(){
   if(urg){bp.style.color='#dc2626';bp.style.borderColor='#fca5a5';bp.style.background='#fef2f2';}
   else{bp.style.color='#10b981';bp.style.borderColor='#86efac';bp.style.background='#f0fdf4';}
 }
-
 function setQzUrgent(on){
   var ring=document.getElementById('qa-ring');
   var row=document.getElementById('qa-timer-row');
@@ -1841,7 +1634,6 @@ function confirmQuizAnswer(){
   document.getElementById('qa-confirm').style.display='none';
   var q=qzQuestions[qzCur]; var ans=q.ans!=null?q.ans:q.a;
   var correct=(qzSelectedIdx===ans), bonus=0;
-  var L=['A','B','C','D'];
   document.getElementById('qa-choices').querySelectorAll('button').forEach(function(c,idx){
     c.onclick=null; c.style.cursor='default';
     if(idx===ans){c.style.borderColor='#16a34a';c.style.background='#f0fdf4';c.style.color='#16a34a';c.querySelector('div').style.background='#16a34a';c.querySelector('div').style.color='#fff';}
@@ -1886,14 +1678,30 @@ function nextQuizQ(){
   renderQzQ();
 }
 
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   FIX 1: showQzResult() — บันทึกคะแนนจริง
+   เปลี่ยนจาก saveQuizDone → saveQuizScore
+   และส่ง base, bonus, total ไปด้วย
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 function showQzResult(){
   stopQuizTimer(); setQzUrgent(false);
   qzDoneMap[qzStation]=true;
-  // บันทึกลง sheet
-  if(currentUid){
-    apiPost({action:'saveQuizDone',uid:currentUid,station:qzStation},function(){});
-  }
   var total=Math.round((qzBaseScore+qzBonusScore)*10)/10;
+  if(currentUid){
+    apiPost({
+      action:'saveQuizScore',
+      uid:currentUid,
+      station:qzStation,
+      base:qzBaseScore,
+      bonus:Math.round(qzBonusScore*10)/10,
+      total:total
+    },function(res){
+      // อัปเดต score บน home ทันทีถ้า API ตอบกลับ
+      if(res&&res.total_score){
+        document.getElementById('home-score').textContent=res.total_score;
+      }
+    });
+  }
   document.getElementById('quiz-active-view').style.display='none';
   document.getElementById('quiz-result-view').style.display='block';
   document.getElementById('qr-score').textContent=total.toFixed(1);
@@ -1903,18 +1711,16 @@ function showQzResult(){
 }
 
 /* ═══════════════════════════════════════════
-   SCAN BONUS (ใหม่)
+   SCAN BONUS
 ═══════════════════════════════════════════ */
 var bonusScanner=null,bonusBusy=false,lastBonusScanAt=0;
 
 function enterScanBonus(){
-  // แสดงข้อมูลผู้ใช้ปัจจุบัน
   var uid=currentUid;
   if(!uid){
     document.getElementById('sb-result').innerHTML='<div class="scan-result bad"><div class="sic">⚠️</div><div class="stitle">กรุณาเข้าสู่ระบบก่อน</div><div class="sdesc">กลับไปล็อกอินที่หน้าหลัก</div></div>';
     return;
   }
-  // ดึงข้อมูลจาก API
   apiGet('getMembers',function(res){
     var m=(res.members||[]).find(function(x){return x.uid===uid;});
     if(m){
@@ -1929,7 +1735,6 @@ function enterScanBonus(){
 
 function startBonusScanner(){
   if(bonusScanner)return;
-  // เช็คว่า element มีอยู่
   var el=document.getElementById('scan-reader');
   if(!el)return;
   bonusScanner=new Html5Qrcode('scan-reader');
@@ -1990,8 +1795,6 @@ window.addEventListener('load',function(){
   var splash=document.getElementById('pg-splash');
   splash.style.display='flex';
   document.getElementById('pg-preview').classList.remove('active');
-
-  // โหลด background data และตรวจ session ระหว่าง splash
   apiGet('getSettings',function(res){if(res.settings)settingsCache=res.settings;});
   apiGet('getEmployees',function(res){
     var employees=(res&&res.employees)||[];
@@ -2001,14 +1804,11 @@ window.addEventListener('load',function(){
 
   var uid=loadSessionUid();
   var token=loadSessionToken();
-  var sessionResult=null; // null=ไม่รู้, true=อยู่, false=หมด
+  var sessionResult=null;
 
   if(uid&&token){
-    // มี session → ตรวจกับ server ระหว่าง splash
     var statusEl=document.getElementById('splash-status');
-    setTimeout(function(){
-      if(statusEl){statusEl.style.opacity='1';statusEl.textContent='กำลังตรวจสอบ session...';}
-    },800);
+    setTimeout(function(){if(statusEl){statusEl.style.opacity='1';statusEl.textContent='กำลังตรวจสอบ session...';}},800);
     apiGet('getMembers',function(res){
       var m=(res.members||[]).find(function(x){return x.uid===uid;});
       sessionResult=(m&&m.has_session)?'valid':'invalid';
@@ -2018,21 +1818,15 @@ window.addEventListener('load',function(){
     });
   }
 
-  // ซ่อน splash หลัง 2.2 วิ → navigate
   setTimeout(function(){
     splash.classList.add('hide');
     setTimeout(function(){
       splash.style.display='none';
       if(sessionResult==='valid'){
-        // session ยังอยู่ → กลับหน้า Home
-        go('home');
-        loadHome();
-        startSessionPolling();
+        go('home');loadHome();startSessionPolling();
       } else if(sessionResult==='invalid'){
-        // session หมด/โดน kick → Preview
         goToPreview();
       } else if(uid&&token&&sessionResult===null){
-        // API ยังไม่ตอบ → รอ แล้ว navigate
         var wait=setInterval(function(){
           if(sessionResult!==null){
             clearInterval(wait);
@@ -2040,10 +1834,8 @@ window.addEventListener('load',function(){
             else goToPreview();
           }
         },200);
-        // timeout 5 วิ ถ้า API ไม่ตอบ → Preview
         setTimeout(function(){if(sessionResult===null){clearInterval(wait);goToPreview();}},5000);
       } else {
-        // ไม่มี session → Preview
         goToPreview();
       }
     },600);
@@ -2051,21 +1843,7 @@ window.addEventListener('load',function(){
 });
 
 function addToCalendar(){
-  var ics=[
-    'BEGIN:VCALENDAR',
-    'VERSION:2.0',
-    'PRODID:-//Engineering Synergy 2026//TH',
-    'BEGIN:VEVENT',
-    'UID:engineering-synergy-2026@smpc',
-    'DTSTAMP:20260614T000000Z',
-    'DTSTART:20260710T020000Z',
-    'DTEND:20260710T050000Z',
-    'SUMMARY:Engineering Synergy 2026',
-    'DESCRIPTION:กิจกรรม Engineer for a Day — ฝ่ายวิศวกรรม',
-    'LOCATION:Shop floor ฝ่ายวิศวกรรม',
-    'END:VEVENT',
-    'END:VCALENDAR'
-  ].join('\r\n');
+  var ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Engineering Synergy 2026//TH','BEGIN:VEVENT','UID:engineering-synergy-2026@smpc','DTSTAMP:20260614T000000Z','DTSTART:20260710T020000Z','DTEND:20260710T050000Z','SUMMARY:Engineering Synergy 2026','DESCRIPTION:กิจกรรม Engineer for a Day — ฝ่ายวิศวกรรม','LOCATION:Shop floor ฝ่ายวิศวกรรม','END:VEVENT','END:VCALENDAR'].join('\r\n');
   var blob=new Blob([ics],{type:'text/calendar;charset=utf-8'});
   var url=URL.createObjectURL(blob);
   var a=document.createElement('a');
@@ -2075,7 +1853,6 @@ function addToCalendar(){
   URL.revokeObjectURL(url);
 }
 
-/* goToPreview ใช้แทน initApp */
 function goToPreview(){
   go('preview');
   var ep=document.getElementById('entry-panel');
