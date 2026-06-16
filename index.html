@@ -1185,9 +1185,17 @@ function openStationQuiz(){
     closeStationDetail();
     return;
   }
-  // แสดง warning overlay ก่อนเริ่ม
   _pendingQuizStation=id;
   closeStationDetail();
+  // ต้อง activate pg-quiz ก่อน เพราะ overlay อยู่ข้างใน
+  // ถ้า pg-quiz ยัง display:none → overlay จะไม่แสดง
+  stopQR();stopBonusScanner();
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  document.getElementById('pg-quiz').classList.add('active');
+  document.getElementById('quiz-select-view').style.display='none';
+  document.getElementById('quiz-active-view').style.display='none';
+  document.getElementById('quiz-result-view').style.display='none';
+  window.scrollTo(0,0);
   document.getElementById('quiz-start-overlay').style.display='flex';
 }
 
