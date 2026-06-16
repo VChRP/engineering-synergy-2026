@@ -975,39 +975,55 @@ function confirmEnter(){
   var dept=selectedReg.dept;
   var errEl=document.getElementById('reg-err');
   errEl.style.display='none';
-  apiPost({action:'enterSession',full_name:fullName,department:dept},function(res){
-    if(res.error==='session_active'){
-      hideEntryLoading();
-      document.getElementById('entry-panel').style.transform='translateY(0)';
-      showBlockedPopup(res.full_name,res.department);return;
+  // ดึง settings ก่อนเสมอ เพื่อตัดสินใจ flow
+  apiGet('getAppSettings',function(settingsRes){
+    if(settingsRes&&!settingsRes.error) appSettings=settingsRes;
+    var isBypass=(appSettings.bypass_list||[]).indexOf(fullName)>=0;
+    var inComingSoon=appSettings.coming_soon&&!isBypass;
+    if(inComingSoon){
+      // Coming Soon: บันทึกข้อมูลเท่านั้น ไม่สร้าง session
+      apiPost({action:'registerOnly',full_name:fullName,department:dept},function(res){
+        if(res.error){
+          hideEntryLoading();
+          document.getElementById('entry-panel').style.transform='translateY(0)';
+          showErr(errEl,res.error);return;
+        }
+        selectedReg=null;
+        showEntryLoading(true);
+        setTimeout(function(){
+          hideEntryLoading();
+          updateCountdown();
+          setInterval(updateCountdown,1000);
+          go('coming');
+        },800);
+      });
+    } else {
+      // Normal: enterSession ปกติ
+      apiPost({action:'enterSession',full_name:fullName,department:dept},function(res){
+        if(res.error==='session_active'){
+          hideEntryLoading();
+          document.getElementById('entry-panel').style.transform='translateY(0)';
+          showBlockedPopup(res.full_name,res.department);return;
+        }
+        if(res.error){
+          hideEntryLoading();
+          document.getElementById('entry-panel').style.transform='translateY(0)';
+          showErr(errEl,res.error);return;
+        }
+        currentUid=res.uid;currentToken=res.token;
+        saveSession(res.uid,res.token);
+        document.getElementById('reg-name').value='';
+        document.getElementById('reg-dept-pill').style.display='none';
+        selectedReg=null;
+        showEntryLoading(true);
+        setTimeout(function(){hideEntryLoading();goHome();},600);
+      });
     }
-    if(res.error){
-      hideEntryLoading();
-      document.getElementById('entry-panel').style.transform='translateY(0)';
-      showErr(errEl,res.error);return;
-    }
-    currentUid=res.uid;currentToken=res.token;
-    saveSession(res.uid,res.token);
-    document.getElementById('reg-name').value='';
-    document.getElementById('reg-dept-pill').style.display='none';
-    selectedReg=null;
-    showEntryLoading(true);
-    setTimeout(function(){hideEntryLoading();afterAuth();},600);
   });
 }
 function afterAuth(){
-  apiGet('getAppSettings',function(res){if(res&&!res.error) appSettings=res;});
-  if(appSettings.coming_soon){
-    apiGet('getMembers',function(mr){
-      var m=(mr.members||[]).find(function(x){return x.uid===currentUid;});
-      var fullName=m?m.full_name:'';
-      var isBypass=(appSettings.bypass_list||[]).indexOf(fullName)>=0;
-      if(!isBypass){updateCountdown();setInterval(updateCountdown,1000);go('coming');}
-      else{goHome();}
-    });
-  } else {
-    goHome();
-  }
+  // legacy stub - flow ย้ายไปอยู่ใน confirmEnter แล้ว
+  goHome();
 }
 
 /* ── Polling ── */
