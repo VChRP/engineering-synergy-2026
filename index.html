@@ -347,7 +347,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
   <div class="coming-wrap">
     <div style="font-size:13px;font-weight:600;color:var(--accent);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;">Engineering Synergy 2026</div>
     <div style="font-size:28px;font-weight:700;color:var(--navy);letter-spacing:-.5px;margin-bottom:8px;">Coming Soon</div>
-    <div style="font-size:14px;color:var(--muted);line-height:1.85;margin-bottom:20px;">แล้วพบกัน<br>วันศุกร์ที่ 3 กรกฎาคม 2569 เวลา 09:00 น.<br>ณ Shop floor ฝ่ายวิศวกรรม</div>
+    <div style="font-size:14px;color:var(--muted);line-height:1.85;margin-bottom:20px;">แล้วพบกัน<br>วันศุกร์ที่ 10 กรกฎาคม 2569 เวลา 09:00 น.<br>ณ Shop floor ฝ่ายวิศวกรรม</div>
     <div class="cd-box">
       <div style="font-size:10px;font-weight:600;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;margin-bottom:16px;">เหลือเวลา</div>
       <div class="cd-row">
@@ -413,6 +413,19 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
     <button class="btn-danger-sm" onclick="doLogout()">↩ ออกจากระบบ</button>
   </div>
   <div style="height:20px"></div>
+
+  <!-- Survey card -->
+  <div style="margin:0 0 16px;">
+    <div class="sec-lbl">แบบประเมิน</div>
+    <div id="home-survey-card" onclick="openSurvey()" style="border-radius:18px;padding:16px 14px;display:flex;align-items:center;gap:12px;transition:.18s;background:var(--bg2);border:1.5px solid var(--border);opacity:.55;cursor:not-allowed;">
+      <div style="font-size:28px;flex-shrink:0;">📋</div>
+      <div style="flex:1;">
+        <div id="survey-card-title" style="font-size:14px;font-weight:700;color:var(--muted);">แบบประเมินความพึงพอใจ</div>
+        <div id="survey-card-sub" style="font-size:11px;color:var(--muted);margin-top:2px;">ทำ Quiz ฐาน PM ให้ครบก่อน</div>
+      </div>
+      <div id="survey-card-badge" style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:var(--bg3);color:var(--muted);border:1px solid var(--border);">🔒 ล็อก</div>
+    </div>
+  </div>
 
   <!-- Station detail overlay -->
   <div id="st-detail-overlay" style="display:none;position:absolute;inset:0;background:#fff;z-index:200;overflow-y:auto;">
@@ -697,6 +710,33 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
 </div>
 
 
+
+<!-- SURVEY -->
+<div id="pg-survey" class="page">
+  <div style="padding:14px 0 10px;display:flex;align-items:center;gap:10px;">
+    <div class="back-ico" onclick="go('home')">←</div>
+    <div class="pg-titles"><div class="ptitle">แบบประเมิน</div><div class="psub">Engineering Synergy 2026 · 10 ข้อ</div></div>
+    <div id="sv-counter" style="font-size:12px;font-weight:700;color:var(--accent);flex-shrink:0;">1 / 10</div>
+  </div>
+  <div style="height:3px;background:var(--border);border-radius:2px;margin-bottom:16px;overflow:hidden;">
+    <div id="sv-bar" style="height:100%;background:var(--accent);border-radius:2px;transition:.4s;width:10%;"></div>
+  </div>
+  <div id="sv-q-view">
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:13px 14px;margin-bottom:12px;">
+      <div id="sv-qnum" style="font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:5px;">คำถามที่ 1</div>
+      <div id="sv-qtext" style="font-size:14px;font-weight:600;line-height:1.6;color:var(--navy);"></div>
+    </div>
+    <div id="sv-choices" style="display:flex;flex-direction:column;gap:7px;margin-bottom:12px;"></div>
+    <button id="sv-next-btn" onclick="svNext()" style="width:100%;padding:12px;background:var(--navy);border:none;border-radius:11px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;opacity:.35;pointer-events:none;">ถัดไป →</button>
+  </div>
+  <div id="sv-done-view" style="display:none;text-align:center;padding:32px 0;">
+    <div style="font-size:44px;margin-bottom:12px;">🙏</div>
+    <div style="font-size:24px;font-weight:700;color:var(--navy);margin-bottom:6px;">ขอบคุณมากครับ</div>
+    <div style="font-size:13px;color:var(--muted);line-height:1.75;margin-bottom:24px;">ข้อมูลของคุณจะช่วยพัฒนา<br>กิจกรรม Engineering Synergy ในครั้งต่อไป</div>
+    <button onclick="go('home');loadHome();" class="btn btn-navy">← กลับหน้าหลัก</button>
+  </div>
+</div>
+
 <!-- SCAN BONUS -->
 <div id="pg-scan-bonus" class="page">
   <div style="padding-top:20px;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
@@ -780,6 +820,7 @@ function go(page,param){
   }
   else if(page==='quiz'){stopQuizTimer();showQuizSelect();document.getElementById('pg-quiz').classList.add('active');}
   else if(page==='scan-bonus'){enterScanBonus();document.getElementById('pg-scan-bonus').classList.add('active');}
+  else if(page==='survey'){document.getElementById('pg-survey').classList.add('active');}
   else{var el=document.getElementById('pg-'+page);if(el)el.classList.add('active');}
   window.scrollTo(0,0);
 }
@@ -1073,7 +1114,9 @@ function loadHome(){
     document.getElementById('home-dept').textContent=emp&&emp.position?emp.position:m?(m.department||'—'):'—';
     document.getElementById('home-rank').textContent=rank;
     document.getElementById('home-score').textContent=m?m.total_score:0;
+    surveyDone=!!(m&&m.survey_done);
     renderStations(m);
+    renderSurveyCard();
     if(lastEl){var d=new Date();lastEl.textContent='อัปเดตล่าสุด: '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');}
   });
 }
@@ -1532,6 +1575,7 @@ var QZ_TIME=15, QZ_BONUS_MAX=5;
 var qzInterval=null, qzTimer=QZ_TIME, qzConfirmed=false, qzSelectedIdx=-1;
 var qzCur=0, qzBaseScore=0, qzBonusScore=0, qzQuestions=[], qzStation='';
 var qzDoneMap={};
+var surveyDone=false;
 
 function calcQzBonus(t){return Math.round((t/QZ_TIME)*QZ_BONUS_MAX*10)/10;}
 
@@ -1755,6 +1799,93 @@ function showQzResult(){
   document.getElementById('qr-station').textContent='คะแนนจาก '+qzStation+' Quiz';
   document.getElementById('qr-base').textContent=qzBaseScore;
   document.getElementById('qr-bonus').textContent=qzBonusScore.toFixed(1);
+}
+
+/* ═══════════════════════════════════════════
+   SURVEY
+═══════════════════════════════════════════ */
+var svCur=0,svSel=-1,svAns=[];
+var SV_Q=[
+  {q:'ก่อนวันนี้ คุณคิดว่าฝ่ายวิศวกรรมทำอะไร?',c:['ซ่อมเครื่องจักรเมื่อมันพัง','ดูแลระบบไฟฟ้าและเครื่องจักรของโรงงาน','วางแผนและป้องกันไม่ให้เครื่องจักรพัง','ไม่แน่ใจ / ไม่เคยนึกถึง']},
+  {q:'กิจกรรมวันนี้เป็นอย่างไรบ้าง?',c:['ดีมาก อยากมาอีก','ดี ได้ความรู้','พอใช้ได้','ควรปรับปรุง']},
+  {q:'วันนี้คุณเป็นใครมากที่สุด?',c:['คนสายละเอียด — ทุกไมครอนมีความหมาย','คนที่ทำให้ทุกอย่างหมุน — เข้าใจแรง เข้าใจระบบ','คนสายควบคุม — ชอบออโตเมต ไม่ชอบทำซ้ำ','คนที่มองเห็นปัญหาก่อนใคร — ดูแลให้ทุกอย่างไม่พัง']},
+  {q:'ได้ความรู้ใหม่จากกิจกรรมนี้แค่ไหน?',c:['มากมาย ไม่เคยรู้มาก่อน','พอสมควร ได้เติมเต็มบางส่วน','เล็กน้อย รู้อยู่แล้วบ้าง','แทบไม่ได้เลย']},
+  {q:'เวลาในแต่ละฐานเหมาะสมไหม?',c:['พอดีมาก','น้อยเกินไป อยากอยู่นานกว่านี้','นานเกินไป','ไม่แน่ใจ']},
+  {q:'ระบบ Quiz สนุกแค่ไหน?',c:['สนุกมาก ตื่นเต้นตลอด','สนุกดี เหมาะกับกิจกรรม','ธรรมดา ไม่ได้รู้สึกอะไรพิเศษ','ซับซ้อนเกินไป ใช้ยาก']},
+  {q:'แอปพลิเคชันวันนี้เป็นอย่างไร?',c:['ใช้ง่ายมาก ลื่นไหล','ใช้ได้ มีปัญหาบ้างนิดหน่อย','ช้า / ค้างบ่อย','งงตั้งแต่แรก ไม่รู้จะทำอะไร']},
+  {q:'ถ้ามีกิจกรรมแบบนี้อีกครั้ง คุณจะ...?',c:['มาแน่นอน และแนะนำเพื่อน','มาถ้าว่างอยู่','ยังไม่แน่ใจ','ไม่ค่อยสนใจ']},
+  {q:'หลังวันนี้ ถ้าต้องแนะนำฝ่ายวิศวกรรมให้คนอื่น คุณทำได้ไหม?',c:['ได้เลย อธิบายได้ทุกฝ่าย','ได้บางส่วน อธิบายได้บางฝ่าย','ได้นิดหน่อย แต่ยังไม่มั่นใจ','ยังไม่ได้เลย ต้องเรียนรู้เพิ่ม']},
+  {q:'อยากลองมาทำงานที่ฝ่ายวิศวกรรมแค่ไหน?',c:['สนใจมาก อยากลองจริงๆ','พอสนใจ ถ้ามีโอกาสก็ไม่แย่','ยังไม่ได้คิด แต่วันนี้ได้เปิดมุมมอง']}
+];
+
+function renderSurveyCard(){
+  var card=document.getElementById('home-survey-card');
+  var badge=document.getElementById('survey-card-badge');
+  var title=document.getElementById('survey-card-title');
+  var sub=document.getElementById('survey-card-sub');
+  if(!card)return;
+  if(surveyDone){
+    card.style.cssText='border-radius:18px;padding:16px 14px;display:flex;align-items:center;gap:12px;transition:.18s;background:#f0fdf4;border:1.5px solid #86efac;cursor:default;opacity:1;';
+    title.style.color='#16a34a';title.textContent='แบบประเมิน — ส่งแล้ว ✓';
+    sub.style.color='#16a34a';sub.textContent='ขอบคุณสำหรับความคิดเห็น';
+    badge.textContent='✓ เสร็จแล้ว';badge.style.cssText='font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:#dcfce7;color:#16a34a;border:1px solid #86efac;';
+  } else if(qzDoneMap['PM']){
+    card.style.cssText='border-radius:18px;padding:16px 14px;display:flex;align-items:center;gap:12px;transition:.18s;background:var(--bg);border:1.5px solid var(--navy);cursor:pointer;opacity:1;box-shadow:0 4px 14px rgba(15,34,72,.12);';
+    title.style.color='var(--navy)';title.textContent='แบบประเมินความพึงพอใจ';
+    sub.style.color='var(--muted)';sub.textContent='10 ข้อ · ใช้เวลาประมาณ 2 นาที';
+    badge.textContent='ทำได้เลย →';badge.style.cssText='font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:var(--navy);color:#fff;border:1px solid var(--navy);';
+  } else {
+    card.style.cssText='border-radius:18px;padding:16px 14px;display:flex;align-items:center;gap:12px;transition:.18s;background:var(--bg2);border:1.5px solid var(--border);opacity:.55;cursor:not-allowed;';
+    title.style.color='var(--muted)';title.textContent='แบบประเมินความพึงพอใจ';
+    sub.style.color='var(--muted)';sub.textContent='ทำ Quiz ฐาน PM ให้ครบก่อน';
+    badge.textContent='🔒 ล็อก';badge.style.cssText='font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:var(--bg3);color:var(--muted);border:1px solid var(--border);';
+  }
+}
+
+function openSurvey(){
+  if(!qzDoneMap['PM']){showStationToast('ทำ Quiz ฐาน PM ให้จบก่อน');return;}
+  if(surveyDone){showStationToast('ทำแบบประเมินแล้ว ขอบคุณ');return;}
+  svCur=0;svSel=-1;svAns=[];
+  go('survey');
+  svRender();
+}
+
+function svRender(){
+  var q=SV_Q[svCur];
+  document.getElementById('sv-qnum').textContent='คำถามที่ '+(svCur+1);
+  document.getElementById('sv-qtext').textContent=q.q;
+  document.getElementById('sv-counter').textContent=(svCur+1)+' / '+SV_Q.length;
+  document.getElementById('sv-bar').style.width=Math.round((svCur+1)/SV_Q.length*100)+'%';
+  svSel=svAns[svCur]!==undefined?svAns[svCur]:-1;
+  var L=['A','B','C','D'];
+  document.getElementById('sv-choices').innerHTML=q.c.map(function(c,i){
+    var s=svSel===i;
+    return'<button onclick="svPick('+i+')" style="background:'+(s?'var(--blue-light)':'var(--bg)')+';border:1.5px solid '+(s?'var(--accent)':'var(--border)')+';border-radius:11px;padding:10px 13px;font-size:13px;color:'+(s?'var(--accent)':'var(--navy)')+';cursor:pointer;text-align:left;font-family:inherit;display:flex;align-items:center;gap:9px;transition:.15s;width:100%;">'
+      +'<div style="width:22px;height:22px;border-radius:50%;background:'+(s?'var(--accent)':'var(--bg2)')+';display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;color:'+(s?'#fff':'var(--navy)')+';">'+L[i]+'</div>'
+      +'<span>'+c+'</span></button>';
+  }).join('');
+  var btn=document.getElementById('sv-next-btn');
+  if(svSel>=0){btn.style.opacity='1';btn.style.pointerEvents='auto';}
+  else{btn.style.opacity='.35';btn.style.pointerEvents='none';}
+  btn.textContent=svCur<SV_Q.length-1?'ถัดไป →':'ส่งแบบประเมิน ✓';
+}
+
+function svPick(i){svSel=i;svAns[svCur]=i;svRender();}
+
+function svNext(){
+  if(svSel<0)return;
+  if(svCur<SV_Q.length-1){svCur++;svRender();return;}
+  showLoad();
+  var answers=SV_Q.map(function(q,i){return q.c[svAns[i]!==undefined?svAns[i]:0];});
+  apiPost({action:'saveSurvey',uid:currentUid,answers:answers},function(res){
+    hideLoad();
+    if(res.error){showStationToast(res.error);return;}
+    surveyDone=true;
+    document.getElementById('sv-q-view').style.display='none';
+    document.getElementById('sv-done-view').style.display='block';
+    document.getElementById('sv-bar').style.width='100%';
+    document.getElementById('sv-counter').textContent='เสร็จสิ้น';
+  });
 }
 
 /* ═══════════════════════════════════════════
