@@ -1488,8 +1488,8 @@ function backToStationFromQuiz(){
   var id=qzStation;
   stopQuizTimer();
   go('home');
-  loadHome();
-  setTimeout(function(){if(id) openStationDetail(id);},300);
+  loadHome();  // โหลด home ใน background
+  if(id) openStationDetail(id);  // เปิด Station Detail ทันทีเลย
 }
 function showQuizSelect(){
   stopQuizTimer();
