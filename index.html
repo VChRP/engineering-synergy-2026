@@ -409,9 +409,6 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
   <div class="sec-lbl">ฐานกิจกรรม</div>
   <div class="st-grid" id="home-stations"></div>
 
-  <div style="display:flex;justify-content:center;padding-top:16px;margin-bottom:4px;">
-    <button class="btn-danger-sm" onclick="doLogout()">↩ ออกจากระบบ</button>
-  </div>
   <div style="height:20px"></div>
 
   <!-- Survey card -->
@@ -426,8 +423,11 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
       <div id="survey-card-badge" style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:var(--bg3);color:var(--muted);border:1px solid var(--border);">🔒 ล็อก</div>
     </div>
   </div>
+  <div style="display:flex;justify-content:center;padding:16px 0 4px;">
+    <button class="btn-danger-sm" onclick="doLogout()">↩ ออกจากระบบ</button>
+  </div>
 
-  <!-- Station detail overlay -->
+   <!-- Station detail overlay -->
   <div id="st-detail-overlay" style="display:none;position:absolute;inset:0;background:#fff;z-index:200;overflow-y:auto;">
     <div style="padding:16px 20px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;position:sticky;top:0;background:#fff;z-index:1;">
       <button onclick="closeStationDetail()" style="width:32px;height:32px;border-radius:9px;background:var(--bg2);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;flex-shrink:0;">←</button>
