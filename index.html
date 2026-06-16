@@ -978,7 +978,11 @@ function confirmEnter(){
   // ดึง settings ก่อนเสมอ เพื่อตัดสินใจ flow
   apiGet('getAppSettings',function(settingsRes){
     if(settingsRes&&!settingsRes.error) appSettings=settingsRes;
-    var isBypass=(appSettings.bypass_list||[]).indexOf(fullName)>=0;
+    // bypass_list อาจไม่ได้ถูก save ในชีท → fallback หาค่า hardcoded เดิม
+    var bypassList=Array.isArray(appSettings.bypass_list)&&appSettings.bypass_list.length>0
+      ? appSettings.bypass_list
+      : ['วัชรพล มีดี'];
+    var isBypass=bypassList.indexOf(fullName)>=0;
     var inComingSoon=appSettings.coming_soon&&!isBypass;
     if(inComingSoon){
       // Coming Soon: บันทึกข้อมูลเท่านั้น ไม่สร้าง session
