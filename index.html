@@ -667,7 +667,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
 
     <div id="qa-result" style="display:none;border-radius:11px;padding:10px 13px;margin-bottom:10px;border:1.5px solid;align-items:center;gap:9px;font-size:13px;"></div>
 
-    <button id="qa-next" onclick="nextQuizQ()" disabled style="width:100%;padding:12px;background:var(--navy);border:none;border-radius:11px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;opacity:.3;">ข้อถัดไป →</button>
+    <button id="qa-next" onclick="nextQuizQ()" disabled style="width:100%;padding:12px;background:var(--navy);border:none;border-radius:11px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;display:none;">ข้อถัดไป →</button>
   </div>
 
   <!-- Quiz result view -->
@@ -1561,7 +1561,7 @@ function renderQzQ(){
   document.getElementById('qa-result').style.display='none';
   document.getElementById('qa-confirm').style.display='none';
   document.getElementById('qa-next').disabled=true;
-  document.getElementById('qa-next').style.opacity='.3';
+  document.getElementById('qa-next').style.display='none';
   setQzUrgent(false);
   var L=['A','B','C','D'];
   document.getElementById('qa-choices').innerHTML=(q.choices||q.c).map(function(c,i){
@@ -1650,6 +1650,7 @@ function confirmQuizAnswer(){
     +'<div><div style="font-size:13px;font-weight:600;">'+(correct?'ถูกต้อง! +1':'ไม่ถูกต้อง')+'</div>'
     +(correct&&bonus>0?'<div style="font-size:11px;color:#10b981;margin-top:1px;">⚡ Bonus +'+bonus.toFixed(1)+'</div>':'')+'</div>';
   document.getElementById('qa-next').disabled=false;
+  document.getElementById('qa-next').style.display='block';
   document.getElementById('qa-next').style.opacity='1';
   document.getElementById('qa-next').textContent=qzCur<qzQuestions.length-1?'ข้อถัดไป →':'ดูผลคะแนน →';
 }
@@ -1667,6 +1668,7 @@ function qzTimeout(){
   rr.style.cssText='display:flex;border-radius:11px;padding:10px 13px;margin-bottom:10px;align-items:center;gap:9px;font-size:13px;border:1.5px solid #fca5a5;background:#fef2f2;';
   rr.innerHTML='<span style="font-size:20px;">⏱</span><div style="font-size:13px;font-weight:600;color:#dc2626;">หมดเวลา! ไม่ได้คะแนน</div>';
   document.getElementById('qa-next').disabled=false;
+  document.getElementById('qa-next').style.display='block';
   document.getElementById('qa-next').style.opacity='1';
   document.getElementById('qa-next').textContent=qzCur<qzQuestions.length-1?'ข้อถัดไป →':'ดูผลคะแนน →';
 }
