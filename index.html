@@ -600,6 +600,18 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
 <!-- QUIZ -->
 <div id="pg-quiz" class="page">
 
+  <!-- Pre-quiz warning overlay -->
+  <div id="quiz-start-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:450;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);">
+    <div style="background:#fff;border-radius:24px 24px 0 0;padding:24px 24px 48px;width:100%;max-width:420px;">
+      <div style="width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px;"></div>
+      <div style="font-size:32px;margin-bottom:10px;">⚠️</div>
+      <div style="font-size:18px;font-weight:700;color:var(--navy);margin-bottom:6px;">ก่อนเริ่มทำ Quiz</div>
+      <div style="font-size:14px;color:var(--sub);line-height:1.8;margin-bottom:22px;">เมื่อเริ่มแล้ว <strong>ต้องทำให้จบ</strong><br>ไม่สามารถกดกลับระหว่างทำได้<br>มีเวลา <strong>15 วินาที</strong> ต่อข้อ รวม <strong>5 ข้อ</strong></div>
+      <button class="btn btn-navy" onclick="startConfirmedQuiz()" style="margin-bottom:10px;">เข้าใจแล้ว เริ่มทำ Quiz →</button>
+      <button class="btn btn-outline" onclick="cancelQuizStart()">← ยกเลิก</button>
+    </div>
+  </div>
+
   <div id="quiz-flash" style="position:fixed;inset:0;background:rgba(220,38,38,.18);pointer-events:none;opacity:0;z-index:400;"></div>
 
   <!-- Station select view -->
@@ -623,7 +635,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
   <!-- Quiz active view -->
   <div id="quiz-active-view" style="display:none;">
     <div style="padding:14px 0 10px;display:flex;align-items:center;gap:10px;">
-      <div class="back-ico" onclick="stopQuizTimer();showQuizSelect()">←</div>
+      <div class="back-ico" onclick="confirmQuitQuiz()">←</div>
       <div style="flex:1;">
         <div style="font-size:14px;font-weight:700;color:var(--navy);" id="qa-station-name">—</div>
         <div style="font-size:10px;color:var(--muted);">Quiz · 5 ข้อ · ข้อละ 15 วินาที</div>
@@ -1162,32 +1174,49 @@ function closeStationDetail(){
   currentStationDetail=null;
 }
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   FIX 2 + FIX 3: openStationQuiz()
-   - Guard ถ้าทำแล้ว (Fix 3)
-   - ข้าม select view, เริ่ม quiz ทันที (Fix 2)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+var _pendingQuizStation=null;
+
 function openStationQuiz(){
   var id=currentStationDetail;
   if(!id) return;
-  // FIX 3: ถ้าทำแล้ว → toast + ปิด detail เท่านั้น
+  // ถ้าทำแล้ว → toast + ปิด detail
   if(qzDoneMap[id]){
     showStationToast('ทำ Quiz ฐาน '+id+' เสร็จแล้ว ✓');
     closeStationDetail();
     return;
   }
+  // แสดง warning overlay ก่อนเริ่ม
+  _pendingQuizStation=id;
   closeStationDetail();
-  // FIX 2: activate pg-quiz ตรงๆ ไม่ผ่าน showQuizSelect
+  document.getElementById('quiz-start-overlay').style.display='flex';
+}
+
+function startConfirmedQuiz(){
+  document.getElementById('quiz-start-overlay').style.display='none';
+  var id=_pendingQuizStation;
+  _pendingQuizStation=null;
+  if(!id) return;
+  // activate pg-quiz ตรงๆ ไม่ผ่าน showQuizSelect
   stopQR();stopBonusScanner();
   document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
   document.getElementById('pg-quiz').classList.add('active');
   window.scrollTo(0,0);
   stopQuizTimer();
-  // ซ่อนทุก view ก่อน แล้ว startQzStation จะแสดง active view เอง
   document.getElementById('quiz-select-view').style.display='none';
   document.getElementById('quiz-active-view').style.display='none';
   document.getElementById('quiz-result-view').style.display='none';
   setTimeout(function(){startQzStation(id);},100);
+}
+
+function cancelQuizStart(){
+  document.getElementById('quiz-start-overlay').style.display='none';
+  _pendingQuizStation=null;
+  go('home');
+}
+
+function confirmQuitQuiz(){
+  // ไม่อนุญาตให้ออกระหว่างทำ quiz
+  showStationToast('ต้องทำ Quiz ให้จบก่อนกดกลับ');
 }
 
 function openStationScan(){
