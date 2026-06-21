@@ -894,13 +894,31 @@ function confirmEnter(){
   var fullName=selectedReg.firstName+' '+selectedReg.lastName;
   var dept=selectedReg.dept;
   var errEl=document.getElementById('reg-err');errEl.style.display='none';
-  apiPost({action:'enterSession',full_name:fullName,department:dept},function(res){
-    if(res.error==='session_active'){hideEntryLoading();document.getElementById('entry-panel').style.transform='translateY(0)';showBlockedPopup(res.full_name,res.department);return;}
-    if(res.error){hideEntryLoading();document.getElementById('entry-panel').style.transform='translateY(0)';showErr(errEl,res.error);return;}
-    currentUid=res.uid;currentToken=res.token;saveSession(res.uid,res.token);
-    document.getElementById('reg-name').value='';document.getElementById('reg-dept-pill').style.display='none';selectedReg=null;
-    showEntryLoading(true);
-    setTimeout(function(){hideEntryLoading();afterAuth();},600);
+  /* FIX: เช็ค mode ก่อน — ตอน Coming Soon เปิด (และไม่ใช่ bypass) ให้ลงทะเบียนอย่างเดียว
+     ด้วย registerOnly (ไม่สร้าง session) เพื่อไม่ให้ติดล็อก "มีผู้ใช้งานอยู่แล้ว"
+     แล้วเข้าหน้า coming soon เลย — pull getAppSettings ให้ค่า fresh ก่อนตัดสินใจ */
+  apiGet('getAppSettings',function(ar){
+    applyAppSettings(ar);
+    var isBypass=(appSettings.bypass_list||[]).indexOf(fullName)>=0;
+    if(appSettings.coming_soon&&!isBypass){
+      apiPost({action:'registerOnly',full_name:fullName,department:dept},function(res){
+        if(res.error){hideEntryLoading();document.getElementById('entry-panel').style.transform='translateY(0)';showErr(errEl,res.error);return;}
+        currentUid=res.uid;currentToken=null;  /* ไม่มี session ตอน coming soon */
+        document.getElementById('reg-name').value='';document.getElementById('reg-dept-pill').style.display='none';selectedReg=null;
+        showEntryLoading(true);
+        setTimeout(function(){hideEntryLoading();updateCountdown();setInterval(updateCountdown,1000);go('coming');},600);
+      });
+      return;
+    }
+    /* เปิดงานปกติ (หรือ bypass) → สร้าง session ตามเดิม */
+    apiPost({action:'enterSession',full_name:fullName,department:dept},function(res){
+      if(res.error==='session_active'){hideEntryLoading();document.getElementById('entry-panel').style.transform='translateY(0)';showBlockedPopup(res.full_name,res.department);return;}
+      if(res.error){hideEntryLoading();document.getElementById('entry-panel').style.transform='translateY(0)';showErr(errEl,res.error);return;}
+      currentUid=res.uid;currentToken=res.token;saveSession(res.uid,res.token);
+      document.getElementById('reg-name').value='';document.getElementById('reg-dept-pill').style.display='none';selectedReg=null;
+      showEntryLoading(true);
+      setTimeout(function(){hideEntryLoading();afterAuth();},600);
+    });
   });
 }
 function afterAuth(){
