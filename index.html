@@ -29,9 +29,23 @@
   ║  v1.4.0 [BUG-06] quiz-select fallback removed            ║
   ║  v1.3.0 [BUG-05] scores key mismatch / removed QR block  ║
   ║  v1.2.0 [BUG-01..04] quiz score/flow/retake/refresh      ║
+  ╔══════════════════════════════════════════════════════════╗
+  ║  Engineering Synergy 2026                               ║
+  ║  Version : 1.6.0                                        ║
+  ║  Date    : 2026-06-21                                   ║
+  ╠══════════════════════════════════════════════════════════╣
+  ║  v1.6.0 — MERGED FROM EARLIER VERSION (doc4)             ║
+  ║  [MERGE-1] Pre-quiz warning popup restored                ║
+  ║            - quiz-start-overlay ก่อนเข้าทำ quiz จริง      ║
+  ║            - startConfirmedQuiz/cancelQuizStart           ║
+  ║            - confirmQuitQuiz กันกด back หนีกลางคัน       ║
+  ║  [MERGE-2] ระบบแบบประเมิน (Survey) restored ครบชุด        ║
+  ║            - pg-survey + การ์ดใน home (ล็อกจนทำ PM เสร็จ) ║
+  ║            - คำถาม 10 ข้อจาก doc4 (verbatim)              ║
+  ║            - backend saveSurvey มีอยู่แล้วใน .gs ปัจจุบัน  ║
   ╚══════════════════════════════════════════════════════════╝
 -->
-<title>Engineering Synergy 2026 · v1.5.0</title>
+<title>Engineering Synergy 2026 · v1.6.0</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -389,6 +403,22 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
   <div id="home-last-refresh" style="text-align:right;font-size:10px;color:var(--muted);margin-top:4px;margin-bottom:12px;"></div>
   <div class="sec-lbl">ฐานกิจกรรม</div>
   <div class="st-grid" id="home-stations"></div>
+
+  <div style="height:20px"></div>
+
+  <!-- Survey card (restored from doc4) -->
+  <div style="margin:0 0 16px;">
+    <div class="sec-lbl">แบบประเมิน</div>
+    <div id="home-survey-card" onclick="openSurvey()" style="border-radius:18px;padding:16px 14px;display:flex;align-items:center;gap:12px;transition:.18s;background:var(--bg2);border:1.5px solid var(--border);opacity:.55;cursor:not-allowed;">
+      <div style="font-size:28px;flex-shrink:0;">📋</div>
+      <div style="flex:1;">
+        <div id="survey-card-title" style="font-size:14px;font-weight:700;color:var(--muted);">แบบประเมินความพึงพอใจ</div>
+        <div id="survey-card-sub" style="font-size:11px;color:var(--muted);margin-top:2px;">ทำ Quiz ฐาน PM ให้ครบก่อน</div>
+      </div>
+      <div id="survey-card-badge" style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:var(--bg3);color:var(--muted);border:1px solid var(--border);">🔒 ล็อก</div>
+    </div>
+  </div>
+
   <div style="display:flex;justify-content:center;padding-top:16px;margin-bottom:4px;">
     <button class="btn-danger-sm" onclick="doLogout()">↩ ออกจากระบบ</button>
   </div>
@@ -466,7 +496,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
   <div style="padding-top:22px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center">
     <div>
       <div style="font-size:20px;font-weight:700;color:var(--navy);letter-spacing:-.4px">Admin</div>
-      <div style="font-size:12px;color:var(--muted);margin-top:2px">Engineering Synergy 2026 · v1.5.0</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px">Engineering Synergy 2026 · v1.6.0</div>
     </div>
     <button class="btn-ghost-sm" style="color:var(--muted);font-size:12px" onclick="document.getElementById('admin-exit-overlay').style.display='flex'">← ออก</button>
   </div>
@@ -569,10 +599,21 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
 <!-- QUIZ PAGE — เข้าได้ทางเดียวผ่าน openStationQuiz() (home grid -> station detail -> quiz)
      FIX-6: ลบ quiz-select-view (หน้ารวม 4 ฐาน) ออกจาก DOM แล้ว ไม่มีโค้ดไหน render ลงไปอีก -->
 <div id="pg-quiz" class="page">
+  <!-- Pre-quiz warning overlay (restored from doc4) -->
+  <div id="quiz-start-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:450;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);">
+    <div style="background:#fff;border-radius:24px 24px 0 0;padding:24px 24px 48px;width:100%;max-width:420px;">
+      <div style="width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px;"></div>
+      <div style="font-size:32px;margin-bottom:10px;">⚠️</div>
+      <div style="font-size:18px;font-weight:700;color:var(--navy);margin-bottom:6px;">ก่อนเริ่มทำ Quiz</div>
+      <div style="font-size:14px;color:var(--sub);line-height:1.8;margin-bottom:22px;">เมื่อเริ่มแล้ว <strong>ต้องทำให้จบ</strong><br>ไม่สามารถกดกลับระหว่างทำได้<br>มีเวลา <strong>15 วินาที</strong> ต่อข้อ รวม <strong>5 ข้อ</strong></div>
+      <button class="btn btn-navy" onclick="startConfirmedQuiz()" style="margin-bottom:10px;">เข้าใจแล้ว เริ่มทำ Quiz →</button>
+      <button class="btn btn-outline" onclick="cancelQuizStart()">← ยกเลิก</button>
+    </div>
+  </div>
   <div id="quiz-flash" style="position:fixed;inset:0;background:rgba(220,38,38,.18);pointer-events:none;opacity:0;z-index:400;"></div>
   <div id="quiz-active-view" style="display:none;">
     <div style="padding:14px 0 10px;display:flex;align-items:center;gap:10px;">
-      <div class="back-ico" onclick="stopQuizTimer();go('home')">←</div>
+      <div class="back-ico" onclick="confirmQuitQuiz()">←</div>
       <div style="flex:1;">
         <div style="font-size:14px;font-weight:700;color:var(--navy);" id="qa-station-name">—</div>
         <div style="font-size:10px;color:var(--muted);">Quiz · 5 ข้อ · ข้อละ 15 วินาที</div>
@@ -623,6 +664,32 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
   </div>
 </div>
 
+<!-- SURVEY (restored from doc4) -->
+<div id="pg-survey" class="page">
+  <div style="padding:14px 0 10px;display:flex;align-items:center;gap:10px;">
+    <div style="width:36px;flex-shrink:0;"></div>
+    <div class="pg-titles"><div class="ptitle">แบบประเมิน</div><div class="psub">Engineering Synergy 2026 · 10 ข้อ</div></div>
+    <div id="sv-counter" style="font-size:12px;font-weight:700;color:var(--accent);flex-shrink:0;">1 / 10</div>
+  </div>
+  <div style="height:3px;background:var(--border);border-radius:2px;margin-bottom:16px;overflow:hidden;">
+    <div id="sv-bar" style="height:100%;background:var(--accent);border-radius:2px;transition:.4s;width:10%;"></div>
+  </div>
+  <div id="sv-q-view">
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:13px 14px;margin-bottom:12px;">
+      <div id="sv-qnum" style="font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:5px;">คำถามที่ 1</div>
+      <div id="sv-qtext" style="font-size:14px;font-weight:600;line-height:1.6;color:var(--navy);"></div>
+    </div>
+    <div id="sv-choices" style="display:flex;flex-direction:column;gap:7px;margin-bottom:12px;"></div>
+    <button id="sv-next-btn" onclick="svNext()" style="width:100%;padding:12px;background:var(--navy);border:none;border-radius:11px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;opacity:.35;pointer-events:none;">ถัดไป →</button>
+  </div>
+  <div id="sv-done-view" style="display:none;text-align:center;padding:32px 0;">
+    <div style="font-size:44px;margin-bottom:12px;">🙏</div>
+    <div style="font-size:24px;font-weight:700;color:var(--navy);margin-bottom:6px;">ขอบคุณมากครับ</div>
+    <div style="font-size:13px;color:var(--muted);line-height:1.75;margin-bottom:24px;">ข้อมูลของคุณจะช่วยพัฒนา<br>กิจกรรม Engineering Synergy ในครั้งต่อไป</div>
+    <button onclick="go('home');loadHome();" class="btn btn-navy">← กลับหน้าหลัก</button>
+  </div>
+</div>
+
 <!-- SCAN BONUS -->
 <div id="pg-scan-bonus" class="page">
   <div style="padding-top:20px;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
@@ -647,10 +714,10 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
 
 <script>
 /* ═══════════════════════════════════════════════════════
-   Engineering Synergy 2026 · v1.5.0
+   Engineering Synergy 2026 · v1.6.0
    Fixes: BUG-01..08 + FIX-1..6 (Active/Disable Quiz)
 ═══════════════════════════════════════════════════════ */
-var APP_VERSION='1.5.0';
+var APP_VERSION='1.6.0';
 
 var API='https://script.google.com/macros/s/AKfycbx8jJ-Mq3mLAwWS_ZhAxiUKbibP_qBbV2WUIUGQvGoIzduY3C-UI12aRGh6D4aFew9h/exec';
 var ADMIN_PASS='engineer_1997';
@@ -691,6 +758,7 @@ var EVENT_OPEN=new Date('2026-07-03T09:00:00+07:00');
    ซึ่งอยู่ข้างบน — พึ่ง var hoisting ทำให้ไม่ error แต่เปราะบางมาก
    ถ้าใครเปลี่ยนเป็น let/const จะพังเงียบทันที จึงย้ายมาไว้ตรงนี้ให้ชัดเจน */
 var qzDoneMap={}; // {TO:true, ME:true, ...} ฐานที่ user ทำ quiz เสร็จแล้ว
+var surveyDone=false; // restored from doc4 — true เมื่อ user ส่งแบบประเมินแล้ว
 
 /* FIX-3: stationActive — ฐานที่ admin เปิด/ปิด quiz ได้ (default เปิดหมด)
    ค่าจริงจะถูก override จาก settings.active ที่ backend ส่งมาใน loadHome()/loadAdmin()
@@ -737,6 +805,7 @@ function go(page,param){
     document.getElementById('pg-quiz').classList.add('active');
   }
   else if(page==='scan-bonus'){enterScanBonus();document.getElementById('pg-scan-bonus').classList.add('active');}
+  else if(page==='survey'){document.getElementById('pg-survey').classList.add('active');}
   else{var el=document.getElementById('pg-'+page);if(el)el.classList.add('active');}
   window.scrollTo(0,0);
 }
@@ -1004,7 +1073,9 @@ function loadHome(onDone){
     document.getElementById('home-dept').textContent=emp&&emp.position?emp.position:(m&&m.department)||'—';
     document.getElementById('home-rank').textContent=rank;
     document.getElementById('home-score').textContent=m?m.total_score:0;
+    surveyDone=!!(m&&m.survey_done); /* restored from doc4 */
     renderStations(m);
+    renderSurveyCard(); /* restored from doc4 */
     if(lastEl){var d=new Date();lastEl.textContent='อัปเดตล่าสุด: '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');}
     if(typeof onDone==='function')onDone();  /* FIX-5: แจ้ง caller ว่าโหลด+restore เสร็จจริง */
   });
@@ -1126,8 +1197,10 @@ function closeStationDetail(){
 /* ─────────────────────────────────────────────
    BUG-02 + BUG-03 FIX: openStationQuiz()
    - ตรวจ qzDoneMap[id] ก่อน (BUG-03)
-   - ข้าม showQuizSelect() → startQzStation ทันที (BUG-02)
+   - ข้าม showQuizSelect() → แสดง pre-quiz warning ก่อนเข้าจริง (BUG-02 + restored doc4 warning)
 ───────────────────────────────────────────── */
+var _pendingQuizStation=null;
+
 function openStationQuiz(){
   var id=currentStationDetail;
   if(!id)return;
@@ -1139,17 +1212,39 @@ function openStationQuiz(){
     return;
   }
 
+  /* restored from doc4: แสดง warning overlay ก่อนเข้า quiz จริง
+     เก็บ id ไว้ใน _pendingQuizStation รอ user กดยืนยัน */
+  _pendingQuizStation=id;
   closeStationDetail();
-
-  /* BUG-02 FIX: เซ็ต active view โดยตรง ไม่ผ่านหน้ารวมใดๆ
-     FIX-6: ลบบรรทัด quiz-select-view.style.display ออกแล้ว (element ถูกลบจาก DOM) */
+  stopQR();stopBonusScanner();
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
   document.getElementById('pg-quiz').classList.add('active');
-  document.querySelectorAll('.page').forEach(function(p){if(p.id!=='pg-quiz')p.classList.remove('active');});
   document.getElementById('quiz-active-view').style.display='none';
   document.getElementById('quiz-result-view').style.display='none';
   window.scrollTo(0,0);
+  document.getElementById('quiz-start-overlay').style.display='flex';
+}
 
+/* restored from doc4: เริ่ม quiz จริงหลังกดยืนยันใน warning overlay */
+function startConfirmedQuiz(){
+  document.getElementById('quiz-start-overlay').style.display='none';
+  var id=_pendingQuizStation;
+  _pendingQuizStation=null;
+  if(!id)return;
+  stopQuizTimer();
   startQzStation(id);
+}
+
+/* restored from doc4: ยกเลิกตอนยังอยู่หน้า warning ก่อนเริ่มจริง — กลับ home ได้ปกติ */
+function cancelQuizStart(){
+  document.getElementById('quiz-start-overlay').style.display='none';
+  _pendingQuizStation=null;
+  go('home');
+}
+
+/* restored from doc4: กันกดปุ่ม back หนีออกจาก quiz ระหว่างทำอยู่จริง (ไม่ใช่หน้า warning) */
+function confirmQuitQuiz(){
+  showStationToast('ต้องทำ Quiz ให้จบก่อนกดกลับ');
 }
 
 function openStationScan(){closeStationDetail();go('scan-bonus');}
@@ -1573,6 +1668,93 @@ window.addEventListener('load',function(){
     },600);
   },2200);
 });
+
+/* ═══════════════════════════════════════════
+   SURVEY (restored from doc4, verbatim 10 questions)
+═══════════════════════════════════════════ */
+var svCur=0,svSel=-1,svAns=[];
+var SV_Q=[
+  {q:'ก่อนวันนี้ คุณคิดว่าฝ่ายวิศวกรรมทำอะไร?',c:['ซ่อมเครื่องจักรเมื่อมันพัง','ดูแลระบบไฟฟ้าและเครื่องจักรของโรงงาน','วางแผนและป้องกันไม่ให้เครื่องจักรพัง','ไม่แน่ใจ / ไม่เคยนึกถึง']},
+  {q:'กิจกรรมวันนี้เป็นอย่างไรบ้าง?',c:['ดีมาก อยากมาอีก','ดี ได้ความรู้','พอใช้ได้','ควรปรับปรุง']},
+  {q:'วันนี้คุณเป็นใครมากที่สุด?',c:['คนสายละเอียด — ทุกไมครอนมีความหมาย','คนที่ทำให้ทุกอย่างหมุน — เข้าใจแรง เข้าใจระบบ','คนสายควบคุม — ชอบออโตเมต ไม่ชอบทำซ้ำ','คนที่มองเห็นปัญหาก่อนใคร — ดูแลให้ทุกอย่างไม่พัง']},
+  {q:'ได้ความรู้ใหม่จากกิจกรรมนี้แค่ไหน?',c:['มากมาย ไม่เคยรู้มาก่อน','พอสมควร ได้เติมเต็มบางส่วน','เล็กน้อย รู้อยู่แล้วบ้าง','แทบไม่ได้เลย']},
+  {q:'เวลาในแต่ละฐานเหมาะสมไหม?',c:['พอดีมาก','น้อยเกินไป อยากอยู่นานกว่านี้','นานเกินไป','ไม่แน่ใจ']},
+  {q:'ระบบ Quiz สนุกแค่ไหน?',c:['สนุกมาก ตื่นเต้นตลอด','สนุกดี เหมาะกับกิจกรรม','ธรรมดา ไม่ได้รู้สึกอะไรพิเศษ','ซับซ้อนเกินไป ใช้ยาก']},
+  {q:'แอปพลิเคชันวันนี้เป็นอย่างไร?',c:['ใช้ง่ายมาก ลื่นไหล','ใช้ได้ มีปัญหาบ้างนิดหน่อย','ช้า / ค้างบ่อย','งงตั้งแต่แรก ไม่รู้จะทำอะไร']},
+  {q:'ถ้ามีกิจกรรมแบบนี้อีกครั้ง คุณจะ...?',c:['มาแน่นอน และแนะนำเพื่อน','มาถ้าว่างอยู่','ยังไม่แน่ใจ','ไม่ค่อยสนใจ']},
+  {q:'หลังวันนี้ ถ้าต้องแนะนำฝ่ายวิศวกรรมให้คนอื่น คุณทำได้ไหม?',c:['ได้เลย อธิบายได้ทุกฝ่าย','ได้บางส่วน อธิบายได้บางฝ่าย','ได้นิดหน่อย แต่ยังไม่มั่นใจ','ยังไม่ได้เลย ต้องเรียนรู้เพิ่ม']},
+  {q:'อยากลองมาทำงานที่ฝ่ายวิศวกรรมแค่ไหน?',c:['สนใจมาก อยากลองจริงๆ','พอสนใจ ถ้ามีโอกาสก็ไม่แย่','ยังไม่ได้คิด แต่วันนี้ได้เปิดมุมมอง']}
+];
+
+function renderSurveyCard(){
+  var card=document.getElementById('home-survey-card');
+  var badge=document.getElementById('survey-card-badge');
+  var title=document.getElementById('survey-card-title');
+  var sub=document.getElementById('survey-card-sub');
+  if(!card)return;
+  if(surveyDone){
+    card.style.cssText='border-radius:18px;padding:16px 14px;display:flex;align-items:center;gap:12px;transition:.18s;background:#f0fdf4;border:1.5px solid #86efac;cursor:default;opacity:1;';
+    title.style.color='#16a34a';title.textContent='แบบประเมิน — ส่งแล้ว ✓';
+    sub.style.color='#16a34a';sub.textContent='ขอบคุณสำหรับความคิดเห็น';
+    badge.textContent='✓ เสร็จแล้ว';badge.style.cssText='font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:#dcfce7;color:#16a34a;border:1px solid #86efac;';
+  } else if(qzDoneMap['PM']){
+    card.style.cssText='border-radius:18px;padding:16px 14px;display:flex;align-items:center;gap:12px;transition:.18s;background:var(--bg);border:1.5px solid var(--navy);cursor:pointer;opacity:1;box-shadow:0 4px 14px rgba(15,34,72,.12);';
+    title.style.color='var(--navy)';title.textContent='แบบประเมินความพึงพอใจ';
+    sub.style.color='var(--muted)';sub.textContent='10 ข้อ · ใช้เวลาประมาณ 2 นาที';
+    badge.textContent='ทำได้เลย →';badge.style.cssText='font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:var(--navy);color:#fff;border:1px solid var(--navy);';
+  } else {
+    card.style.cssText='border-radius:18px;padding:16px 14px;display:flex;align-items:center;gap:12px;transition:.18s;background:var(--bg2);border:1.5px solid var(--border);opacity:.55;cursor:not-allowed;';
+    title.style.color='var(--muted)';title.textContent='แบบประเมินความพึงพอใจ';
+    sub.style.color='var(--muted)';sub.textContent='ทำ Quiz ฐาน PM ให้ครบก่อน';
+    badge.textContent='🔒 ล็อก';badge.style.cssText='font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:var(--bg3);color:var(--muted);border:1px solid var(--border);';
+  }
+}
+
+function openSurvey(){
+  if(!qzDoneMap['PM']){showStationToast('ทำ Quiz ฐาน PM ให้จบก่อน');return;}
+  if(surveyDone){showStationToast('ทำแบบประเมินแล้ว ขอบคุณ');return;}
+  svCur=0;svSel=-1;svAns=[];
+  go('survey');
+  svRender();
+}
+
+function svRender(){
+  var q=SV_Q[svCur];
+  document.getElementById('sv-qnum').textContent='คำถามที่ '+(svCur+1);
+  document.getElementById('sv-qtext').textContent=q.q;
+  document.getElementById('sv-counter').textContent=(svCur+1)+' / '+SV_Q.length;
+  document.getElementById('sv-bar').style.width=Math.round((svCur+1)/SV_Q.length*100)+'%';
+  svSel=svAns[svCur]!==undefined?svAns[svCur]:-1;
+  var L=['A','B','C','D'];
+  document.getElementById('sv-choices').innerHTML=q.c.map(function(c,i){
+    var s=svSel===i;
+    return'<button onclick="svPick('+i+')" style="background:'+(s?'var(--blue-light)':'var(--bg)')+';border:1.5px solid '+(s?'var(--accent)':'var(--border)')+';border-radius:11px;padding:10px 13px;font-size:13px;color:'+(s?'var(--accent)':'var(--navy)')+';cursor:pointer;text-align:left;font-family:inherit;display:flex;align-items:center;gap:9px;transition:.15s;width:100%;">'
+      +'<div style="width:22px;height:22px;border-radius:50%;background:'+(s?'var(--accent)':'var(--bg2)')+';display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;color:'+(s?'#fff':'var(--navy)')+';">'+L[i]+'</div>'
+      +'<span>'+c+'</span></button>';
+  }).join('');
+  var btn=document.getElementById('sv-next-btn');
+  if(svSel>=0){btn.style.opacity='1';btn.style.pointerEvents='auto';}
+  else{btn.style.opacity='.35';btn.style.pointerEvents='none';}
+  btn.textContent=svCur<SV_Q.length-1?'ถัดไป →':'ส่งแบบประเมิน ✓';
+}
+
+function svPick(i){svSel=i;svAns[svCur]=i;svRender();}
+
+function svNext(){
+  if(svSel<0)return;
+  if(svCur<SV_Q.length-1){svCur++;svRender();return;}
+  showLoad();
+  var answers=SV_Q.map(function(q,i){return q.c[svAns[i]!==undefined?svAns[i]:0];});
+  apiPost({action:'saveSurvey',uid:currentUid,answers:answers},function(res){
+    hideLoad();
+    if(res.error){showStationToast(res.error);return;}
+    surveyDone=true;
+    document.getElementById('sv-q-view').style.display='none';
+    document.getElementById('sv-done-view').style.display='block';
+    document.getElementById('sv-bar').style.width='100%';
+    document.getElementById('sv-counter').textContent='เสร็จสิ้น';
+  });
+}
 
 function addToCalendar(){
   var ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Engineering Synergy 2026//TH','BEGIN:VEVENT','UID:engineering-synergy-2026@smpc','DTSTAMP:20260614T000000Z','DTSTART:20260703T020000Z','DTEND:20260703T050000Z','SUMMARY:Engineering Synergy 2026','DESCRIPTION:กิจกรรม Engineer for a Day — ฝ่ายวิศวกรรม','LOCATION:Shop floor ฝ่ายวิศวกรรม','END:VEVENT','END:VCALENDAR'].join('\r\n');
