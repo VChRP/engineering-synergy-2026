@@ -1467,13 +1467,14 @@ function calcQzBonus(t){return Math.round((t/QZ_TIME)*QZ_BONUS_MAX*10)/10;}
    BUG-01 FIX: backToStationFromQuiz()
    กลับ home แล้ว reload เพื่อให้ score อัปเดต
 ───────────────────────────────────────────── */
+/* UPDATE: backToStationFromQuiz() แก้ตามคำขอ — กลับไปหน้ารวมฐานเฉยๆ
+   ไม่เด้งกลับเข้า station detail เดิมให้อัตโนมัติอีกต่อไป
+   (เดิม FIX-5 ออกแบบให้เปิด detail เดิมกลับมาเอง แต่สร้างความสับสน
+   เพราะดูเหมือนหน้าค้าง/กระตุก จึงตัดพฤติกรรมนี้ออก) */
 function backToStationFromQuiz(){
-  var id=qzStation;
   stopQuizTimer();
   go('home');
-  /* FIX-5: รอ loadHome() เสร็จจริง (callback) แทนการเดาเวลา setTimeout 400ms
-     กันกรณีเน็ตช้าแล้ว openStationDetail ถูกเรียกก่อน qzDoneMap restore ครบ */
-  loadHome(function(){if(id)openStationDetail(id);});
+  loadHome();
 }
 
 /* FIX-6: ลบ showQuizSelect() และ renderQzSelect() ออกทั้งหมด
