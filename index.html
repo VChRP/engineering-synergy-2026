@@ -672,6 +672,16 @@ var STATION_MAP={
 
 var currentStation=null,currentUid=null,currentToken=null,employeeDB=[],settingsCache={};
 var appSettings={coming_soon:true,bypass_list:['วัชรพล มีดี'],quiz_order:['TO','ME','EE','PM']};
+
+/* FIX: merge getAppSettings response อย่างปลอดภัย — กันกรณี backend ส่ง bypass_list
+   เป็น array ว่าง [] (เพราะ sheet app_settings ไม่มี row bypass_list) มาเขียนทับ default
+   ถ้า bypass_list ที่ได้มาไม่ใช่ array หรือว่างเปล่า ให้คงค่าเดิมไว้ */
+function applyAppSettings(res){
+  if(!res||res.error)return;
+  if(res.coming_soon!=null)appSettings.coming_soon=res.coming_soon;
+  if(Array.isArray(res.bypass_list)&&res.bypass_list.length)appSettings.bypass_list=res.bypass_list;
+  if(Array.isArray(res.quiz_order)&&res.quiz_order.length)appSettings.quiz_order=res.quiz_order;
+}
 var seenPopup={},qrScanner=null,stLog={EE:[],ME:[],TO:[],PM:[]};
 var selectedReg=null;
 var EVENT_OPEN=new Date('2026-07-10T09:00:00+07:00');
@@ -898,7 +908,7 @@ function afterAuth(){
      ทำให้หน้า preview วูบโผล่ระหว่างรอ API) — แสดง loading คั่นกันหน้าวูบ */
   showLoad();
   apiGet('getAppSettings',function(res){
-    if(res&&!res.error)appSettings=res;
+    applyAppSettings(res);
     if(appSettings.coming_soon){
       apiGet('getMembers',function(mr){
         hideLoad();
@@ -1182,7 +1192,7 @@ function loadAdmin(){
     /* FIX-3c: โหลดสถานะ active ต่อฐานจาก settings (default true ถ้า backend ยังไม่ส่ง field นี้) */
     stationActive[id]=(st&&st.active!=null)?(st.active!==false):true;});
     renderStationActiveToggles();}});
-  apiGet('getAppSettings',function(res){if(res&&!res.error){appSettings=res;var tog=document.getElementById('cs-toggle');var pill=document.getElementById('cs-pill');var track=document.getElementById('cs-track');var knob=document.getElementById('cs-knob');var on=res.coming_soon;if(tog)tog.checked=on;if(pill){pill.textContent=on?'● กำลังแสดง Coming Soon':'● เปิดใช้งานปกติ';pill.style.background=on?'#fff7ed':'#f0fdf4';pill.style.color=on?'#c2410c':'#16a34a';pill.style.borderColor=on?'#fed7aa':'#bbf7d0';}if(track)track.style.background=on?'var(--navy)':'var(--border)';if(knob)knob.style.transform=on?'translateX(18px)':'translateX(0)';}});
+  apiGet('getAppSettings',function(res){if(res&&!res.error){applyAppSettings(res);var tog=document.getElementById('cs-toggle');var pill=document.getElementById('cs-pill');var track=document.getElementById('cs-track');var knob=document.getElementById('cs-knob');var on=res.coming_soon;if(tog)tog.checked=on;if(pill){pill.textContent=on?'● กำลังแสดง Coming Soon':'● เปิดใช้งานปกติ';pill.style.background=on?'#fff7ed':'#f0fdf4';pill.style.color=on?'#c2410c':'#16a34a';pill.style.borderColor=on?'#fed7aa':'#bbf7d0';}if(track)track.style.background=on?'var(--navy)':'var(--border)';if(knob)knob.style.transform=on?'translateX(18px)':'translateX(0)';}});
 }
 function confirmAdminExit(){document.getElementById('admin-exit-overlay').style.display='none';goPreview();}
 function goPreview(){
@@ -1520,7 +1530,7 @@ window.addEventListener('load',function(){
   document.getElementById('pg-preview').classList.remove('active');
   apiGet('getSettings',function(res){if(res.settings)settingsCache=res.settings;});
   apiGet('getEmployees',function(res){var e=(res&&res.employees)||[];employeeDB=e.map(function(x){return{firstName:x.firstName,lastName:x.lastName,dept:x.dept,position:x.position||''};});});
-  apiGet('getAppSettings',function(res){if(res&&!res.error)appSettings=res;});
+  apiGet('getAppSettings',function(res){applyAppSettings(res);});
   var uid=loadSessionUid();var token=loadSessionToken();var sessionResult=null;
   if(uid&&token){
     var statusEl=document.getElementById('splash-status');
