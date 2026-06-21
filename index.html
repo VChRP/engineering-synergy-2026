@@ -3,7 +3,35 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Engineering Synergy 2026</title>
+<!--
+  ╔══════════════════════════════════════════════════════════╗
+  ║  Engineering Synergy 2026                               ║
+  ║  Version : 1.5.0                                        ║
+  ║  Date    : 2026-06-21                                   ║
+  ╠══════════════════════════════════════════════════════════╣
+  ║  v1.5.0 — AUDIT FIXES + NEW FEATURE                      ║
+  ║  [FIX-1/BUG-08] ย้าย qzDoneMap ไปประกาศ state block บนสุด║
+  ║           (เดิมใช้ก่อนประกาศ พึ่ง var hoisting เปราะบาง) ║
+  ║  [FIX-2/BUG-07] loadStationStats ใช้ QUIZ_ORDER          ║
+  ║           (TO,ME,EE,PM) แทน hardcode EE,ME,TO,PM ผิดลำดับ║
+  ║  [FIX-3] เพิ่มฟีเจอร์ Active/Disable Quiz รายฐาน          ║
+  ║           - toggle ใน Admin→ตั้งค่า, ฐานปิด user ข้ามได้  ║
+  ║           - getStationState/renderStations ข้ามฐานที่ปิด ║
+  ║           ⚠️ BACKEND ต้องเก็บ+ส่ง field 'active' ต่อฐาน  ║
+  ║             และไม่รวมคะแนนฐานปิดตอนคิด ranking            ║
+  ║  [FIX-4] รวม suffix "_quiz" เป็น scoreKey() helper จุดเดียว║
+  ║  [FIX-5] backToStationFromQuiz รอ callback loadHome จริง ║
+  ║           แทน setTimeout 400ms (กัน race condition)      ║
+  ║  [FIX-6] ลบ dead code: showQuizSelect, renderQzSelect,   ║
+  ║           quiz-select-view DOM, onStationClick,          ║
+  ║           STATION_INFO — กำจัดต้นตอ BUG-06 ถาวร          ║
+  ╠══════════════════════════════════════════════════════════╣
+  ║  v1.4.0 [BUG-06] quiz-select fallback removed            ║
+  ║  v1.3.0 [BUG-05] scores key mismatch / removed QR block  ║
+  ║  v1.2.0 [BUG-01..04] quiz score/flow/retake/refresh      ║
+  ╚══════════════════════════════════════════════════════════╝
+-->
+<title>Engineering Synergy 2026 · v1.5.0</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -40,9 +68,6 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
 @keyframes logoIn{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
 @keyframes fadeUp{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
 @keyframes fill{from{width:0}to{width:100%}}
-
-/* ── Divider ── */
-.divider{height:1px;background:var(--border);margin:20px 0;}
 
 /* ── Buttons ── */
 .btn{width:100%;padding:14px;border:none;border-radius:14px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;transition:.18s;text-align:center;display:block;letter-spacing:-.1px;}
@@ -99,31 +124,13 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
 .rc-info{flex:1;}
 .rc-sl{font-size:11px;color:rgba(255,255,255,.45);margin-bottom:3px;}
 .rc-score{font-size:32px;font-weight:700;color:#fff;line-height:1;}
-.rc-sub{font-size:11px;color:rgba(255,255,255,.35);margin-top:2px;}
 .rc-refresh{font-size:18px;color:rgba(255,255,255,.25);background:none;border:none;cursor:pointer;padding:4px;}
-.tl-pill{display:flex;align-items:center;gap:8px;background:var(--blue-light);border:1px solid #bfdbfe;border-radius:12px;padding:10px 14px;margin-bottom:18px;}
-.tl-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;animation:pulse 1.5s ease infinite;}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-.tl-txt{font-size:11px;color:#1d4ed8;font-weight:600;flex:1;}
-.tl-time{font-size:10px;color:#60a5fa;font-weight:600;}
 .sec-lbl{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px;}
 .st-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
-.st-card{background:var(--bg);border:1.5px solid var(--border);border-radius:18px;padding:18px 12px;text-align:center;cursor:pointer;position:relative;overflow:hidden;transition:.2s;box-shadow:0 1px 4px rgba(0,30,80,.05);}
-.st-card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,30,80,.09);}
-.st-card:active{transform:scale(.97);}
-.st-card.done{border-color:#bfdbfe;background:#f5f9ff;}
-.st-card.pending .st-ico{opacity:.3;filter:grayscale(1);}
-.st-stamp{position:absolute;top:8px;right:9px;width:18px;height:18px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:700;}
-.st-ico{font-size:28px;margin-bottom:8px;display:block;}
-.lb-box{background:var(--bg);border:1.5px solid var(--border);border-radius:18px;overflow:hidden;margin-bottom:18px;}
-.lb-item{display:flex;align-items:center;gap:11px;padding:12px 16px;border-bottom:1px solid var(--bg2);}
-.lb-item:last-child{border-bottom:none;}
-.lb-item.me{background:var(--blue-light);}
-.lb-rank{width:22px;text-align:center;font-size:13px;flex-shrink:0;}
-.lb-name{font-size:13px;font-weight:600;color:var(--navy);flex:1;}
-.lb-sub{font-size:10px;color:var(--muted);}
-.lb-score{font-size:14px;font-weight:700;color:var(--navy);}
-.me-tag{font-size:9px;background:var(--blue-light);color:var(--accent);border-radius:4px;padding:1px 6px;margin-left:4px;font-weight:700;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes elSpin{to{transform:rotate(360deg)}}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.skel{background:linear-gradient(90deg,#f1f4f9 25%,#e8ecf1 50%,#f1f4f9 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:6px;display:inline-block;}
 
 /* ── Popup ── */
 .popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);animation:fadeIn .2s;}
@@ -161,25 +168,9 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
 .cd-row{display:flex;justify-content:center;align-items:flex-end;gap:4px;}
 .cd-unit{text-align:center;min-width:52px;}
 .cd-unit-num{font-size:32px;font-weight:700;color:var(--navy);line-height:1;font-variant-numeric:tabular-nums;}
-@keyframes elSpin{to{transform:rotate(360deg)}}
-@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
-.skel{background:linear-gradient(90deg,#f1f4f9 25%,#e8ecf1 50%,#f1f4f9 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:6px;display:inline-block;}
 .cd-unit-num.accent{color:var(--accent);}
 .cd-unit-lbl{font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-top:4px;}
 .cd-sep{font-size:26px;font-weight:300;color:var(--border2);padding-bottom:8px;}
-
-/* ── QUIZ ── */
-.q-choice{background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:12px 15px;font-size:14px;color:var(--text);cursor:pointer;text-align:left;font-family:inherit;transition:.15s;display:flex;align-items:center;gap:10px;}
-.q-choice:hover{border-color:var(--accent);background:#f5f8ff;}
-.q-choice.sel{border-color:var(--accent);background:var(--blue-light);color:var(--accent);}
-.q-choice.correct{border-color:var(--green);background:#f0fdf4;color:var(--green);}
-.q-choice.wrong{border-color:var(--red);background:#fef2f2;color:var(--red);}
-.q-choice.disabled{cursor:default;pointer-events:none;}
-.q-letter{width:24px;height:24px;border-radius:50%;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
-
-/* ── Admin QR grid ── */
-.qr-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
-.qr-card{background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:16px 12px;text-align:center;}
 
 /* ── Scan bonus (user) ── */
 .me-bar{display:flex;align-items:center;gap:10px;background:var(--blue-light);border:1px solid #bfdbfe;border-radius:12px;padding:11px 14px;margin-bottom:16px;}
@@ -221,9 +212,8 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
 
 <div class="wrap">
 
-<!-- PREVIEW -->
+<!-- PREVIEW + REGISTER -->
 <div id="pg-preview" class="page active" style="min-height:100vh;position:relative;overflow:hidden;">
-
   <div id="confirm-popup" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:400;align-items:flex-end;justify-content:center;">
     <div style="background:var(--bg);border-radius:24px 24px 0 0;padding:24px 24px 48px;width:100%;max-width:420px;">
       <div style="width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px;"></div>
@@ -244,7 +234,6 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
       </div>
     </div>
   </div>
-
   <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center;padding:0 24px;">
     <div style="font-size:54px;font-weight:700;color:var(--navy);letter-spacing:-2px;line-height:1.05;">Engineering</div>
     <div style="font-size:54px;font-weight:700;color:var(--accent);letter-spacing:-2px;line-height:1.05;margin-bottom:14px;">Synergy</div>
@@ -260,8 +249,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
       <div id="pvRingLbl" style="font-size:12px;color:var(--muted);">กำลังโหลด...</div>
     </div>
   </div>
-
-  <div id="entry-loading" style="position:absolute;inset:0;background:#fff;z-index:20;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;border-radius:0;">
+  <div id="entry-loading" style="position:absolute;inset:0;background:#fff;z-index:20;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;">
     <div style="position:relative;width:36px;height:36px;">
       <div id="el-spinner" style="width:36px;height:36px;border:2.5px solid var(--border);border-top-color:#1e3a5f;border-radius:50%;animation:elSpin .7s linear infinite;"></div>
       <svg id="el-check" style="display:none;position:absolute;inset:0;" viewBox="0 0 36 36" fill="none">
@@ -271,7 +259,6 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
     </div>
     <div id="el-txt" style="font-size:13px;color:var(--muted);">กำลังเข้าสู่ระบบ...</div>
   </div>
-
   <div id="entry-panel" style="position:absolute;bottom:0;left:0;right:0;background:#fff;border-radius:22px 22px 0 0;padding:20px 24px 44px;border-top:0.5px solid var(--border);transform:translateY(100%);transition:transform .45s cubic-bezier(.34,1.1,.64,1);">
     <div style="width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 18px;"></div>
     <div style="font-size:17px;font-weight:700;color:var(--navy);margin-bottom:3px;">สวัสดี 👋</div>
@@ -287,7 +274,6 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
     </div>
     <button id="reg-submit" onclick="onRegSubmit()" style="width:100%;padding:15px;background:#1e3a5f;border:none;border-radius:14px;color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;opacity:0;transform:translateY(8px);transition:opacity .35s,transform .35s;pointer-events:none;">เข้าร่วมกิจกรรม →</button>
   </div>
-
   <div id="admin-entry-panel" style="position:absolute;inset:0;background:#fff;display:flex;flex-direction:column;justify-content:center;padding:40px 28px;opacity:0;pointer-events:none;transition:opacity .35s ease;z-index:10;">
     <div style="font-size:12px;font-weight:600;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">Admin</div>
     <div style="font-size:22px;font-weight:700;color:var(--navy);margin-bottom:4px;">เข้าสู่ระบบ</div>
@@ -308,7 +294,6 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
 <div id="pg-register" class="page"></div>
 <div id="pg-login" class="page"></div>
 
-<!-- ADMIN LOGIN -->
 <div id="pg-admin-login" class="page">
   <div class="pg-header">
     <div class="back-ico" onclick="go('preview')">←</div>
@@ -325,7 +310,6 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
   </div>
 </div>
 
-<!-- RESET PASSWORD -->
 <div id="pg-reset-pass" class="page">
   <div class="pg-header">
     <div class="back-ico" onclick="go('admin-login')">←</div>
@@ -347,7 +331,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
   <div class="coming-wrap">
     <div style="font-size:13px;font-weight:600;color:var(--accent);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;">Engineering Synergy 2026</div>
     <div style="font-size:28px;font-weight:700;color:var(--navy);letter-spacing:-.5px;margin-bottom:8px;">Coming Soon</div>
-    <div style="font-size:14px;color:var(--muted);line-height:1.85;margin-bottom:20px;">แล้วพบกัน<br>วันศุกร์ที่ 3 กรกฎาคม 2569 เวลา 09:00 น.<br>ณ Shop floor ฝ่ายวิศวกรรม</div>
+    <div style="font-size:14px;color:var(--muted);line-height:1.85;margin-bottom:20px;">แล้วพบกัน<br>วันศุกร์ที่ 10 กรกฎาคม 2569 เวลา 09:00 น.<br>ณ Shop floor ฝ่ายวิศวกรรม</div>
     <div class="cd-box">
       <div style="font-size:10px;font-weight:600;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;margin-bottom:16px;">เหลือเวลา</div>
       <div class="cd-row">
@@ -367,7 +351,6 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
 
 <!-- HOME -->
 <div id="pg-home" class="page" style="position:relative;">
-
   <div id="kick-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);z-index:300;align-items:flex-end;justify-content:center;">
     <div style="background:#fff;border-radius:24px 24px 0 0;padding:24px 24px 48px;width:100%;max-width:420px;">
       <div style="width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px;"></div>
@@ -377,7 +360,6 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
       <button class="btn btn-navy" onclick="dismissKick()">รับทราบ เข้าสู่ระบบใหม่</button>
     </div>
   </div>
-
   <div id="st-popup" style="display:none">
     <div class="popup-overlay" onclick="closePopup(event)">
       <div class="popup-sheet" onclick="event.stopPropagation()">
@@ -391,7 +373,6 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
       </div>
     </div>
   </div>
-
   <div class="home-top">
     <div class="home-greet">สวัสดี 👋</div>
     <div class="home-name" id="home-name">—</div>
@@ -408,26 +389,11 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
   <div id="home-last-refresh" style="text-align:right;font-size:10px;color:var(--muted);margin-top:4px;margin-bottom:12px;"></div>
   <div class="sec-lbl">ฐานกิจกรรม</div>
   <div class="st-grid" id="home-stations"></div>
-
-  <div style="height:20px"></div>
-
-  <!-- Survey card -->
-  <div style="margin:0 0 16px;">
-    <div class="sec-lbl">แบบประเมิน</div>
-    <div id="home-survey-card" onclick="openSurvey()" style="border-radius:18px;padding:16px 14px;display:flex;align-items:center;gap:12px;transition:.18s;background:var(--bg2);border:1.5px solid var(--border);opacity:.55;cursor:not-allowed;">
-      <div style="font-size:28px;flex-shrink:0;">📋</div>
-      <div style="flex:1;">
-        <div id="survey-card-title" style="font-size:14px;font-weight:700;color:var(--muted);">แบบประเมินความพึงพอใจ</div>
-        <div id="survey-card-sub" style="font-size:11px;color:var(--muted);margin-top:2px;">ทำ Quiz ฐาน PM ให้ครบก่อน</div>
-      </div>
-      <div id="survey-card-badge" style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:var(--bg3);color:var(--muted);border:1px solid var(--border);">🔒 ล็อก</div>
-    </div>
-  </div>
-  <div style="display:flex;justify-content:center;padding:16px 0 4px;">
+  <div style="display:flex;justify-content:center;padding-top:16px;margin-bottom:4px;">
     <button class="btn-danger-sm" onclick="doLogout()">↩ ออกจากระบบ</button>
   </div>
-
-   <!-- Station detail overlay -->
+  <div style="height:20px"></div>
+  <!-- Station detail overlay -->
   <div id="st-detail-overlay" style="display:none;position:absolute;inset:0;background:#fff;z-index:200;overflow-y:auto;">
     <div style="padding:16px 20px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;position:sticky;top:0;background:#fff;z-index:1;">
       <button onclick="closeStationDetail()" style="width:32px;height:32px;border-radius:9px;background:var(--bg2);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;flex-shrink:0;">←</button>
@@ -439,10 +405,11 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
     <div style="padding:20px 20px 40px;">
       <div style="text-align:center;padding:16px 0 24px;">
         <div id="std-icon" style="font-size:56px;margin-bottom:10px;"></div>
-        <div id="std-stamp" style="display:none;font-size:12px;font-weight:600;color:#16a34a;background:#f0fdf4;border:1px solid #86efac;border-radius:20px;padding:4px 14px;display:inline-block;"></div>
+        <div id="std-stamp" style="font-size:12px;font-weight:600;color:#16a34a;background:#f0fdf4;border:1px solid #86efac;border-radius:20px;padding:4px 14px;display:none;"></div>
       </div>
       <div class="sec-lbl">กิจกรรมในฐานนี้</div>
-      <div id="std-quiz-card" onclick="openStationQuiz()" style="border-radius:14px;padding:16px;margin-bottom:10px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:.15s;">
+      <!-- Quiz card — BUG-03: onclick จะถูก override ใน openStationDetail() -->
+      <div id="std-quiz-card" style="border-radius:14px;padding:16px;margin-bottom:10px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:.15s;">
         <div style="font-size:28px;flex-shrink:0;">📋</div>
         <div style="flex:1;">
           <div id="std-quiz-title" style="font-size:15px;font-weight:700;">ทำ Quiz</div>
@@ -450,6 +417,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
         </div>
         <div style="font-size:18px;">→</div>
       </div>
+      <!-- Scan Bonus card -->
       <div onclick="openStationScan()" style="background:linear-gradient(135deg,#1e40af,#2563eb);border-radius:14px;padding:16px;display:flex;align-items:center;gap:12px;cursor:pointer;color:#fff;">
         <div style="font-size:28px;flex-shrink:0;">📷</div>
         <div style="flex:1;">
@@ -485,7 +453,6 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
 
 <!-- ADMIN -->
 <div id="pg-admin" class="page">
-
   <div id="admin-exit-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);">
     <div style="background:var(--bg);border-radius:24px 24px 0 0;padding:24px 24px 48px;width:100%;max-width:420px;">
       <div style="width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px;"></div>
@@ -496,22 +463,19 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
       <button class="btn btn-outline" onclick="document.getElementById('admin-exit-overlay').style.display='none'">ยกเลิก อยู่ต่อ</button>
     </div>
   </div>
-
   <div style="padding-top:22px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center">
     <div>
       <div style="font-size:20px;font-weight:700;color:var(--navy);letter-spacing:-.4px">Admin</div>
-      <div style="font-size:12px;color:var(--muted);margin-top:2px">Engineering Synergy 2026</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px">Engineering Synergy 2026 · v1.5.0</div>
     </div>
     <button class="btn-ghost-sm" style="color:var(--muted);font-size:12px" onclick="document.getElementById('admin-exit-overlay').style.display='flex'">← ออก</button>
   </div>
-
   <div style="display:flex;gap:6px;margin-bottom:16px;overflow-x:auto;padding-bottom:2px;">
     <button class="tab active" id="atab-overview" onclick="switchAdminTab('overview')">📊 ภาพรวม</button>
     <button class="tab" id="atab-members"  onclick="switchAdminTab('members')">👥 สมาชิก</button>
     <button class="tab" id="atab-stations" onclick="switchAdminTab('stations')">🏭 ฐาน</button>
     <button class="tab" id="atab-settings" onclick="switchAdminTab('settings')">⚙️ ตั้งค่า</button>
   </div>
-
   <div id="apanel-overview">
     <div class="sec-lbl">สถิติวันนี้</div>
     <div class="grid2" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px;">
@@ -520,38 +484,25 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
       <div class="stat-box"><div style="font-size:18px;margin-bottom:4px;">🟢</div><div id="stat-online" style="font-size:22px;font-weight:700;color:var(--green)">0</div><div style="font-size:10px;color:var(--muted);margin-top:2px">Online</div></div>
     </div>
     <div class="sec-lbl">Leaderboard</div>
-    <div id="admin-lb" style="background:var(--bg);border:1.5px solid var(--border);border-radius:16px;padding:0 16px;">
-      <div style="text-align:center;color:var(--muted);padding:22px;font-size:13px;">กำลังโหลด...</div>
-    </div>
+    <div id="admin-lb" style="background:var(--bg);border:1.5px solid var(--border);border-radius:16px;padding:0 16px;"></div>
   </div>
-
   <div id="apanel-members" style="display:none;">
-    <div id="admin-list" style="background:var(--bg);border:1.5px solid var(--border);border-radius:16px;padding:0 16px;">
-      <div style="text-align:center;color:var(--muted);padding:28px;font-size:13px;">กำลังโหลด...</div>
-    </div>
+    <div id="admin-list" style="background:var(--bg);border:1.5px solid var(--border);border-radius:16px;padding:0 16px;"></div>
     <div style="margin-top:10px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;">
       <div style="font-size:12px;color:var(--muted);line-height:1.6;">🔒 การลบข้อมูลสมาชิกทั้งหมดไม่สามารถทำได้จากแอป กรุณาแก้ไขจาก Google Sheet โดยตรง</div>
     </div>
   </div>
-
   <div id="apanel-stations" style="display:none;">
-    <div class="sec-lbl">เปิดฐานสแกน QR (ให้คะแนน)</div>
-    <div class="grid2" style="margin-bottom:20px;">
-      <button class="btn btn-outline" style="font-size:13px;padding:11px" onclick="go('station','EE')">⚡ EE</button>
-      <button class="btn btn-outline" style="font-size:13px;padding:11px" onclick="go('station','ME')">⚙️ ME</button>
-      <button class="btn btn-outline" style="font-size:13px;padding:11px;margin-top:0" onclick="go('station','TO')">🔬 TO</button>
-      <button class="btn btn-outline" style="font-size:13px;padding:11px;margin-top:0" onclick="go('station','PM')">📳 PM</button>
-    </div>
+    <!-- v1.3.0: ลบส่วน "เปิดฐานสแกน QR (ให้คะแนน)" ออกตามคำขอผู้ใช้
+         (ปุ่ม go('station', X) 4 ปุ่ม) — โค้ด pg-station/loadStation/doGiveScore
+         ยังคงอยู่ในระบบเผื่อใช้งานทางอื่น แค่ไม่แสดง entry point นี้ใน Admin แล้ว -->
     <div class="sec-lbl">สถิติประจำฐาน</div>
     <div id="station-stats"><div style="text-align:center;color:var(--muted);padding:22px;font-size:13px;">กำลังโหลด...</div></div>
     <div class="sec-lbl" style="margin-top:16px;">QR Bonus ประจำฐาน</div>
     <div style="font-size:12px;color:var(--muted);background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:10px 14px;margin-bottom:12px;line-height:1.6;">
       แตะฐานเพื่อแสดง QR · ผู้เข้าร่วมสแกนจากแอปของตัวเอง · รับได้ <strong>1 ครั้ง/ฐาน</strong>
     </div>
-    <div class="grid2" id="adminQrGrid">
-      <div style="text-align:center;color:var(--muted);padding:20px;font-size:13px;grid-column:span 2">กำลังโหลด...</div>
-    </div>
-
+    <div class="grid2" id="adminQrGrid"><div style="text-align:center;color:var(--muted);padding:20px;font-size:13px;grid-column:span 2">กำลังโหลด...</div></div>
     <div id="qr-popup-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);z-index:500;align-items:flex-end;justify-content:center;">
       <div style="background:#fff;border-radius:22px 22px 0 0;padding:20px 22px 48px;width:100%;max-width:420px;text-align:center;">
         <div style="width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 18px;"></div>
@@ -564,7 +515,6 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
       </div>
     </div>
   </div>
-
   <div id="apanel-settings" style="display:none;">
     <div class="sec-lbl">โหมดระบบ</div>
     <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:14px;">
@@ -592,6 +542,13 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
         </div>
       </div>
     </div>
+    <!-- FIX-3a: Active/Disable Quiz รายฐาน — ปิดฐานไหน user จะข้ามไปทำฐานถัดไปได้เลย -->
+    <div class="sec-lbl">เปิด / ปิด Quiz รายฐาน</div>
+    <div style="font-size:12px;color:var(--muted);background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:10px 14px;margin-bottom:12px;line-height:1.6;">
+      ปิดฐานไหน → ผู้เข้าร่วมจะ<strong>ข้ามฐานนั้นไปทำฐานถัดไปได้เลย</strong> และคะแนนฐานที่ปิดจะไม่ถูกนำไปคิด ranking
+    </div>
+    <div id="station-active-list" style="margin-bottom:16px;"></div>
+
     <div class="sec-lbl">คะแนนแต่ละฐาน</div>
     <div id="admin-ok" class="ok-box"></div>
     <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:16px;padding:14px 16px;margin-bottom:10px;">
@@ -609,53 +566,19 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
   </div>
 </div>
 
-
-<!-- QUIZ -->
+<!-- QUIZ PAGE — เข้าได้ทางเดียวผ่าน openStationQuiz() (home grid -> station detail -> quiz)
+     FIX-6: ลบ quiz-select-view (หน้ารวม 4 ฐาน) ออกจาก DOM แล้ว ไม่มีโค้ดไหน render ลงไปอีก -->
 <div id="pg-quiz" class="page">
-
-  <!-- Pre-quiz warning overlay -->
-  <div id="quiz-start-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:450;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);">
-    <div style="background:#fff;border-radius:24px 24px 0 0;padding:24px 24px 48px;width:100%;max-width:420px;">
-      <div style="width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px;"></div>
-      <div style="font-size:32px;margin-bottom:10px;">⚠️</div>
-      <div style="font-size:18px;font-weight:700;color:var(--navy);margin-bottom:6px;">ก่อนเริ่มทำ Quiz</div>
-      <div style="font-size:14px;color:var(--sub);line-height:1.8;margin-bottom:22px;">เมื่อเริ่มแล้ว <strong>ต้องทำให้จบ</strong><br>ไม่สามารถกดกลับระหว่างทำได้<br>มีเวลา <strong>15 วินาที</strong> ต่อข้อ รวม <strong>5 ข้อ</strong></div>
-      <button class="btn btn-navy" onclick="startConfirmedQuiz()" style="margin-bottom:10px;">เข้าใจแล้ว เริ่มทำ Quiz →</button>
-      <button class="btn btn-outline" onclick="cancelQuizStart()">← ยกเลิก</button>
-    </div>
-  </div>
-
   <div id="quiz-flash" style="position:fixed;inset:0;background:rgba(220,38,38,.18);pointer-events:none;opacity:0;z-index:400;"></div>
-
-  <!-- Station select view -->
-  <div id="quiz-select-view">
-    <div style="padding:20px 0 16px;display:flex;align-items:center;gap:10px;">
-      <div class="back-ico" onclick="go('home')">←</div>
-      <div class="pg-titles"><div class="ptitle">Quiz</div><div class="psub">ทำตามลำดับ · 5 ข้อ/ฐาน · ข้อละ 15 วินาที</div></div>
-    </div>
-    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:18px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;">
-        <span style="font-size:12px;font-weight:600;color:var(--sub);">ความคืบหน้าทั้งหมด</span>
-        <span id="qs-overall-val" style="font-size:12px;font-weight:700;color:var(--accent);">0 / 4 ฐาน</span>
-      </div>
-      <div style="height:5px;background:var(--border);border-radius:3px;overflow:hidden;">
-        <div id="qs-overall-fill" style="height:100%;background:var(--accent);border-radius:3px;transition:.4s;width:0%;"></div>
-      </div>
-    </div>
-    <div id="qs-list" style="display:flex;flex-direction:column;gap:0;"></div>
-  </div>
-
-  <!-- Quiz active view -->
   <div id="quiz-active-view" style="display:none;">
     <div style="padding:14px 0 10px;display:flex;align-items:center;gap:10px;">
-      <div class="back-ico" onclick="confirmQuitQuiz()">←</div>
+      <div class="back-ico" onclick="stopQuizTimer();go('home')">←</div>
       <div style="flex:1;">
         <div style="font-size:14px;font-weight:700;color:var(--navy);" id="qa-station-name">—</div>
         <div style="font-size:10px;color:var(--muted);">Quiz · 5 ข้อ · ข้อละ 15 วินาที</div>
       </div>
       <div id="qa-counter" style="font-size:12px;font-weight:700;color:var(--accent);flex-shrink:0;">1 / 5</div>
     </div>
-
     <div style="display:flex;justify-content:space-between;margin-bottom:5px;font-size:11px;">
       <span style="color:var(--sub);">ความคืบหน้า</span>
       <span id="qa-score" style="color:var(--accent);font-weight:700;">0 คะแนน</span>
@@ -663,7 +586,6 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
     <div style="height:3px;background:var(--border);border-radius:2px;margin-bottom:12px;overflow:hidden;">
       <div id="qa-prog" style="height:100%;border-radius:2px;transition:.3s;background:#10b981;width:0%;"></div>
     </div>
-
     <div id="qa-timer-row" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding:8px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;transition:.3s;">
       <div style="display:flex;align-items:center;gap:10px;">
         <div id="qa-ring" style="position:relative;width:44px;height:44px;flex-shrink:0;">
@@ -680,22 +602,15 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
       </div>
       <div id="qa-bonus-pill" style="font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid #86efac;color:#10b981;background:#f0fdf4;transition:.3s;">⚡ +5.0</div>
     </div>
-
     <div id="qa-qcard" style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:13px 14px;margin-bottom:10px;transition:border-color .3s,background .3s;">
       <div id="qa-qnum" style="font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:5px;">คำถามที่ 1</div>
       <div id="qa-qtext" style="font-size:14px;font-weight:600;line-height:1.6;color:var(--navy);"></div>
     </div>
-
     <div id="qa-choices" style="display:flex;flex-direction:column;gap:7px;margin-bottom:10px;"></div>
-
     <button id="qa-confirm" onclick="confirmQuizAnswer()" style="width:100%;padding:12px;background:#2563eb;border:none;border-radius:11px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:10px;display:none;">✓ ยืนยันคำตอบ</button>
-
     <div id="qa-result" style="display:none;border-radius:11px;padding:10px 13px;margin-bottom:10px;border:1.5px solid;align-items:center;gap:9px;font-size:13px;"></div>
-
-    <button id="qa-next" onclick="nextQuizQ()" disabled style="width:100%;padding:12px;background:var(--navy);border:none;border-radius:11px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;display:none;">ข้อถัดไป →</button>
+    <button id="qa-next" onclick="nextQuizQ()" disabled style="width:100%;padding:12px;background:var(--navy);border:none;border-radius:11px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;opacity:.3;">ข้อถัดไป →</button>
   </div>
-
-  <!-- Quiz result view -->
   <div id="quiz-result-view" style="display:none;text-align:center;padding:32px 0;">
     <div style="font-size:44px;margin-bottom:12px;">🏅</div>
     <div id="qr-score" style="font-size:34px;font-weight:800;color:var(--navy);line-height:1;"></div>
@@ -705,35 +620,6 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
       <div style="text-align:center;"><div id="qr-bonus" style="font-size:22px;font-weight:700;color:#10b981;">0</div><div style="font-size:11px;color:var(--muted);">Bonus ความเร็ว</div></div>
     </div>
     <button onclick="backToStationFromQuiz()" class="btn btn-navy">← กลับหน้าฐาน</button>
-  </div>
-
-</div>
-
-
-
-<!-- SURVEY -->
-<div id="pg-survey" class="page">
-  <div style="padding:14px 0 10px;display:flex;align-items:center;gap:10px;">
-    <div style="width:36px;flex-shrink:0;"></div>
-    <div class="pg-titles"><div class="ptitle">แบบประเมิน</div><div class="psub">Engineering Synergy 2026 · 10 ข้อ</div></div>
-    <div id="sv-counter" style="font-size:12px;font-weight:700;color:var(--accent);flex-shrink:0;">1 / 10</div>
-  </div>
-  <div style="height:3px;background:var(--border);border-radius:2px;margin-bottom:16px;overflow:hidden;">
-    <div id="sv-bar" style="height:100%;background:var(--accent);border-radius:2px;transition:.4s;width:10%;"></div>
-  </div>
-  <div id="sv-q-view">
-    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:13px 14px;margin-bottom:12px;">
-      <div id="sv-qnum" style="font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:5px;">คำถามที่ 1</div>
-      <div id="sv-qtext" style="font-size:14px;font-weight:600;line-height:1.6;color:var(--navy);"></div>
-    </div>
-    <div id="sv-choices" style="display:flex;flex-direction:column;gap:7px;margin-bottom:12px;"></div>
-    <button id="sv-next-btn" onclick="svNext()" style="width:100%;padding:12px;background:var(--navy);border:none;border-radius:11px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;opacity:.35;pointer-events:none;">ถัดไป →</button>
-  </div>
-  <div id="sv-done-view" style="display:none;text-align:center;padding:32px 0;">
-    <div style="font-size:44px;margin-bottom:12px;">🙏</div>
-    <div style="font-size:24px;font-weight:700;color:var(--navy);margin-bottom:6px;">ขอบคุณมากครับ</div>
-    <div style="font-size:13px;color:var(--muted);line-height:1.75;margin-bottom:24px;">ข้อมูลของคุณจะช่วยพัฒนา<br>กิจกรรม Engineering Synergy ในครั้งต่อไป</div>
-    <button onclick="go('home');loadHome();" class="btn btn-navy">← กลับหน้าหลัก</button>
   </div>
 </div>
 
@@ -760,9 +646,12 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
 </div><!-- /wrap -->
 
 <script>
-/* ═══════════════════════════════════════════
-   CONFIG + STATE
-═══════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════
+   Engineering Synergy 2026 · v1.5.0
+   Fixes: BUG-01..08 + FIX-1..6 (Active/Disable Quiz)
+═══════════════════════════════════════════════════════ */
+var APP_VERSION='1.5.0';
+
 var API='https://script.google.com/macros/s/AKfycbx8jJ-Mq3mLAwWS_ZhAxiUKbibP_qBbV2WUIUGQvGoIzduY3C-UI12aRGh6D4aFew9h/exec';
 var ADMIN_PASS='engineer_1997';
 var adminPassOverride=null;
@@ -779,18 +668,30 @@ var STATION_MAP={
   TO:{name:'Tooling Eng.',icon:'🔬',color:'#92400e'},
   PM:{name:'Preventive Maint.',icon:'📳',color:'#4c1d95'},
 };
-var STATION_INFO={
-  EE:{title:'Electrical Engineering',sub:'วิศวกรรมไฟฟ้าและระบบควบคุม',body:'ฝ่าย EE ดูแลระบบไฟฟ้ากำลัง วงจรควบคุม และระบบอัตโนมัติ ครอบคลุมการออกแบบวงจร ติดตั้ง PLC และบำรุงรักษาระบบ Drive และ Inverter',tags:['PLC / SCADA','ระบบไฟฟ้ากำลัง','Automation','Inverter & Drive'],accent:'#3b82f6',color:'#1e40af'},
-  ME:{title:'Mechanical Engineering',sub:'วิศวกรรมเครื่องกลและเครื่องจักร',body:'ฝ่าย ME รับผิดชอบระบบเครื่องจักรกล ไฮดรอลิกส์ นิวแมติกส์ และระบบ HVAC ทั่วโรงงาน ดูแลการติดตั้ง ปรับแต่ง และซ่อมบำรุงเครื่องจักร',tags:['Hydraulics','Pneumatics','HVAC','Mechanical System'],accent:'#10b981',color:'#065f46'},
-  TO:{title:'Tooling Engineering',sub:'วิศวกรรมแม่พิมพ์และการวัดละเอียด',body:'ฝ่าย TO เชี่ยวชาญด้านการออกแบบและซ่อมบำรุงแม่พิมพ์ งานกลึง CNC และการวัดละเอียดด้วยเครื่องมือความแม่นยำสูง',tags:['CNC Machining','Mold & Die','CMM Measurement','Surface Roughness'],accent:'#f59e0b',color:'#92400e'},
-  PM:{title:'Preventive Maintenance',sub:'งานซ่อมบำรุงเชิงป้องกัน',body:'ฝ่าย PM วางแผนและดำเนินการบำรุงรักษาเครื่องจักรเชิงป้องกัน ด้วยการวิเคราะห์ข้อมูล ตรวจสอบตามรอบ และใช้เทคโนโลยี Predictive Maintenance',tags:['PM Schedule','Predictive Maintenance','Downtime Reduction','Condition Monitoring'],accent:'#8b5cf6',color:'#4c1d95'},
-};
+/* FIX-6: ลบ STATION_INFO ออกแล้ว — ผู้ใช้เพียงรายเดียวคือ onStationClick() ซึ่งถูกลบไปแล้ว */
 
 var currentStation=null,currentUid=null,currentToken=null,employeeDB=[],settingsCache={};
 var appSettings={coming_soon:true,bypass_list:['วัชรพล มีดี'],quiz_order:['TO','ME','EE','PM']};
 var seenPopup={},qrScanner=null,stLog={EE:[],ME:[],TO:[],PM:[]};
 var selectedReg=null;
-var EVENT_OPEN=new Date('2026-07-03T09:00:00+07:00');
+var EVENT_OPEN=new Date('2026-07-10T09:00:00+07:00');
+
+/* FIX-1 (BUG-08): ย้าย qzDoneMap มาประกาศที่ state block บนสุด
+   เดิมประกาศอยู่บรรทัด ~1259 (ใต้ QUIZ FLOW) แต่ถูกใช้ครั้งแรกใน loadHome()/getStationState()
+   ซึ่งอยู่ข้างบน — พึ่ง var hoisting ทำให้ไม่ error แต่เปราะบางมาก
+   ถ้าใครเปลี่ยนเป็น let/const จะพังเงียบทันที จึงย้ายมาไว้ตรงนี้ให้ชัดเจน */
+var qzDoneMap={}; // {TO:true, ME:true, ...} ฐานที่ user ทำ quiz เสร็จแล้ว
+
+/* FIX-3: stationActive — ฐานที่ admin เปิด/ปิด quiz ได้ (default เปิดหมด)
+   ค่าจริงจะถูก override จาก settings.active ที่ backend ส่งมาใน loadHome()/loadAdmin()
+   ⚠️ BACKEND ต้องเพิ่ม field 'active' (boolean) ต่อฐานใน sheet settings + return ใน getSettings
+   และตอนคำนวณ ranking ต้องไม่รวมคะแนนฐานที่ active=false */
+var stationActive={TO:true,ME:true,EE:true,PM:true};
+
+/* FIX-4: helper สร้าง key คะแนนใน scores object ให้ตรง schema ของ sheet ("{station}_quiz")
+   รวม suffix "_quiz" ที่เคย hardcode กระจาย 3 จุด (loadHome/loadStationStats/member chip)
+   มาไว้ที่เดียว ถ้า backend เปลี่ยน schema ในอนาคต แก้จุดเดียวจบ */
+function scoreKey(stationId){return stationId+'_quiz';}
 
 /* ── API helpers ── */
 function apiGet(a,cb){fetch(API+'?action='+a+'&t='+Date.now()).then(function(r){return r.json();}).then(cb).catch(function(e){cb({error:e.message});});}
@@ -804,23 +705,28 @@ function go(page,param){
   stopQR();
   stopBonusScanner();
   document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
-  if(page==='preview'){
-    document.getElementById('pg-preview').classList.add('active');
-  }
+  if(page==='preview'){document.getElementById('pg-preview').classList.add('active');}
   else if(page==='station'){currentStation=param;loadStation(param);document.getElementById('pg-station').classList.add('active');}
   else if(page==='admin'){loadAdmin();document.getElementById('pg-admin').classList.add('active');}
   else if(page==='register'||page==='login'){
-    if(employeeDB.length===0){
-      apiGet('getEmployees',function(res){
-        var employees=(res&&res.employees)||[];
-        employeeDB=employees.map(function(e){return{firstName:e.firstName,lastName:e.lastName,dept:e.dept,position:e.position||''};});
-      });
-    }
+    if(employeeDB.length===0){apiGet('getEmployees',function(res){var e=(res&&res.employees)||[];employeeDB=e.map(function(x){return{firstName:x.firstName,lastName:x.lastName,dept:x.dept,position:x.position||''};});});}
     document.getElementById('pg-register').classList.add('active');
   }
-  else if(page==='quiz'){stopQuizTimer();showQuizSelect();document.getElementById('pg-quiz').classList.add('active');}
+  else if(page==='quiz'){
+    /* BUG-06 + FIX-6: quiz-select-view (หน้ารวม 4 ฐาน) ถูกลบออกจาก DOM แล้ว
+       go('quiz') เข้าได้เฉพาะตอนมี active/result view แสดงอยู่จริงเท่านั้น
+       ถ้าถูกเรียกผิดทาง (ไม่มีฐานกำลังทำ) ให้เด้งกลับ home — กันหน้าว่างเปล่า */
+    var activeViewShowing=document.getElementById('quiz-active-view').style.display==='block';
+    var resultViewShowing=document.getElementById('quiz-result-view').style.display==='block';
+    if(!qzStation||(!activeViewShowing&&!resultViewShowing)){
+      document.getElementById('pg-home').classList.add('active');
+      loadHome();
+      window.scrollTo(0,0);
+      return;
+    }
+    document.getElementById('pg-quiz').classList.add('active');
+  }
   else if(page==='scan-bonus'){enterScanBonus();document.getElementById('pg-scan-bonus').classList.add('active');}
-  else if(page==='survey'){document.getElementById('pg-survey').classList.add('active');}
   else{var el=document.getElementById('pg-'+page);if(el)el.classList.add('active');}
   window.scrollTo(0,0);
 }
@@ -853,7 +759,7 @@ function startPreviewRing(totalSecs){
   var prog=document.getElementById('pvRingProg');
   var lbl=document.getElementById('pvRingLbl');
   var wrap=document.getElementById('pv-ring-wrap');
-  if(!prog) return;
+  if(!prog)return;
   var secs=totalSecs;
   prog.style.strokeDashoffset=circ;
   function tick(){
@@ -861,11 +767,7 @@ function startPreviewRing(totalSecs){
     lbl.textContent=secs>0?secs+' วินาที...':'พร้อมแล้ว ✓';
     if(secs<=0){
       prog.style.stroke='var(--accent)';
-      setTimeout(function(){
-        wrap.style.opacity='0';
-        wrap.style.transform='translateY(-6px)';
-        setTimeout(function(){openEntryPanel();},500);
-      },600);
+      setTimeout(function(){wrap.style.opacity='0';wrap.style.transform='translateY(-6px)';setTimeout(openEntryPanel,500);},600);
       return;
     }
     secs--;
@@ -875,15 +777,14 @@ function startPreviewRing(totalSecs){
 }
 function openEntryPanel(){
   var p=document.getElementById('entry-panel');
-  if(p) p.style.transform='translateY(0)';
-  setTimeout(function(){var n=document.getElementById('reg-name');if(n) n.focus();},450);
+  if(p)p.style.transform='translateY(0)';
+  setTimeout(function(){var n=document.getElementById('reg-name');if(n)n.focus();},450);
 }
 function closeAdminEntry(){
   var adm=document.getElementById('admin-entry-panel');
   adm.style.opacity='0';adm.style.pointerEvents='none';
   setTimeout(function(){
-    var n=document.getElementById('reg-name');
-    if(n){n.value='';n.focus();}
+    var n=document.getElementById('reg-name');if(n){n.value='';n.focus();}
     document.getElementById('reg-dept-pill').style.display='none';
     var btn=document.getElementById('reg-submit');
     if(btn){btn.style.opacity='0';btn.style.transform='translateY(8px)';btn.style.pointerEvents='none';btn.textContent='เข้าร่วมกิจกรรม →';btn.dataset.isAdmin='0';}
@@ -900,14 +801,8 @@ function onRegSubmit(){
   var btn=document.getElementById('reg-submit');
   if(btn&&btn.dataset.isAdmin==='1'){
     document.getElementById('entry-panel').style.transform='translateY(100%)';
-    setTimeout(function(){
-      var adm=document.getElementById('admin-entry-panel');
-      adm.style.opacity='1';adm.style.pointerEvents='auto';
-      var p=document.getElementById('al-pass');if(p)p.focus();
-    },300);
-  } else {
-    showConfirmPopup();
-  }
+    setTimeout(function(){var adm=document.getElementById('admin-entry-panel');adm.style.opacity='1';adm.style.pointerEvents='auto';var p=document.getElementById('al-pass');if(p)p.focus();},300);
+  } else {showConfirmPopup();}
 }
 var regSugIdx=-1,regSugResults=[];
 function onRegInput(){
@@ -916,22 +811,17 @@ function onRegInput(){
   if(q.trim().toLowerCase()==='admin'){
     document.getElementById('reg-suggest').style.display='none';
     document.getElementById('reg-dept-pill').style.display='none';
-    btn.textContent='เข้าสู่ระบบ Admin →';
-    btn.dataset.isAdmin='1';
-    btn.style.opacity='1';btn.style.transform='translateY(0)';btn.style.pointerEvents='auto';
-    return;
+    btn.textContent='เข้าสู่ระบบ Admin →';btn.dataset.isAdmin='1';
+    btn.style.opacity='1';btn.style.transform='translateY(0)';btn.style.pointerEvents='auto';return;
   }
-  btn.dataset.isAdmin='0';
-  btn.textContent='เข้าร่วมกิจกรรม →';
+  btn.dataset.isAdmin='0';btn.textContent='เข้าร่วมกิจกรรม →';
   var res=searchEmp(q);
   var box=document.getElementById('reg-suggest');
   regSugIdx=-1;regSugResults=res;selectedReg=null;
   document.getElementById('reg-dept-pill').style.display='none';
   btn.style.opacity='0';btn.style.transform='translateY(8px)';btn.style.pointerEvents='none';
   if(!res.length){box.style.display='none';return;}
-  box.innerHTML=res.map(function(e,i){
-    return'<div class="sug-item" onclick="selectReg('+i+')"><span class="sug-name">'+e.firstName+' '+e.lastName+'</span><span class="sug-dept">'+e.dept+'</span></div>';
-  }).join('');
+  box.innerHTML=res.map(function(e,i){return'<div class="sug-item" onclick="selectReg('+i+')"><span class="sug-name">'+e.firstName+' '+e.lastName+'</span><span class="sug-dept">'+e.dept+'</span></div>';}).join('');
   box.style.display='block';
 }
 function selectReg(i){
@@ -941,10 +831,7 @@ function selectReg(i){
   document.getElementById('reg-dept-val').textContent=e.position||e.dept;
   document.getElementById('reg-dept-pill').style.display='flex';
   document.getElementById('reg-suggest').style.display='none';
-  setTimeout(function(){
-    var btn=document.getElementById('reg-submit');
-    btn.style.opacity='1';btn.style.transform='translateY(0)';btn.style.pointerEvents='auto';
-  },50);
+  setTimeout(function(){var btn=document.getElementById('reg-submit');btn.style.opacity='1';btn.style.transform='translateY(0)';btn.style.pointerEvents='auto';},50);
 }
 function onRegKey(ev){
   var box=document.getElementById('reg-suggest');if(box.style.display==='none')return;
@@ -958,12 +845,11 @@ document.addEventListener('click',function(e){if(!e.target.closest('.sug-wrap'))
 /* ── Confirm popup ── */
 function showConfirmPopup(){
   if(!selectedReg)return;
-  var popup=document.getElementById('confirm-popup');
   document.getElementById('cp-normal').style.display='block';
   document.getElementById('cp-blocked').style.display='none';
   document.getElementById('cp-name').textContent=selectedReg.firstName+' '+selectedReg.lastName;
   document.getElementById('cp-pos').textContent=(selectedReg.position||'')+' · ฝ่าย '+selectedReg.dept;
-  popup.style.display='flex';
+  document.getElementById('confirm-popup').style.display='flex';
 }
 function closeConfirm(){
   document.getElementById('confirm-popup').style.display='none';
@@ -971,41 +857,24 @@ function closeConfirm(){
   document.getElementById('reg-suggest').style.display='none';
   document.getElementById('reg-dept-pill').style.display='none';
   var btn=document.getElementById('reg-submit');
-  btn.disabled=false;
-  btn.style.opacity='0';
-  btn.style.transform='translateY(8px)';
-  btn.style.pointerEvents='none';
-  btn.textContent='เข้าร่วมกิจกรรม →';
-  btn.dataset.isAdmin='0';
-  btn.onclick=function(){onRegSubmit();};
+  btn.disabled=false;btn.style.opacity='0';btn.style.transform='translateY(8px)';btn.style.pointerEvents='none';
+  btn.textContent='เข้าร่วมกิจกรรม →';btn.dataset.isAdmin='0';btn.onclick=function(){onRegSubmit();};
   selectedReg=null;
 }
 function showBlockedPopup(name,dept){
-  var popup=document.getElementById('confirm-popup');
   document.getElementById('cp-normal').style.display='none';
   document.getElementById('cp-blocked').style.display='block';
   document.getElementById('cp-blocked-name').textContent=name+' · ฝ่าย '+(dept||'');
-  popup.style.display='flex';
+  document.getElementById('confirm-popup').style.display='flex';
 }
-
-/* ── Entry loading ── */
 function showEntryLoading(success){
-  var el=document.getElementById('entry-loading');
-  el.style.display='flex';
-  if(success){
-    document.getElementById('el-spinner').style.display='none';
-    document.getElementById('el-check').style.display='block';
-    document.getElementById('el-txt').textContent='เข้าสู่ระบบสำเร็จ';
-    document.getElementById('el-txt').style.color='#16a34a';
-  }
+  var el=document.getElementById('entry-loading');el.style.display='flex';
+  if(success){document.getElementById('el-spinner').style.display='none';document.getElementById('el-check').style.display='block';document.getElementById('el-txt').textContent='เข้าสู่ระบบสำเร็จ';document.getElementById('el-txt').style.color='#16a34a';}
 }
 function hideEntryLoading(){
-  var el=document.getElementById('entry-loading');
-  el.style.display='none';
-  document.getElementById('el-spinner').style.display='block';
-  document.getElementById('el-check').style.display='none';
-  document.getElementById('el-txt').textContent='กำลังเข้าสู่ระบบ...';
-  document.getElementById('el-txt').style.color='';
+  var el=document.getElementById('entry-loading');el.style.display='none';
+  document.getElementById('el-spinner').style.display='block';document.getElementById('el-check').style.display='none';
+  document.getElementById('el-txt').textContent='กำลังเข้าสู่ระบบ...';document.getElementById('el-txt').style.color='';
 }
 function confirmEnter(){
   if(!selectedReg)return;
@@ -1014,64 +883,30 @@ function confirmEnter(){
   showEntryLoading(false);
   var fullName=selectedReg.firstName+' '+selectedReg.lastName;
   var dept=selectedReg.dept;
-  var errEl=document.getElementById('reg-err');
-  errEl.style.display='none';
-  // ดึง settings ก่อนเสมอ เพื่อตัดสินใจ flow
-  apiGet('getAppSettings',function(settingsRes){
-    if(settingsRes&&!settingsRes.error) appSettings=settingsRes;
-    // bypass_list อาจไม่ได้ถูก save ในชีท → fallback หาค่า hardcoded เดิม
-    var bypassList=Array.isArray(appSettings.bypass_list)&&appSettings.bypass_list.length>0
-      ? appSettings.bypass_list
-      : ['วัชรพล มีดี'];
-    var isBypass=bypassList.indexOf(fullName)>=0;
-    var inComingSoon=appSettings.coming_soon&&!isBypass;
-    if(inComingSoon){
-      // Coming Soon: บันทึกข้อมูลเท่านั้น ไม่สร้าง session
-      apiPost({action:'registerOnly',full_name:fullName,department:dept},function(res){
-        if(res.error){
-          hideEntryLoading();
-          document.getElementById('entry-panel').style.transform='translateY(0)';
-          showErr(errEl,res.error);return;
-        }
-        selectedReg=null;
-        showEntryLoading(true);
-        setTimeout(function(){
-          hideEntryLoading();
-          updateCountdown();
-          setInterval(updateCountdown,1000);
-          go('coming');
-        },800);
-      });
-    } else {
-      // Normal: enterSession ปกติ
-      apiPost({action:'enterSession',full_name:fullName,department:dept},function(res){
-        if(res.error==='session_active'){
-          hideEntryLoading();
-          document.getElementById('entry-panel').style.transform='translateY(0)';
-          showBlockedPopup(res.full_name,res.department);return;
-        }
-        if(res.error){
-          hideEntryLoading();
-          document.getElementById('entry-panel').style.transform='translateY(0)';
-          showErr(errEl,res.error);return;
-        }
-        currentUid=res.uid;currentToken=res.token;
-        saveSession(res.uid,res.token);
-        document.getElementById('reg-name').value='';
-        document.getElementById('reg-dept-pill').style.display='none';
-        selectedReg=null;
-        showEntryLoading(true);
-        setTimeout(function(){hideEntryLoading();goHome();},600);
-      });
-    }
+  var errEl=document.getElementById('reg-err');errEl.style.display='none';
+  apiPost({action:'enterSession',full_name:fullName,department:dept},function(res){
+    if(res.error==='session_active'){hideEntryLoading();document.getElementById('entry-panel').style.transform='translateY(0)';showBlockedPopup(res.full_name,res.department);return;}
+    if(res.error){hideEntryLoading();document.getElementById('entry-panel').style.transform='translateY(0)';showErr(errEl,res.error);return;}
+    currentUid=res.uid;currentToken=res.token;saveSession(res.uid,res.token);
+    document.getElementById('reg-name').value='';document.getElementById('reg-dept-pill').style.display='none';selectedReg=null;
+    showEntryLoading(true);
+    setTimeout(function(){hideEntryLoading();afterAuth();},600);
   });
 }
 function afterAuth(){
-  // legacy stub - flow ย้ายไปอยู่ใน confirmEnter แล้ว
-  goHome();
+  apiGet('getAppSettings',function(res){if(res&&!res.error)appSettings=res;});
+  if(appSettings.coming_soon){
+    apiGet('getMembers',function(mr){
+      var m=(mr.members||[]).find(function(x){return x.uid===currentUid;});
+      var fullName=m?m.full_name:'';
+      var isBypass=(appSettings.bypass_list||[]).indexOf(fullName)>=0;
+      if(!isBypass){updateCountdown();setInterval(updateCountdown,1000);go('coming');}
+      else{goHome();}
+    });
+  } else {goHome();}
 }
 
-/* ── Polling ── */
+/* ── Session polling ── */
 var pollInterval=null;
 function startSessionPolling(){
   stopSessionPolling();
@@ -1085,65 +920,75 @@ function startSessionPolling(){
   },30000);
 }
 function stopSessionPolling(){if(pollInterval){clearInterval(pollInterval);pollInterval=null;}}
-function showKickNotification(){var overlay=document.getElementById('kick-overlay');if(overlay) overlay.style.display='flex';}
-function dismissKick(){
-  var overlay=document.getElementById('kick-overlay');
-  if(overlay) overlay.style.display='none';
-  currentUid=null;currentToken=null;clearSession();goPreview();
-}
+function showKickNotification(){var o=document.getElementById('kick-overlay');if(o)o.style.display='flex';}
+function dismissKick(){var o=document.getElementById('kick-overlay');if(o)o.style.display='none';currentUid=null;currentToken=null;clearSession();goPreview();}
 
 /* ── Home ── */
 function goHome(){go('home');loadHome();startSessionPolling();}
-function loadHome(){
+
+/* ─────────────────────────────────────────────
+   BUG-04 FIX: loadHome() — restore qzDoneMap
+   จาก BOTH quiz_done AND scores (fallback)
+   เพื่อให้แน่ใจว่า map ไม่ว่างเปล่าหลัง refresh
+───────────────────────────────────────────── */
+function loadHome(onDone){
   renderHomeSkeleton();
+  /* FIX-3g: refresh settingsCache ทุกครั้งที่โหลด home เพื่อให้ stationActive สดเสมอ
+     (admin อาจปิด/เปิดฐานระหว่างงาน — user ที่กดรีเฟรชควรเห็นทันที) */
+  apiGet('getSettings',function(sres){if(sres&&sres.settings)settingsCache=sres.settings;});
   var lastEl=document.getElementById('home-last-refresh');
   apiGet('getMembers',function(res){
-    if(res.error){renderHomeError();return;}
+    if(res.error){renderHomeError();if(typeof onDone==='function')onDone();return;}
     var members=res.members||[];
     var m=currentUid?members.find(function(x){return x.uid===currentUid;}):null;
-    qzDoneMap={};
-    if(m&&m.quiz_done){
-      var arr=Array.isArray(m.quiz_done)?m.quiz_done
-             :(typeof m.quiz_done==='string'&&m.quiz_done.length?m.quiz_done.split(','):[]);
-      arr.forEach(function(k){if(k.trim())qzDoneMap[k.trim()]=true;});
+
+    /* BUG-04 FIX: restore qzDoneMap — ลอง quiz_done ก่อน แล้ว fallback ไป scores */
+    if(m){
+      /* Primary: quiz_done array จาก API (ต้องให้ GAS return field นี้) */
+      if(m.quiz_done&&Array.isArray(m.quiz_done)&&m.quiz_done.length){
+        m.quiz_done.forEach(function(k){if(STATION_MAP[k])qzDoneMap[k]=true;});
+      }
+      /* Fallback: ถ้า quiz_done ว่าง ให้ดูจาก scores object แทน
+         (field ที่มีอยู่แน่ใน API response — ค่า > 0 หมายความว่าผ่านแล้ว) */
+      if(m.scores){
+        /* BUG-05 FIX + FIX-4: sheet เก็บ key เป็น "EE_quiz","ME_quiz",... (suffix _quiz)
+           ตัด suffix ออกก่อนเทียบ STATION_MAP (suffix นิยามที่ scoreKey() จุดเดียว) */
+        Object.keys(m.scores).forEach(function(k){
+          var stationId=k.replace(/_quiz$/,'');
+          if(STATION_MAP[stationId]&&m.scores[k])qzDoneMap[stationId]=true;
+        });
+      }
     }
+
+    /* FIX-3g: apply stationActive จาก settingsCache (โหลดไว้ตอน splash/แต่ละครั้งที่ดึง getSettings)
+       ให้ฝั่ง user เห็นฐานที่ admin ปิด — default true ถ้า backend ยังไม่ส่ง field active */
+    QUIZ_ORDER.forEach(function(id){var st=settingsCache&&settingsCache[id];stationActive[id]=(st&&st.active!=null)?(st.active!==false):true;});
+
     var sorted=members.slice().sort(function(a,b){return b.total_score-a.total_score;});
     var rank=m?sorted.findIndex(function(x){return x.uid===m.uid;})+1:'—';
     document.getElementById('home-name').textContent=m?m.full_name.split(' ')[0]:'—';
-    var emp=employeeDB.find(function(e){return (e.firstName+' '+e.lastName)===(m?m.full_name:'');});
-    document.getElementById('home-dept').textContent=emp&&emp.position?emp.position:m?(m.department||'—'):'—';
+    var emp=employeeDB.find(function(e){return(e.firstName+' '+e.lastName)===(m&&m.full_name);});
+    document.getElementById('home-dept').textContent=emp&&emp.position?emp.position:(m&&m.department)||'—';
     document.getElementById('home-rank').textContent=rank;
     document.getElementById('home-score').textContent=m?m.total_score:0;
-    surveyDone=!!(m&&m.survey_done);
     renderStations(m);
-    renderSurveyCard();
     if(lastEl){var d=new Date();lastEl.textContent='อัปเดตล่าสุด: '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');}
+    if(typeof onDone==='function')onDone();  /* FIX-5: แจ้ง caller ว่าโหลด+restore เสร็จจริง */
   });
 }
 function renderHomeSkeleton(){
   var s='<div class="skel" style="height:14px;width:60%;margin-bottom:6px;"></div><div class="skel" style="height:10px;width:35%;"></div>';
   var el=document.getElementById('home-name');if(el)el.innerHTML=s;
 }
-function renderHomeError(){
-  var el=document.getElementById('home-score');if(el) el.textContent='—';
-}
-function doAdminLogin(){
-  var passEl=document.getElementById('al-pass');
-  var errEl=document.getElementById('al-err');
-  if(!passEl||!errEl) return;
-  var pass=passEl.value;
-  var correct=adminPassOverride||ADMIN_PASS;
-  if(pass===correct){
-    passEl.value='';errEl.style.display='none';
-    document.getElementById('admin-entry-panel').style.opacity='0';
-    document.getElementById('admin-entry-panel').style.pointerEvents='none';
-    go('admin');
-  } else {
-    showErr(errEl,'รหัสผ่านไม่ถูกต้อง');
-  }
-}
+function renderHomeError(){var el=document.getElementById('home-score');if(el)el.textContent='—';}
 
-/* ── Reset Password ── */
+function doAdminLogin(){
+  var passEl=document.getElementById('al-pass');var errEl=document.getElementById('al-err');
+  if(!passEl||!errEl)return;
+  var pass=passEl.value;var correct=adminPassOverride||ADMIN_PASS;
+  if(pass===correct){passEl.value='';errEl.style.display='none';document.getElementById('admin-entry-panel').style.opacity='0';document.getElementById('admin-entry-panel').style.pointerEvents='none';go('admin');}
+  else{showErr(errEl,'รหัสผ่านไม่ถูกต้อง');}
+}
 var rpStep=1;
 function doResetPass(){
   var errEl=document.getElementById('rp-err'),okEl=document.getElementById('rp-ok');
@@ -1155,54 +1000,60 @@ function doResetPass(){
 /* ── Station grid ── */
 var currentStationDetail=null;
 var QUIZ_ORDER_HOME=['TO','ME','EE','PM'];
-
+/* FIX-3e/3f: getStationState รองรับฐานที่ admin ปิด (stationActive[id]===false)
+   - ฐานที่ปิด → คืน 'disabled' (แสดงจาง + ป้ายปิดชั่วคราว ทำไม่ได้)
+   - การปลดล็อกฐานถัดไป: ข้ามฐานที่ปิดไปเลย ดูเฉพาะ "ฐานที่เปิด" ก่อนหน้า
+     ถ้าฐานเปิดก่อนหน้าทั้งหมดเสร็จแล้ว (หรือไม่มีฐานเปิดก่อนหน้า) → available */
 function getStationState(id){
+  if(stationActive[id]===false)return 'disabled';
+  if(qzDoneMap&&qzDoneMap[id])return 'done';
   var i=QUIZ_ORDER_HOME.indexOf(id);
-  if(qzDoneMap&&qzDoneMap[id]) return 'done';
-  if(i===0) return 'available';
-  if(qzDoneMap&&qzDoneMap[QUIZ_ORDER_HOME[i-1]]) return 'available';
+  /* หาฐานที่ "เปิดอยู่" ก่อนหน้า id ในลำดับ */
+  var prevEnabled=null;
+  for(var j=i-1;j>=0;j--){if(stationActive[QUIZ_ORDER_HOME[j]]!==false){prevEnabled=QUIZ_ORDER_HOME[j];break;}}
+  if(!prevEnabled)return 'available';                 // ไม่มีฐานเปิดก่อนหน้า → ฐานแรกที่ทำได้
+  if(qzDoneMap&&qzDoneMap[prevEnabled])return 'available';
   return 'locked';
 }
-
 function renderStations(m){
   document.getElementById('home-stations').innerHTML=STATIONS.map(function(s){
     var state=getStationState(s.id);
-    var isDone=state==='done';
-    var isAvail=state==='available';
-    var prevId=QUIZ_ORDER_HOME[QUIZ_ORDER_HOME.indexOf(s.id)-1]||'';
-    var onclick=state==='locked'
-      ?'showStationToast(\'ต้องผ่านฐาน '+prevId+' ก่อน\')'
+    var isDone=state==='done',isAvail=state==='available',isDisabled=state==='disabled';
+    /* FIX-3f: หาชื่อฐานเปิดก่อนหน้า (สำหรับข้อความ lock) โดยข้ามฐานที่ปิด */
+    var iHome=QUIZ_ORDER_HOME.indexOf(s.id);var prevId='';
+    for(var j=iHome-1;j>=0;j--){if(stationActive[QUIZ_ORDER_HOME[j]]!==false){prevId=QUIZ_ORDER_HOME[j];break;}}
+    var onclick=isDisabled?'showStationToast(\'ฐาน '+s.id+' ปิดชั่วคราว — ข้ามไปทำฐานถัดไปได้เลย\')'
+      :state==='locked'?'showStationToast(\'ต้องผ่านฐาน '+prevId+' ก่อน\')'
       :'openStationDetail(\''+s.id+'\')';
-    return'<div onclick="'+onclick+'" style="'
-      +'border:1.5px solid '+(isDone?'#86efac':isAvail?'var(--navy)':'var(--border)')+';'
-      +'background:'+(isDone?'#f0fdf4':isAvail?'var(--bg)':'var(--bg2)')+';'
-      +'border-radius:18px;padding:20px 12px;text-align:center;position:relative;transition:.18s;'
-      +(isAvail?'box-shadow:0 4px 14px rgba(15,34,72,.12);':'')
-      +(state==='locked'?'opacity:.55;cursor:not-allowed;':'cursor:pointer;')
-      +'">'
+    /* สี/สไตล์ตาม state (disabled = เทาจาง มี dashed border) */
+    var borderC=isDone?'#86efac':isAvail?'var(--navy)':isDisabled?'var(--border2)':'var(--border)';
+    var bgC=isDone?'#f0fdf4':isAvail?'var(--bg)':isDisabled?'#f4f5f7':'var(--bg2)';
+    var dim=(state==='locked'||isDisabled);
+    return'<div onclick="'+onclick+'" style="border:1.5px '+(isDisabled?'dashed':'solid')+' '+borderC+';background:'+bgC+';border-radius:18px;padding:20px 12px;text-align:center;position:relative;transition:.18s;'+(isAvail?'box-shadow:0 4px 14px rgba(15,34,72,.12);':'')+(dim?'opacity:.55;':'')+(isAvail||isDone?'cursor:pointer;':'cursor:not-allowed;')+'">'
       +(isDone?'<div style="position:absolute;top:8px;right:9px;width:20px;height:20px;border-radius:50%;background:#16a34a;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:700;">✓</div>':'')
       +(state==='locked'?'<div style="position:absolute;top:8px;right:9px;font-size:12px;color:#cbd5e1;">🔒</div>':'')
-      +'<div style="font-size:36px;margin-bottom:8px;'+(state==='locked'?'filter:grayscale(1);opacity:.5;':'')+'">'+s.icon+'</div>'
+      +(isDisabled?'<div style="position:absolute;top:8px;right:9px;font-size:11px;">⏸</div>':'')
+      +'<div style="font-size:36px;margin-bottom:8px;'+(dim?'filter:grayscale(1);opacity:.5;':'')+'">'+s.icon+'</div>'
       +'<div style="font-size:14px;font-weight:700;color:'+(isDone?'#16a34a':isAvail?'var(--navy)':'var(--muted)')+';">'+s.id+'</div>'
       +'<div style="font-size:10px;color:var(--muted);margin-top:1px;">'+s.name+'</div>'
-      +'<div style="font-size:10px;font-weight:600;margin-top:8px;padding:3px 10px;border-radius:20px;display:inline-block;'
-      +(isDone?'background:#dcfce7;color:#16a34a;border:1px solid #86efac;':isAvail?'background:var(--navy);color:#fff;':'background:var(--bg3);color:var(--muted);border:1px solid var(--border);')
-      +'">'+( isDone?'✓ เสร็จ':isAvail?'เข้าได้เลย →':'🔒 ล็อก')+'</div>'
+      +'<div style="font-size:10px;font-weight:600;margin-top:8px;padding:3px 10px;border-radius:20px;display:inline-block;'+(isDone?'background:#dcfce7;color:#16a34a;border:1px solid #86efac;':isAvail?'background:var(--navy);color:#fff;':'background:var(--bg3);color:var(--muted);border:1px solid var(--border);')+'">'+(isDone?'✓ เสร็จ':isAvail?'เข้าได้เลย →':isDisabled?'⏸ ปิดชั่วคราว':'🔒 ล็อก')+'</div>'
       +'</div>';
   }).join('');
 }
-
 function showStationToast(msg){
-  var existing=document.getElementById('st-toast-el');
-  if(existing) document.body.removeChild(existing);
-  var el=document.createElement('div');
-  el.id='st-toast-el';
+  var existing=document.getElementById('st-toast-el');if(existing)document.body.removeChild(existing);
+  var el=document.createElement('div');el.id='st-toast-el';
   el.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 22px;border-radius:20px;font-size:13px;font-weight:600;z-index:999;white-space:nowrap;font-family:\'IBM Plex Sans Thai\',sans-serif;';
-  el.textContent=msg;
-  document.body.appendChild(el);
+  el.textContent=msg;document.body.appendChild(el);
   setTimeout(function(){if(el.parentNode)document.body.removeChild(el);},2000);
 }
 
+/* ─────────────────────────────────────────────
+   BUG-03 FIX: openStationDetail()
+   ผูก onclick ของ std-quiz-card แบบ dynamic
+   ถ้า qzDone → onclick = แสดง toast และ return
+   ถ้าไม่ → onclick = openStationQuiz()
+───────────────────────────────────────────── */
 function openStationDetail(id){
   currentStationDetail=id;
   var s=STATION_MAP[id];
@@ -1217,101 +1068,76 @@ function openStationDetail(id){
   var qTitle=document.getElementById('std-quiz-title');
   var qSub=document.getElementById('std-quiz-sub');
   if(qzDone){
-    qCard.style.cssText='border-radius:14px;padding:16px;margin-bottom:10px;display:flex;align-items:center;gap:12px;cursor:pointer;background:#f0fdf4;border:1.5px solid #86efac;';
-    qTitle.style.color='#16a34a'; qTitle.textContent='✓ Quiz เสร็จแล้ว';
-    qSub.textContent='(ทำแล้ว ไม่สามารถทำซ้ำได้)'; qSub.style.color='#16a34a';
+    /* BUG-03 FIX: ถ้าทำแล้ว ปิด onclick ทำ quiz ทันที */
+    qCard.onclick=function(){
+      showStationToast('✓ ทำ Quiz ฐาน '+id+' แล้ว');
+    };
+    qCard.style.cssText='border-radius:14px;padding:16px;margin-bottom:10px;display:flex;align-items:center;gap:12px;cursor:default;background:#f0fdf4;border:1.5px solid #86efac;';
+    qTitle.style.color='#16a34a';qTitle.textContent='✓ Quiz เสร็จแล้ว';
+    qSub.textContent='ได้คะแนนไปแล้ว — ไม่สามารถทำซ้ำได้';qSub.style.color='#16a34a';
   } else {
+    /* BUG-03 FIX: ถ้ายังไม่ทำ ผูก onclick = openStationQuiz */
+    qCard.onclick=function(){openStationQuiz();};
     qCard.style.cssText='border-radius:14px;padding:16px;margin-bottom:10px;display:flex;align-items:center;gap:12px;cursor:pointer;background:var(--navy);';
-    qTitle.style.color='#fff'; qTitle.textContent='ทำ Quiz';
-    qSub.textContent='5 ข้อ · ข้อละ 15 วินาที · bonus ความเร็ว'; qSub.style.color='rgba(255,255,255,.7)';
+    qTitle.style.color='#fff';qTitle.textContent='ทำ Quiz';
+    qSub.textContent='5 ข้อ · ข้อละ 15 วินาที · bonus ความเร็ว';qSub.style.color='rgba(255,255,255,.7)';
   }
   document.getElementById('std-scan-sub').textContent='รับได้ 1 ครั้ง · สแกนจาก QR ของเจ้าหน้าที่ฐาน '+id;
   document.getElementById('st-detail-overlay').style.display='block';
 }
-
 function closeStationDetail(){
   document.getElementById('st-detail-overlay').style.display='none';
   currentStationDetail=null;
 }
 
-var _pendingQuizStation=null;
-
+/* ─────────────────────────────────────────────
+   BUG-02 + BUG-03 FIX: openStationQuiz()
+   - ตรวจ qzDoneMap[id] ก่อน (BUG-03)
+   - ข้าม showQuizSelect() → startQzStation ทันที (BUG-02)
+───────────────────────────────────────────── */
 function openStationQuiz(){
   var id=currentStationDetail;
-  if(!id) return;
+  if(!id)return;
+
+  /* BUG-03 FIX: guard — ถ้าทำแล้วไม่ให้เข้าอีก */
   if(qzDoneMap[id]){
-    showStationToast('ทำ Quiz ฐาน '+id+' เสร็จแล้ว ✓');
+    showStationToast('✓ ทำ Quiz ฐาน '+id+' แล้ว');
     closeStationDetail();
     return;
   }
-  _pendingQuizStation=id;
+
   closeStationDetail();
-  // ต้อง activate pg-quiz ก่อน เพราะ overlay อยู่ข้างใน
-  // ถ้า pg-quiz ยัง display:none → overlay จะไม่แสดง
-  stopQR();stopBonusScanner();
-  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+
+  /* BUG-02 FIX: เซ็ต active view โดยตรง ไม่ผ่านหน้ารวมใดๆ
+     FIX-6: ลบบรรทัด quiz-select-view.style.display ออกแล้ว (element ถูกลบจาก DOM) */
   document.getElementById('pg-quiz').classList.add('active');
-  document.getElementById('quiz-select-view').style.display='none';
+  document.querySelectorAll('.page').forEach(function(p){if(p.id!=='pg-quiz')p.classList.remove('active');});
   document.getElementById('quiz-active-view').style.display='none';
   document.getElementById('quiz-result-view').style.display='none';
   window.scrollTo(0,0);
-  document.getElementById('quiz-start-overlay').style.display='flex';
+
+  startQzStation(id);
 }
 
-function startConfirmedQuiz(){
-  document.getElementById('quiz-start-overlay').style.display='none';
-  var id=_pendingQuizStation;
-  _pendingQuizStation=null;
-  if(!id) return;
-  stopQR();stopBonusScanner();
-  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
-  document.getElementById('pg-quiz').classList.add('active');
-  window.scrollTo(0,0);
-  stopQuizTimer();
-  document.getElementById('quiz-select-view').style.display='none';
-  document.getElementById('quiz-active-view').style.display='none';
-  document.getElementById('quiz-result-view').style.display='none';
-  setTimeout(function(){startQzStation(id);},100);
-}
+function openStationScan(){closeStationDetail();go('scan-bonus');}
 
-function cancelQuizStart(){
-  document.getElementById('quiz-start-overlay').style.display='none';
-  _pendingQuizStation=null;
-  go('home');
-}
-
-function confirmQuitQuiz(){
-  showStationToast('ต้องทำ Quiz ให้จบก่อนกดกลับ');
-}
-
-function openStationScan(){
-  closeStationDetail();
-  go('scan-bonus');
-}
-
-/* ── Popup ── */
-function onStationClick(id){if(seenPopup[id])return;var info=STATION_INFO[id],st=STATIONS.find(function(s){return s.id===id;});document.getElementById('popup-icon').textContent=st.icon;document.getElementById('popup-title').textContent=info.title;document.getElementById('popup-sub').textContent=info.sub;document.getElementById('popup-body').textContent=info.body;document.getElementById('popup-tags').innerHTML=info.tags.map(function(t){return'<span class="ptag" style="background:'+info.accent+'18;color:'+info.accent+';border:1px solid '+info.accent+'30">'+t+'</span>';}).join('');document.getElementById('popup-btn').style.background=info.color;document.getElementById('popup-btn').dataset.stId=id;document.getElementById('st-popup').style.display='block';}
+/* ── Popup (station info) ──
+   FIX-6: ลบ onStationClick() ออกแล้ว — เป็น dead code ไม่ถูกเรียกจาก element ใดในระบบ
+   (เคยใช้กับ popup อธิบายฐานที่ตอนนี้ไม่มี trigger) พร้อม STATION_INFO ที่ใช้แค่ที่นี่
+   เหลือไว้เฉพาะ dismissPopup/closePopup เพราะ #st-popup DOM ยังมีอยู่ (ใช้ generic) */
 function dismissPopup(){seenPopup[document.getElementById('popup-btn').dataset.stId]=true;document.getElementById('st-popup').style.display='none';}
 function closePopup(e){if(e.target===e.currentTarget)dismissPopup();}
 
-/* ── Station Admin ── */
+/* ── Station admin give score ── */
 function loadStation(id){
   var s=STATIONS.find(function(x){return x.id===id;});
-  var b=document.getElementById('st-banner');
-  b.style.background='linear-gradient(135deg,'+s.color+','+s.accent+')';
-  document.getElementById('st-icon').textContent=s.icon;
-  document.getElementById('st-title').textContent='ฐาน '+s.id+' — '+s.label;
-  document.getElementById('st-btn').style.background=s.color;
-  document.getElementById('st-uid').value='';
-  document.getElementById('st-err').style.display='none';
-  document.getElementById('st-ok').style.display='none';
+  var b=document.getElementById('st-banner');b.style.background='linear-gradient(135deg,'+s.color+','+s.accent+')';
+  document.getElementById('st-icon').textContent=s.icon;document.getElementById('st-title').textContent='ฐาน '+s.id+' — '+s.label;
+  document.getElementById('st-btn').style.background=s.color;document.getElementById('st-uid').value='';
+  document.getElementById('st-err').style.display='none';document.getElementById('st-ok').style.display='none';
   renderLog(id);startQR();
 }
-function startQR(){
-  if(qrScanner)return;
-  try{qrScanner=new Html5Qrcode('qr-reader');qrScanner.start({facingMode:'environment'},{fps:10,qrbox:{width:200,height:200}},function(decoded){document.getElementById('st-uid').value=decoded;doGiveScore();},function(){}).catch(function(){qrScanner=null;});}
-  catch(e){qrScanner=null;}
-}
+function startQR(){if(qrScanner)return;try{qrScanner=new Html5Qrcode('qr-reader');qrScanner.start({facingMode:'environment'},{fps:10,qrbox:{width:200,height:200}},function(decoded){document.getElementById('st-uid').value=decoded;doGiveScore();},function(){}).catch(function(){qrScanner=null;});}catch(e){qrScanner=null;}}
 function stopQR(){if(qrScanner){try{qrScanner.stop().then(function(){qrScanner=null;});}catch(e){qrScanner=null;}}}
 function doGiveScore(){
   var uid=document.getElementById('st-uid').value.trim().toUpperCase();
@@ -1322,12 +1148,10 @@ function doGiveScore(){
   apiPost({action:'giveScore',uid:uid,station:currentStation},function(res){
     hideLoad();
     if(res.error){showErr(errEl,res.error);return;}
-    okEl.textContent='✅ '+res.full_name+' +'+res.pts+' pts · รวม '+res.total_score+' pts';
-    okEl.style.display='block';
+    okEl.textContent='✅ '+res.full_name+' +'+res.pts+' pts · รวม '+res.total_score+' pts';okEl.style.display='block';
     stLog[currentStation].unshift({name:res.full_name,pts:res.pts,time:new Date().toLocaleTimeString('th-TH')});
     if(stLog[currentStation].length>5)stLog[currentStation].pop();
-    document.getElementById('st-uid').value='';
-    renderLog(currentStation);
+    document.getElementById('st-uid').value='';renderLog(currentStation);
   });
 }
 function renderLog(id){var logs=stLog[id],wrap=document.getElementById('st-log-wrap');if(!logs.length){wrap.style.display='none';return;}wrap.style.display='block';document.getElementById('st-log').innerHTML=logs.map(function(l){return'<div class="log-row"><span style="font-weight:500">'+l.name+'</span><span style="color:var(--green);font-weight:600">+'+l.pts+' · '+l.time+'</span></div>';}).join('');}
@@ -1340,147 +1164,100 @@ function loadAdmin(){
     hideLoad();
     var sorted=(res.members||[]).slice().sort(function(a,b){return b.total_score-a.total_score;});
     var online=sorted.filter(function(m){return m.has_session;}).length;
-    if(document.getElementById('stat-count')) document.getElementById('stat-count').textContent=sorted.length;
-    if(document.getElementById('stat-top')) document.getElementById('stat-top').textContent=sorted.length?sorted[0].total_score:0;
-    if(document.getElementById('stat-online')) document.getElementById('stat-online').textContent=online;
+    if(document.getElementById('stat-count'))document.getElementById('stat-count').textContent=sorted.length;
+    if(document.getElementById('stat-top'))document.getElementById('stat-top').textContent=sorted.length?sorted[0].total_score:0;
+    if(document.getElementById('stat-online'))document.getElementById('stat-online').textContent=online;
     var medals=['#ffd700','#c0c0c0','#cd7f32'];
     var lbEl=document.getElementById('admin-lb');
-    if(lbEl){
-      if(!sorted.length){lbEl.innerHTML='<div style="text-align:center;color:var(--muted);padding:22px;font-size:13px">ยังไม่มีผู้ลงทะเบียน</div>';}
-      else{lbEl.innerHTML='<div style="padding:0 14px;">'+sorted.slice(0,5).map(function(m,i){
-        return'<div class="member-row">'
-          +'<div class="av" style="background:'+(medals[i]||'#eef1f8')+';color:'+(i<3?'#000':'var(--navy)')+'">'+( i+1)+'</div>'
-          +'<div style="flex:1;padding:0 8px;"><div style="font-size:13px;font-weight:600;">'+m.full_name+'</div><div style="font-size:11px;color:var(--muted);">'+m.department+'</div></div>'
-          +'<div style="font-weight:700;font-size:16px;color:var(--navy);">'+m.total_score+'</div></div>';
-      }).join('')+'</div>';}
-    }
+    if(lbEl){if(!sorted.length){lbEl.innerHTML='<div style="text-align:center;color:var(--muted);padding:22px;font-size:13px">ยังไม่มีผู้ลงทะเบียน</div>';}else{lbEl.innerHTML='<div style="padding:0 14px;">'+sorted.slice(0,5).map(function(m,i){return'<div class="member-row"><div class="av" style="background:'+(medals[i]||'#eef1f8')+';color:'+(i<3?'#000':'var(--navy)')+'">'+( i+1)+'</div><div style="flex:1;padding:0 8px;"><div style="font-size:13px;font-weight:600;">'+m.full_name+'</div><div style="font-size:11px;color:var(--muted);">'+m.department+'</div></div><div style="font-weight:700;font-size:16px;color:var(--navy);">'+m.total_score+'</div></div>';}).join('')+'</div>';}}
     var listEl=document.getElementById('admin-list');
-    if(listEl){
-      if(!sorted.length){listEl.innerHTML='<div style="text-align:center;color:var(--muted);padding:28px;font-size:13px">ยังไม่มีผู้ลงทะเบียน</div>';}
-      else{listEl.innerHTML=sorted.map(function(m,i){
-        var hasSession=m.has_session;
-        return'<div class="member-row">'
-          +'<div style="display:flex;gap:10px;align-items:center;flex:1;">'
-          +'<div class="av" style="background:'+(medals[i]||'#eef1f8')+';color:'+(i<3?'#000':'var(--navy)')+'">'+( i+1)+'</div>'
-          +'<div style="flex:1;"><div style="display:flex;align-items:center;gap:6px;">'
-          +'<span style="font-weight:600;font-size:14px">'+m.full_name+'</span>'
-          +(hasSession?'<span style="font-size:9px;font-weight:700;color:#16a34a;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:20px;padding:1px 7px;">● ออนไลน์</span>':'')
-          +'</div>'
-          +'<div style="font-size:11px;color:var(--muted)">'+m.department+'</div>'
-          +'<div style="margin-top:4px">'+STATIONS.map(function(s){
-            return'<span class="chip" style="background:'+(m.scores&&m.scores[s.id]?s.color+'22':'var(--bg3)')+';color:'+(m.scores&&m.scores[s.id]?s.accent:'var(--muted)')+';border:1px solid '+(m.scores&&m.scores[s.id]?s.accent+'44':'var(--border)')+'">'+s.id+'</span>';
-          }).join('')+'</div></div></div>'
-          +'<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">'
-          +'<div style="font-weight:700;font-size:18px;color:var(--navy)">'+m.total_score+'</div>'
-          +(hasSession?'<button onclick="doKickSession(\''+m.uid+'\',\''+m.full_name+'\')" style="font-size:10px;font-weight:600;color:var(--red);background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:3px 10px;cursor:pointer;font-family:inherit;">Kick</button>':'')
-          +'</div></div>';
-      }).join('');}
-    }
+    if(listEl){if(!sorted.length){listEl.innerHTML='<div style="text-align:center;color:var(--muted);padding:28px;font-size:13px">ยังไม่มีผู้ลงทะเบียน</div>';}else{listEl.innerHTML=sorted.map(function(m,i){var hs=m.has_session;return'<div class="member-row"><div style="display:flex;gap:10px;align-items:center;flex:1;"><div class="av" style="background:'+(medals[i]||'#eef1f8')+';color:'+(i<3?'#000':'var(--navy)')+'">'+( i+1)+'</div><div style="flex:1;"><div style="display:flex;align-items:center;gap:6px;"><span style="font-weight:600;font-size:14px">'+m.full_name+'</span>'+(hs?'<span style="font-size:9px;font-weight:700;color:#16a34a;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:20px;padding:1px 7px;">● ออนไลน์</span>':'')+'</div><div style="font-size:11px;color:var(--muted)">'+m.department+'</div><div style="margin-top:4px">'+STATIONS.map(function(s){var sk=scoreKey(s.id);return'<span class="chip" style="background:'+(m.scores&&m.scores[sk]?s.color+'22':'var(--bg3)')+';color:'+(m.scores&&m.scores[sk]?s.accent:'var(--muted)')+';border:1px solid '+(m.scores&&m.scores[sk]?s.accent+'44':'var(--border)')+'">'+s.id+'</span>';}).join('')+'</div></div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;"><div style="font-weight:700;font-size:18px;color:var(--navy)">'+m.total_score+'</div>'+(hs?'<button onclick="doKickSession(\''+m.uid+'\',\''+m.full_name+'\')" style="font-size:10px;font-weight:600;color:var(--red);background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:3px 10px;cursor:pointer;font-family:inherit;">Kick</button>':'')+'</div></div>';}).join('');}}
   });
-  apiGet('getSettings',function(res){
-    if(res.settings){
-      settingsCache=res.settings;
-      ['EE','ME','TO','PM'].forEach(function(id){
-        var pts=document.getElementById('pts-'+id);
-        var bon=document.getElementById('bon-'+id);
-        var st=res.settings[id];
-        if(pts) pts.value=(st&&st.points!=null?st.points:st)||1;
-        if(bon) bon.value=(st&&st.bonus!=null?st.bonus:0);
-      });
-    }
-  });
-  apiGet('getAppSettings',function(res){
-    if(res&&!res.error){
-      appSettings=res;
-      var tog=document.getElementById('cs-toggle');
-      var pill=document.getElementById('cs-pill');
-      var track=document.getElementById('cs-track');
-      var knob=document.getElementById('cs-knob');
-      var on=res.coming_soon;
-      if(tog) tog.checked=on;
-      if(pill){pill.textContent=on?'● กำลังแสดง Coming Soon':'● เปิดใช้งานปกติ';pill.style.background=on?'#fff7ed':'#f0fdf4';pill.style.color=on?'#c2410c':'#16a34a';pill.style.borderColor=on?'#fed7aa':'#bbf7d0';}
-      if(track) track.style.background=on?'var(--navy)':'var(--border)';
-      if(knob) knob.style.transform=on?'translateX(18px)':'translateX(0)';
-    }
-  });
+  apiGet('getSettings',function(res){if(res.settings){settingsCache=res.settings;['EE','ME','TO','PM'].forEach(function(id){var pts=document.getElementById('pts-'+id);var bon=document.getElementById('bon-'+id);var st=res.settings[id];if(pts)pts.value=(st&&st.points!=null?st.points:st)||1;if(bon)bon.value=(st&&st.bonus!=null?st.bonus:0);
+    /* FIX-3c: โหลดสถานะ active ต่อฐานจาก settings (default true ถ้า backend ยังไม่ส่ง field นี้) */
+    stationActive[id]=(st&&st.active!=null)?(st.active!==false):true;});
+    renderStationActiveToggles();}});
+  apiGet('getAppSettings',function(res){if(res&&!res.error){appSettings=res;var tog=document.getElementById('cs-toggle');var pill=document.getElementById('cs-pill');var track=document.getElementById('cs-track');var knob=document.getElementById('cs-knob');var on=res.coming_soon;if(tog)tog.checked=on;if(pill){pill.textContent=on?'● กำลังแสดง Coming Soon':'● เปิดใช้งานปกติ';pill.style.background=on?'#fff7ed':'#f0fdf4';pill.style.color=on?'#c2410c':'#16a34a';pill.style.borderColor=on?'#fed7aa':'#bbf7d0';}if(track)track.style.background=on?'var(--navy)':'var(--border)';if(knob)knob.style.transform=on?'translateX(18px)':'translateX(0)';}});
 }
 function confirmAdminExit(){document.getElementById('admin-exit-overlay').style.display='none';goPreview();}
 function goPreview(){
-  var ep=document.getElementById('entry-panel');if(ep) ep.style.transform='translateY(100%)';
-  var n=document.getElementById('reg-name');if(n) n.value='';
-  var pill=document.getElementById('reg-dept-pill');if(pill) pill.style.display='none';
-  var btn=document.getElementById('reg-submit');
-  if(btn){btn.style.opacity='0';btn.style.transform='translateY(8px)';btn.style.pointerEvents='none';btn.textContent='เข้าร่วมกิจกรรม →';btn.dataset.isAdmin='0';}
-  var adm=document.getElementById('admin-entry-panel');
-  if(adm){adm.style.opacity='0';adm.style.pointerEvents='none';}
-  var wrap=document.getElementById('pv-ring-wrap');
-  var prog=document.getElementById('pvRingProg');
-  var lbl=document.getElementById('pvRingLbl');
+  var ep=document.getElementById('entry-panel');if(ep)ep.style.transform='translateY(100%)';
+  var n=document.getElementById('reg-name');if(n)n.value='';
+  var pill=document.getElementById('reg-dept-pill');if(pill)pill.style.display='none';
+  var btn=document.getElementById('reg-submit');if(btn){btn.style.opacity='0';btn.style.transform='translateY(8px)';btn.style.pointerEvents='none';btn.textContent='เข้าร่วมกิจกรรม →';btn.dataset.isAdmin='0';}
+  var adm=document.getElementById('admin-entry-panel');if(adm){adm.style.opacity='0';adm.style.pointerEvents='none';}
+  var wrap=document.getElementById('pv-ring-wrap');var prog=document.getElementById('pvRingProg');var lbl=document.getElementById('pvRingLbl');
   if(wrap){wrap.style.opacity='1';wrap.style.transform='translateY(0)';}
   if(prog){prog.style.stroke='var(--navy)';prog.style.strokeDashoffset=String(2*Math.PI*18);}
-  if(lbl) lbl.textContent='กำลังโหลด...';
-  selectedReg=null;
-  go('preview');
-  startPreviewRing(3);
+  if(lbl)lbl.textContent='กำลังโหลด...';
+  selectedReg=null;go('preview');startPreviewRing(3);
 }
-function doKickSession(uid,name){
-  if(!confirm('Kick session ของ '+name+'?\nคนนี้จะถูกออกจากระบบและเข้าใหม่ได้'))return;
-  showLoad();
-  apiPost({action:'kickSession',uid:uid},function(res){hideLoad();if(res.success){loadAdmin();}});
-}
+function doKickSession(uid,name){if(!confirm('Kick session ของ '+name+'?\nคนนี้จะถูกออกจากระบบและเข้าใหม่ได้'))return;showLoad();apiPost({action:'kickSession',uid:uid},function(res){hideLoad();if(res.success)loadAdmin();});}
 function switchAdminTab(t){
-  ['overview','members','stations','settings'].forEach(function(n){
-    var panel=document.getElementById('apanel-'+n);
-    var tab=document.getElementById('atab-'+n);
-    if(panel) panel.style.display=n===t?'block':'none';
-    if(tab) tab.classList.toggle('active',n===t);
-  });
-  if(t==='overview'||t==='members') loadAdmin();
+  ['overview','members','stations','settings'].forEach(function(n){var panel=document.getElementById('apanel-'+n);var tab=document.getElementById('atab-'+n);if(panel)panel.style.display=n===t?'block':'none';if(tab)tab.classList.toggle('active',n===t);});
+  if(t==='overview'||t==='members')loadAdmin();
   if(t==='stations'){loadAdmin();loadStationStats();if(!adminQrBuilt)buildAdminQR();}
+  /* FIX-3h: settings tab เรียก loadAdmin ด้วย เพื่อให้ station-active toggles + pts/bonus
+     render ด้วยข้อมูลสดจาก getSettings (เดิม tab นี้ไม่ refresh อะไรเลย) */
+  if(t==='settings')loadAdmin();
 }
-function switchTab(t){switchAdminTab(t);}
 function onCsToggle(){
   var on=document.getElementById('cs-toggle').checked;
-  var pill=document.getElementById('cs-pill');
-  var track=document.getElementById('cs-track');
-  var knob=document.getElementById('cs-knob');
-  pill.textContent=on?'● กำลังแสดง Coming Soon':'● เปิดใช้งานปกติ';
-  pill.style.background=on?'#fff7ed':'#f0fdf4';
-  pill.style.color=on?'#c2410c':'#16a34a';
-  pill.style.borderColor=on?'#fed7aa':'#bbf7d0';
-  track.style.background=on?'var(--navy)':'var(--border)';
-  knob.style.transform=on?'translateX(18px)':'translateX(0)';
-  appSettings.coming_soon=on;
-  apiPost({action:'saveAppSettings',settings:{coming_soon:on}},function(){});
+  var pill=document.getElementById('cs-pill'),track=document.getElementById('cs-track'),knob=document.getElementById('cs-knob');
+  pill.textContent=on?'● กำลังแสดง Coming Soon':'● เปิดใช้งานปกติ';pill.style.background=on?'#fff7ed':'#f0fdf4';pill.style.color=on?'#c2410c':'#16a34a';pill.style.borderColor=on?'#fed7aa':'#bbf7d0';
+  track.style.background=on?'var(--navy)':'var(--border)';knob.style.transform=on?'translateX(18px)':'translateX(0)';
+  appSettings.coming_soon=on;apiPost({action:'saveAppSettings',settings:{coming_soon:on}},function(){});
+}
+
+/* ─────────────────────────────────────────────
+   FIX-3b: Active/Disable Quiz รายฐาน (admin settings)
+   render toggle list + handler บันทึกผ่าน saveSettings (field active ต่อฐาน)
+   ⚠️ BACKEND: saveSettings ต้องเก็บ field 'active' ลง sheet settings
+      และ getSettings ต้อง return active กลับมาด้วย
+───────────────────────────────────────────── */
+function renderStationActiveToggles(){
+  var el=document.getElementById('station-active-list');if(!el)return;
+  var html='';
+  QUIZ_ORDER.forEach(function(k){
+    var s=STATION_MAP[k];var on=stationActive[k]!==false;
+    html+='<div style="background:var(--bg);border:1.5px solid '+(on?'var(--border)':'var(--border)')+';border-radius:12px;padding:11px 14px;margin-bottom:8px;display:flex;align-items:center;gap:11px;'+(on?'':'opacity:.7;')+'">';
+    html+='<div style="width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;background:'+(on?s.color+'1a':'var(--bg3)')+';'+(on?'':'filter:grayscale(1);')+'">'+s.icon+'</div>';
+    html+='<div style="flex:1;"><div style="font-size:13px;font-weight:700;color:var(--navy);">ฐาน '+k+' — '+s.name+'</div>';
+    html+='<div id="sa-state-'+k+'" style="font-size:11px;margin-top:1px;font-weight:600;color:'+(on?'var(--green)':'var(--muted)')+';">'+(on?'● เปิดใช้งาน Quiz':'● ปิดชั่วคราว — ข้ามฐานนี้')+'</div></div>';
+    html+='<label style="position:relative;width:44px;height:26px;flex-shrink:0;cursor:pointer;">';
+    html+='<input type="checkbox" '+(on?'checked':'')+' style="opacity:0;width:0;height:0;position:absolute;" onchange="toggleStationActive(\''+k+'\',this.checked)">';
+    html+='<span id="sa-track-'+k+'" style="position:absolute;inset:0;background:'+(on?'var(--navy)':'var(--border)')+';border-radius:13px;transition:.3s;"><span id="sa-knob-'+k+'" style="position:absolute;width:20px;height:20px;background:#fff;border-radius:50%;top:3px;left:3px;transition:.3s;box-shadow:0 1px 4px rgba(0,0,0,.15);'+(on?'transform:translateX(18px);':'')+'"></span></span>';
+    html+='</label></div>';
+  });
+  el.innerHTML=html;
+}
+function toggleStationActive(k,on){
+  stationActive[k]=on;
+  /* update visuals ทันที (optimistic) */
+  var st=document.getElementById('sa-state-'+k);var tr=document.getElementById('sa-track-'+k);var kn=document.getElementById('sa-knob-'+k);
+  if(st){st.textContent=on?'● เปิดใช้งาน Quiz':'● ปิดชั่วคราว — ข้ามฐานนี้';st.style.color=on?'var(--green)':'var(--muted)';}
+  if(tr)tr.style.background=on?'var(--navy)':'var(--border)';
+  if(kn)kn.style.transform=on?'translateX(18px)':'translateX(0)';
+  /* บันทึกลง backend — รวม points/bonus ปัจจุบันไปด้วยเพื่อไม่ให้ค่าหาย */
+  var s={};QUIZ_ORDER.forEach(function(id){s[id]={points:parseInt((document.getElementById('pts-'+id)||{}).value)||1,bonus:parseInt((document.getElementById('bon-'+id)||{}).value)||0,active:stationActive[id]!==false};});
+  apiPost({action:'saveSettings',settings:s},function(){});
 }
 function loadStationStats(){
-  var el=document.getElementById('station-stats');
-  if(!el)return;
+  var el=document.getElementById('station-stats');if(!el)return;
   apiGet('getMembers',function(res){
-    var members=res.members||[];
-    var total=members.length;
-    var ORDER=['EE','ME','TO','PM'];
-    var medals=['#ffd700','#c0c0c0','#cd7f32'];
-    var html='';
+    var members=res.members||[];var total=members.length;
+    /* FIX-2 (BUG-07): ใช้ QUIZ_ORDER (TO→ME→EE→PM) ให้ตรงลำดับจริงที่ user เดิน
+       เดิม hardcode ['EE','ME','TO','PM'] ทำให้สถิติแอดมินเรียงสลับกับลำดับจริง */
+    var ORDER=QUIZ_ORDER;var medals=['#ffd700','#c0c0c0','#cd7f32'];var html='';
     ORDER.forEach(function(k){
-      var s=STATION_MAP[k];
-      var passed=members.filter(function(m){return m.scores&&m.scores[k];});
-      var pct=total?Math.round(passed.length/total*100):0;
-      var sorted=passed.slice().sort(function(a,b){return b.total_score-a.total_score;});
-      var top3=sorted.slice(0,3);
-      html+='<div style="border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:12px;">';
-      html+='<div style="display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid var(--border);">';
-      html+='<div style="width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;background:var(--bg2);">'+s.icon+'</div>';
-      html+='<div><div style="font-size:13px;font-weight:700;color:var(--navy);">ฐาน '+k+'</div><div style="font-size:10px;color:var(--muted);">'+s.name+'</div></div></div>';
-      html+='<div style="padding:11px 14px;">';
-      html+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;"><div style="font-size:20px;font-weight:700;color:var(--navy);">'+passed.length+'</div><div style="font-size:12px;color:var(--sub);">คน / '+total+' คนทั้งหมด</div></div>';
+      /* FIX-4: ใช้ scoreKey() helper แทน hardcode k+'_quiz' */
+      var s=STATION_MAP[k];var passed=members.filter(function(m){return m.scores&&m.scores[scoreKey(k)];});var pct=total?Math.round(passed.length/total*100):0;
+      var sorted=passed.slice().sort(function(a,b){return b.total_score-a.total_score;});var top3=sorted.slice(0,3);
+      html+='<div style="border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:12px;"><div style="display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid var(--border);"><div style="width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;background:var(--bg2);">'+s.icon+'</div><div><div style="font-size:13px;font-weight:700;color:var(--navy);">ฐาน '+k+'</div><div style="font-size:10px;color:var(--muted);">'+s.name+'</div></div></div>';
+      html+='<div style="padding:11px 14px;"><div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;"><div style="font-size:20px;font-weight:700;color:var(--navy);">'+passed.length+'</div><div style="font-size:12px;color:var(--sub);">คน / '+total+' คนทั้งหมด</div></div>';
       html+='<div style="height:5px;background:var(--border);border-radius:3px;margin-bottom:12px;overflow:hidden;"><div style="height:100%;width:'+pct+'%;background:'+s.color+';border-radius:3px;"></div></div>';
-      if(top3.length){
-        html+='<div style="font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px;">คะแนนสูงสุด 3 อันดับ</div>';
-        top3.forEach(function(m,i){
-          html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><div style="width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;background:'+(medals[i]||'#eef1f8')+';flex-shrink:0;">'+(i+1)+'</div><div style="flex:1;"><div style="font-size:13px;color:var(--navy);">'+m.full_name+'</div><div style="font-size:10px;color:var(--muted);">'+m.department+'</div></div><div style="font-size:13px;font-weight:700;color:var(--navy);">'+m.total_score+'</div></div>';
-        });
-      } else {html+='<div style="font-size:12px;color:var(--muted);">ยังไม่มีผู้เข้าทำ</div>';}
+      if(top3.length){html+='<div style="font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px;">คะแนนสูงสุด 3 อันดับ</div>';top3.forEach(function(m,i){html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><div style="width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;background:'+(medals[i]||'#eef1f8')+';flex-shrink:0;">'+(i+1)+'</div><div style="flex:1;"><div style="font-size:13px;color:var(--navy);">'+m.full_name+'</div><div style="font-size:10px;color:var(--muted);">'+m.department+'</div></div><div style="font-size:13px;font-weight:700;color:var(--navy);">'+m.total_score+'</div></div>';});}
+      else{html+='<div style="font-size:12px;color:var(--muted);">ยังไม่มีผู้เข้าทำ</div>';}
       html+='</div></div>';
     });
     el.innerHTML=html;
@@ -1488,56 +1265,36 @@ function loadStationStats(){
 }
 buildAdminQR=function(){
   apiGet('getSettings',function(res){
-    var s=res.settings||{};
-    var ORDER=['TO','ME','EE','PM'];
-    var html='';
-    ORDER.forEach(function(k){
-      var info=STATION_MAP[k];
-      var bonus=(s[k]&&s[k].bonus!=null?s[k].bonus:0);
-      html+='<button onclick="showAdminQR(\''+k+'\')" style="background:var(--bg2);border:1.5px solid var(--border);border-radius:14px;padding:16px 10px;text-align:center;cursor:pointer;font-family:inherit;transition:.15s;" onmouseover="this.style.borderColor=\'var(--navy)\'" onmouseout="this.style.borderColor=\'var(--border)\'">'
-        +'<div style="font-size:26px;margin-bottom:6px;">'+info.icon+'</div>'
-        +'<div style="font-size:13px;font-weight:700;color:var(--navy);">'+k+'</div>'
-        +'<div style="font-size:10px;color:var(--muted);margin-top:1px;">'+info.name+'</div>'
-        +'<div style="font-size:10px;font-weight:700;color:var(--accent);background:var(--blue-light);border:1px solid #bfdbfe;border-radius:20px;padding:2px 8px;display:inline-block;margin-top:6px;">+'+bonus+' bonus</div>'
-        +'</button>';
-    });
-    document.getElementById('adminQrGrid').innerHTML=html;
-    adminQrBuilt=true;
+    var s=res.settings||{};var ORDER=['TO','ME','EE','PM'];var html='';
+    ORDER.forEach(function(k){var info=STATION_MAP[k];var bonus=(s[k]&&s[k].bonus!=null?s[k].bonus:0);html+='<button onclick="showAdminQR(\''+k+'\')" style="background:var(--bg2);border:1.5px solid var(--border);border-radius:14px;padding:16px 10px;text-align:center;cursor:pointer;font-family:inherit;transition:.15s;" onmouseover="this.style.borderColor=\'var(--navy)\'" onmouseout="this.style.borderColor=\'var(--border)\'"><div style="font-size:26px;margin-bottom:6px;">'+info.icon+'</div><div style="font-size:13px;font-weight:700;color:var(--navy);">'+k+'</div><div style="font-size:10px;color:var(--muted);margin-top:1px;">'+info.name+'</div><div style="font-size:10px;font-weight:700;color:var(--accent);background:var(--blue-light);border:1px solid #bfdbfe;border-radius:20px;padding:2px 8px;display:inline-block;margin-top:6px;">+'+bonus+' bonus</div></button>';});
+    document.getElementById('adminQrGrid').innerHTML=html;adminQrBuilt=true;
   });
-}
+};
 var qrPopupInstance=null;
 function showAdminQR(k){
   var info=STATION_MAP[k];
-  document.getElementById('qr-popup-icon').textContent=info.icon;
-  document.getElementById('qr-popup-title').textContent='ฐาน '+k+' — '+info.name;
-  document.getElementById('qr-popup-sub').textContent='ให้ผู้เข้าร่วมสแกน QR นี้เพื่อรับ bonus';
-  document.getElementById('qr-popup-label').textContent='ENS-BONUS-'+k;
-  var box=document.getElementById('qr-popup-box');
-  box.innerHTML='';
+  document.getElementById('qr-popup-icon').textContent=info.icon;document.getElementById('qr-popup-title').textContent='ฐาน '+k+' — '+info.name;
+  document.getElementById('qr-popup-sub').textContent='ให้ผู้เข้าร่วมสแกน QR นี้เพื่อรับ bonus';document.getElementById('qr-popup-label').textContent='ENS-BONUS-'+k;
+  var box=document.getElementById('qr-popup-box');box.innerHTML='';
   qrPopupInstance=new QRCode(box,{text:'ENS-BONUS-'+k,width:180,height:180,colorDark:'#0f2248',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H});
   document.getElementById('qr-popup-overlay').style.display='flex';
 }
 function closeQRPopup(){document.getElementById('qr-popup-overlay').style.display='none';document.getElementById('qr-popup-box').innerHTML='';qrPopupInstance=null;}
 function doSaveSettings(){
-  var s={};
-  ['EE','ME','TO','PM'].forEach(function(id){s[id]={points:parseInt(document.getElementById('pts-'+id).value)||1,bonus:parseInt(document.getElementById('bon-'+id).value)||0};});
+  /* FIX-3d: รวม field active (จาก stationActive) ไปด้วย กันค่า toggle หายตอนกดบันทึก */
+  var s={};['EE','ME','TO','PM'].forEach(function(id){s[id]={points:parseInt(document.getElementById('pts-'+id).value)||1,bonus:parseInt(document.getElementById('bon-'+id).value)||0,active:stationActive[id]!==false};});
   showLoad();
-  apiPost({action:'saveSettings',settings:s},function(res){
-    hideLoad();
-    if(res.success){settingsCache=s;adminQrBuilt=false;var ok=document.getElementById('admin-ok');ok.textContent='✅ บันทึกแล้ว';ok.style.display='block';setTimeout(function(){ok.style.display='none';},2000);}
-  });
+  apiPost({action:'saveSettings',settings:s},function(res){hideLoad();if(res.success){settingsCache=s;adminQrBuilt=false;var ok=document.getElementById('admin-ok');ok.textContent='✅ บันทึกแล้ว';ok.style.display='block';setTimeout(function(){ok.style.display='none';},2000);}});
 }
-
-/* ── Logout ── */
 function doLogout(){
   if(!confirm('ออกจากระบบ?\nข้อมูลคะแนนของคุณจะยังถูกบันทึกไว้'))return;
   stopSessionPolling();
-  if(currentUid&&currentToken){apiPost({action:'logoutSession',uid:currentUid,token:currentToken},function(){});}
+  if(currentUid&&currentToken)apiPost({action:'logoutSession',uid:currentUid,token:currentToken},function(){});
   currentUid=null;currentToken=null;clearSession();goPreview();
 }
 
 /* ═══════════════════════════════════════════
-   QUIZ
+   QUIZ FLOW
 ═══════════════════════════════════════════ */
 var DEMO_QUESTIONS={
   EE:[
@@ -1571,71 +1328,35 @@ var DEMO_QUESTIONS={
 };
 
 var QUIZ_ORDER=['TO','ME','EE','PM'];
-var QZ_TIME=15, QZ_BONUS_MAX=5;
-var qzInterval=null, qzTimer=QZ_TIME, qzConfirmed=false, qzSelectedIdx=-1;
-var qzCur=0, qzBaseScore=0, qzBonusScore=0, qzQuestions=[], qzStation='';
-var qzDoneMap={};
-var surveyDone=false;
+var QZ_TIME=15,QZ_BONUS_MAX=5;
+var qzInterval=null,qzTimer=QZ_TIME,qzConfirmed=false,qzSelectedIdx=-1;
+var qzCur=0,qzBaseScore=0,qzBonusScore=0,qzQuestions=[],qzStation='';
+/* FIX-1 (BUG-08): qzDoneMap ย้ายไปประกาศที่ state block บนสุดแล้ว (ดูคอมเมนต์ที่นั่น) */
 
 function calcQzBonus(t){return Math.round((t/QZ_TIME)*QZ_BONUS_MAX*10)/10;}
 
+/* ─────────────────────────────────────────────
+   BUG-01 FIX: backToStationFromQuiz()
+   กลับ home แล้ว reload เพื่อให้ score อัปเดต
+───────────────────────────────────────────── */
 function backToStationFromQuiz(){
   var id=qzStation;
   stopQuizTimer();
   go('home');
-  loadHome();
-  if(id) openStationDetail(id);
-}
-function showQuizSelect(){
-  stopQuizTimer();
-  document.getElementById('quiz-select-view').style.display='block';
-  document.getElementById('quiz-active-view').style.display='none';
-  document.getElementById('quiz-result-view').style.display='none';
-  renderQzSelect();
-}
-function renderQzSelect(){
-  var done=QUIZ_ORDER.filter(function(k){return qzDoneMap[k];}).length;
-  document.getElementById('qs-overall-val').textContent=done+' / '+QUIZ_ORDER.length+' ฐาน';
-  document.getElementById('qs-overall-fill').style.width=(done/QUIZ_ORDER.length*100)+'%';
-  var html='';
-  QUIZ_ORDER.forEach(function(k,i){
-    var s=STATION_MAP[k];
-    var isDone=!!qzDoneMap[k];
-    var isActive=!isDone&&(i===0||qzDoneMap[QUIZ_ORDER[i-1]]);
-    var isLocked=!isDone&&!isActive;
-    var prevName=i>0?QUIZ_ORDER[i-1]:'';
-    if(i>0){
-      var prevDone=!!qzDoneMap[QUIZ_ORDER[i-1]];
-      html+='<div style="display:flex;justify-content:center;height:10px;"><div style="width:2px;background:'+(prevDone?'#86efac':'var(--border)')+'border-radius:1px;"></div></div>';
-    }
-    var borderColor=isDone?'#86efac':isActive?'var(--navy)':'var(--border)';
-    var bg=isDone?'#f0fdf4':isActive?'var(--bg)':'var(--bg2)';
-    var opacity=isLocked?'.55':'1';
-    var cursor=isLocked?'not-allowed':isActive?'pointer':'default';
-    html+='<div onclick="'+(isActive?'startQzStation(\''+k+'\')':isLocked?'alert(\'ต้องทำ '+prevName+' ก่อน\')':'')
-      +'" style="border:1.5px solid '+borderColor+';background:'+bg+';border-radius:16px;padding:14px;display:flex;align-items:center;gap:12px;opacity:'+opacity+';cursor:'+cursor+';position:relative;'+(isActive?'box-shadow:0 4px 14px rgba(15,34,72,.08);':'')+'margin-bottom:0;">';
-    var iconBg=isDone?'#dcfce7':isActive?'var(--bg2)':'var(--border)';
-    html+='<div style="width:48px;height:48px;border-radius:12px;background:'+iconBg+';display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;">'+s.icon+'</div>';
-    html+='<div style="flex:1;">';
-    var nameColor=isDone?'#16a34a':isActive?'var(--navy)':'var(--muted)';
-    html+='<div style="font-size:15px;font-weight:700;color:'+nameColor+';">'+k+' — '+s.name+'</div>';
-    if(isDone) html+='<div style="font-size:11px;color:#16a34a;margin-top:2px;">✓ ทำเสร็จแล้ว</div>';
-    else if(isActive) html+='<div style="font-size:11px;color:var(--accent);margin-top:2px;font-weight:600;">→ ถึงคิวของคุณแล้ว!</div>';
-    else html+='<div style="font-size:11px;color:var(--muted);margin-top:2px;">ปลดล็อกหลังทำ '+prevName+'</div>';
-    html+='</div>';
-    if(isDone) html+='<div style="font-size:10px;font-weight:700;color:#16a34a;background:#dcfce7;border:1px solid #86efac;border-radius:20px;padding:3px 10px;">✓ เสร็จ</div>';
-    else if(isActive) html+='<div style="font-size:10px;font-weight:700;color:var(--navy);background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:3px 10px;">ถัดไป</div>';
-    else html+='<div style="font-size:11px;font-weight:600;color:var(--muted);">🔒</div>';
-    html+='<div style="position:absolute;top:10px;right:12px;font-size:10px;font-weight:700;color:var(--muted);">'+(i+1)+'</div>';
-    html+='</div>';
-  });
-  document.getElementById('qs-list').innerHTML=html;
+  /* FIX-5: รอ loadHome() เสร็จจริง (callback) แทนการเดาเวลา setTimeout 400ms
+     กันกรณีเน็ตช้าแล้ว openStationDetail ถูกเรียกก่อน qzDoneMap restore ครบ */
+  loadHome(function(){if(id)openStationDetail(id);});
 }
 
+/* FIX-6: ลบ showQuizSelect() และ renderQzSelect() ออกทั้งหมด
+   ทั้งสองเป็น dead code ที่ขับเคลื่อน "หน้ารวม 4 ฐาน" (quiz-select-view)
+   ซึ่งผู้ใช้สั่งเอาออกถาวร และเป็นต้นเหตุ BUG-06 — กำจัดให้สิ้นซาก
+   logic การข้ามฐานที่ถูกปิด (stationActive) ย้ายไปอยู่ใน renderStations()
+   + getStationState() ซึ่งเป็น flow จริงที่ user ใช้ (home grid -> detail -> quiz) */
+
 function startQzStation(station){
-  qzStation=station;
-  qzCur=0; qzBaseScore=0; qzBonusScore=0;
-  document.getElementById('quiz-select-view').style.display='none';
+  qzStation=station;qzCur=0;qzBaseScore=0;qzBonusScore=0;
+  /* FIX-6: ลบบรรทัด quiz-select-view ออกแล้ว (element ถูกลบจาก DOM) */
   document.getElementById('quiz-active-view').style.display='block';
   document.getElementById('quiz-result-view').style.display='none';
   var s=STATION_MAP[station];
@@ -1646,7 +1367,6 @@ function startQzStation(station){
     .then(function(res){qzQuestions=(res&&res.length)?res:DEMO_QUESTIONS[station];renderQzQ();})
     .catch(function(){qzQuestions=DEMO_QUESTIONS[station];renderQzQ();});
 }
-
 function renderQzQ(){
   var q=qzQuestions[qzCur];
   document.getElementById('qa-counter').textContent=(qzCur+1)+' / '+qzQuestions.length;
@@ -1655,31 +1375,17 @@ function renderQzQ(){
   document.getElementById('qa-qtext').textContent=q.q;
   document.getElementById('qa-result').style.display='none';
   document.getElementById('qa-confirm').style.display='none';
-  document.getElementById('qa-next').disabled=true;
-  document.getElementById('qa-next').style.display='none';
+  document.getElementById('qa-next').disabled=true;document.getElementById('qa-next').style.opacity='.3';
   setQzUrgent(false);
   var L=['A','B','C','D'];
-  document.getElementById('qa-choices').innerHTML=(q.choices||q.c).map(function(c,i){
-    return'<button onclick="selectQzChoice('+i+')" style="background:var(--bg);border:1.5px solid var(--border);border-radius:11px;padding:10px 13px;font-size:13px;color:var(--navy);cursor:pointer;text-align:left;font-family:inherit;display:flex;align-items:center;gap:9px;transition:.15s;">'
-      +'<div style="width:22px;height:22px;border-radius:50%;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;">'+L[i]+'</div>'
-      +'<span>'+c+'</span></button>';
-  }).join('');
-  qzConfirmed=false; qzSelectedIdx=-1;
+  document.getElementById('qa-choices').innerHTML=(q.choices||q.c).map(function(c,i){return'<button onclick="selectQzChoice('+i+')" style="background:var(--bg);border:1.5px solid var(--border);border-radius:11px;padding:10px 13px;font-size:13px;color:var(--navy);cursor:pointer;text-align:left;font-family:inherit;display:flex;align-items:center;gap:9px;transition:.15s;"><div style="width:22px;height:22px;border-radius:50%;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;">'+L[i]+'</div><span>'+c+'</span></button>';}).join('');
+  qzConfirmed=false;qzSelectedIdx=-1;
   startQzTimer();
 }
-
-function startQzTimer(){
-  stopQuizTimer(); qzTimer=QZ_TIME; updateQzTimer();
-  qzInterval=setInterval(function(){
-    if(qzConfirmed) return;
-    qzTimer--; updateQzTimer();
-    if(qzTimer<=5&&qzTimer>0){setQzUrgent(true);if(navigator.vibrate)navigator.vibrate(60);}
-    if(qzTimer<=0){stopQuizTimer();if(!qzConfirmed)qzTimeout();}
-  },1000);
-}
+function startQzTimer(){stopQuizTimer();qzTimer=QZ_TIME;updateQzTimer();qzInterval=setInterval(function(){if(qzConfirmed)return;qzTimer--;updateQzTimer();if(qzTimer<=5&&qzTimer>0){setQzUrgent(true);if(navigator.vibrate)navigator.vibrate(60);}if(qzTimer<=0){stopQuizTimer();if(!qzConfirmed)qzTimeout();}},1000);}
 function stopQuizTimer(){clearInterval(qzInterval);}
 function updateQzTimer(){
-  var circ=113, offset=circ*(qzTimer/QZ_TIME);
+  var circ=113,offset=circ*(qzTimer/QZ_TIME);
   document.getElementById('qa-ring-prog').style.strokeDashoffset=circ-offset;
   document.getElementById('qa-ring-num').textContent=qzTimer;
   document.getElementById('qa-timer-lbl').textContent=qzTimer+' วินาที';
@@ -1687,112 +1393,85 @@ function updateQzTimer(){
   document.getElementById('qa-ring-prog').style.stroke=urg?'#dc2626':'#10b981';
   document.getElementById('qa-ring-num').style.color=urg?'#dc2626':'var(--navy)';
   document.getElementById('qa-timer-lbl').style.color=urg?'#dc2626':'var(--navy)';
-  var bp=document.getElementById('qa-bonus-pill');
-  bp.textContent='⚡ +'+calcQzBonus(qzTimer).toFixed(1);
+  var bp=document.getElementById('qa-bonus-pill');bp.textContent='⚡ +'+calcQzBonus(qzTimer).toFixed(1);
   if(urg){bp.style.color='#dc2626';bp.style.borderColor='#fca5a5';bp.style.background='#fef2f2';}
   else{bp.style.color='#10b981';bp.style.borderColor='#86efac';bp.style.background='#f0fdf4';}
 }
 function setQzUrgent(on){
-  var ring=document.getElementById('qa-ring');
-  var row=document.getElementById('qa-timer-row');
-  var card=document.getElementById('qa-qcard');
-  var fl=document.getElementById('quiz-flash');
+  var ring=document.getElementById('qa-ring');var row=document.getElementById('qa-timer-row');var card=document.getElementById('qa-qcard');var fl=document.getElementById('quiz-flash');
   if(on){
     if(!ring._pint)ring._pint=setInterval(function(){ring.style.transform=ring.style.transform===''?'scale(1.08)':'';},225);
     if(!fl._fint){fl.style.opacity='0.18';fl._fint=setInterval(function(){fl.style.opacity=fl.style.opacity==='0'?'0.18':'0';},450);}
-    row.style.borderColor='#fca5a5';row.style.background='#fff5f5';
-    card.style.borderColor='#fca5a5';card.style.background='#fff5f5';
+    row.style.borderColor='#fca5a5';row.style.background='#fff5f5';card.style.borderColor='#fca5a5';card.style.background='#fff5f5';
   } else {
     if(ring._pint){clearInterval(ring._pint);ring._pint=null;ring.style.transform='';}
     if(fl._fint){clearInterval(fl._fint);fl._fint=null;fl.style.opacity='0';}
-    row.style.borderColor='';row.style.background='';
-    card.style.borderColor='';card.style.background='';
+    row.style.borderColor='';row.style.background='';card.style.borderColor='';card.style.background='';
   }
 }
-
 function selectQzChoice(i){
-  if(qzConfirmed)return;
-  qzSelectedIdx=i;
-  document.getElementById('qa-choices').querySelectorAll('button').forEach(function(c,idx){
-    c.style.borderColor=idx===i?'#2563eb':'var(--border)';
-    c.style.background=idx===i?'#eff6ff':'var(--bg)';
-    c.style.color=idx===i?'#2563eb':'var(--navy)';
-    c.querySelector('div').style.background=idx===i?'#2563eb':'var(--bg2)';
-    c.querySelector('div').style.color=idx===i?'#fff':'';
-  });
+  if(qzConfirmed)return;qzSelectedIdx=i;
+  document.getElementById('qa-choices').querySelectorAll('button').forEach(function(c,idx){c.style.borderColor=idx===i?'#2563eb':'var(--border)';c.style.background=idx===i?'#eff6ff':'var(--bg)';c.style.color=idx===i?'#2563eb':'var(--navy)';c.querySelector('div').style.background=idx===i?'#2563eb':'var(--bg2)';c.querySelector('div').style.color=idx===i?'#fff':'';});
   document.getElementById('qa-confirm').style.display='block';
 }
-
 function confirmQuizAnswer(){
   if(qzConfirmed||qzSelectedIdx<0)return;
-  qzConfirmed=true; stopQuizTimer(); setQzUrgent(false);
+  qzConfirmed=true;stopQuizTimer();setQzUrgent(false);
   document.getElementById('qa-confirm').style.display='none';
-  var q=qzQuestions[qzCur]; var ans=q.ans!=null?q.ans:q.a;
-  var correct=(qzSelectedIdx===ans), bonus=0;
-  document.getElementById('qa-choices').querySelectorAll('button').forEach(function(c,idx){
-    c.onclick=null; c.style.cursor='default';
-    if(idx===ans){c.style.borderColor='#16a34a';c.style.background='#f0fdf4';c.style.color='#16a34a';c.querySelector('div').style.background='#16a34a';c.querySelector('div').style.color='#fff';}
-    else if(idx===qzSelectedIdx){c.style.borderColor='#dc2626';c.style.background='#fef2f2';c.style.color='#dc2626';c.querySelector('div').style.background='#dc2626';c.querySelector('div').style.color='#fff';}
-    else{c.style.borderColor='var(--border)';c.style.background='var(--bg)';}
-  });
+  var q=qzQuestions[qzCur];var ans=q.ans!=null?q.ans:q.a;var correct=(qzSelectedIdx===ans),bonus=0;
+  document.getElementById('qa-choices').querySelectorAll('button').forEach(function(c,idx){c.onclick=null;c.style.cursor='default';if(idx===ans){c.style.borderColor='#16a34a';c.style.background='#f0fdf4';c.style.color='#16a34a';c.querySelector('div').style.background='#16a34a';c.querySelector('div').style.color='#fff';}else if(idx===qzSelectedIdx){c.style.borderColor='#dc2626';c.style.background='#fef2f2';c.style.color='#dc2626';c.querySelector('div').style.background='#dc2626';c.querySelector('div').style.color='#fff';}else{c.style.borderColor='var(--border)';c.style.background='var(--bg)';}});
   if(correct){qzBaseScore+=1;bonus=calcQzBonus(qzTimer);qzBonusScore+=bonus;}
   var totalScore=Math.round((qzBaseScore+qzBonusScore)*10)/10;
   document.getElementById('qa-score').textContent=totalScore+' คะแนน';
   document.getElementById('qa-timer-lbl').textContent=qzTimer+' วินาที (หยุด)';
   var rr=document.getElementById('qa-result');
   rr.style.cssText='display:flex;border-radius:11px;padding:10px 13px;margin-bottom:10px;align-items:center;gap:9px;font-size:13px;border:1.5px solid '+(correct?'#86efac':'#fca5a5')+';background:'+(correct?'#f0fdf4':'#fef2f2')+';';
-  rr.innerHTML='<span style="font-size:20px;">'+(correct?'✅':'❌')+'</span>'
-    +'<div><div style="font-size:13px;font-weight:600;">'+(correct?'ถูกต้อง! +1':'ไม่ถูกต้อง')+'</div>'
-    +(correct&&bonus>0?'<div style="font-size:11px;color:#10b981;margin-top:1px;">⚡ Bonus +'+bonus.toFixed(1)+'</div>':'')+'</div>';
-  document.getElementById('qa-next').disabled=false;
-  document.getElementById('qa-next').style.display='block';
-  document.getElementById('qa-next').style.opacity='1';
+  rr.innerHTML='<span style="font-size:20px;">'+(correct?'✅':'❌')+'</span><div><div style="font-size:13px;font-weight:600;">'+(correct?'ถูกต้อง! +1':'ไม่ถูกต้อง')+'</div>'+(correct&&bonus>0?'<div style="font-size:11px;color:#10b981;margin-top:1px;">⚡ Bonus +'+bonus.toFixed(1)+'</div>':'')+'</div>';
+  document.getElementById('qa-next').disabled=false;document.getElementById('qa-next').style.opacity='1';
   document.getElementById('qa-next').textContent=qzCur<qzQuestions.length-1?'ข้อถัดไป →':'ดูผลคะแนน →';
 }
-
 function qzTimeout(){
-  qzConfirmed=true; setQzUrgent(false);
-  document.getElementById('qa-confirm').style.display='none';
-  var q=qzQuestions[qzCur]; var ans=q.ans!=null?q.ans:q.a;
-  document.getElementById('qa-choices').querySelectorAll('button').forEach(function(c,idx){
-    c.onclick=null;c.style.cursor='default';
-    if(idx===ans){c.style.borderColor='#16a34a';c.style.background='#f0fdf4';c.style.color='#16a34a';}
-    else{c.style.borderColor='var(--border)';c.style.background='var(--bg)';}
-  });
-  var rr=document.getElementById('qa-result');
-  rr.style.cssText='display:flex;border-radius:11px;padding:10px 13px;margin-bottom:10px;align-items:center;gap:9px;font-size:13px;border:1.5px solid #fca5a5;background:#fef2f2;';
-  rr.innerHTML='<span style="font-size:20px;">⏱</span><div style="font-size:13px;font-weight:600;color:#dc2626;">หมดเวลา! ไม่ได้คะแนน</div>';
-  document.getElementById('qa-next').disabled=false;
-  document.getElementById('qa-next').style.display='block';
-  document.getElementById('qa-next').style.opacity='1';
-  document.getElementById('qa-next').textContent=qzCur<qzQuestions.length-1?'ข้อถัดไป →':'ดูผลคะแนน →';
+  qzConfirmed=true;setQzUrgent(false);document.getElementById('qa-confirm').style.display='none';
+  var q=qzQuestions[qzCur];var ans=q.ans!=null?q.ans:q.a;
+  document.getElementById('qa-choices').querySelectorAll('button').forEach(function(c,idx){c.onclick=null;c.style.cursor='default';if(idx===ans){c.style.borderColor='#16a34a';c.style.background='#f0fdf4';c.style.color='#16a34a';}else{c.style.borderColor='var(--border)';c.style.background='var(--bg)';}});
+  var rr=document.getElementById('qa-result');rr.style.cssText='display:flex;border-radius:11px;padding:10px 13px;margin-bottom:10px;align-items:center;gap:9px;font-size:13px;border:1.5px solid #fca5a5;background:#fef2f2;';rr.innerHTML='<span style="font-size:20px;">⏱</span><div style="font-size:13px;font-weight:600;color:#dc2626;">หมดเวลา! ไม่ได้คะแนน</div>';
+  document.getElementById('qa-next').disabled=false;document.getElementById('qa-next').style.opacity='1';document.getElementById('qa-next').textContent=qzCur<qzQuestions.length-1?'ข้อถัดไป →':'ดูผลคะแนน →';
 }
+function nextQuizQ(){qzCur++;if(qzCur>=qzQuestions.length){showQzResult();return;}qzConfirmed=false;qzSelectedIdx=-1;renderQzQ();}
 
-function nextQuizQ(){
-  qzCur++;
-  if(qzCur>=qzQuestions.length){showQzResult();return;}
-  qzConfirmed=false;qzSelectedIdx=-1;
-  renderQzQ();
-}
-
+/* ─────────────────────────────────────────────
+   BUG-01 FIX: showQzResult()
+   เปลี่ยนจาก action:'saveQuizDone'
+   เป็น action:'saveQuizScore' + ส่ง base/bonus/total
+   และ callback อัปเดต home-score inline ทันที
+───────────────────────────────────────────── */
 function showQzResult(){
-  stopQuizTimer(); setQzUrgent(false);
+  stopQuizTimer();setQzUrgent(false);
   qzDoneMap[qzStation]=true;
   var total=Math.round((qzBaseScore+qzBonusScore)*10)/10;
+
+  /* BUG-01 FIX: ส่งคะแนนจริงไปบันทึกใน sheet */
   if(currentUid){
     apiPost({
-      action:'saveQuizScore',
+      action:'saveQuizScore',       /* เปลี่ยนจาก saveQuizDone */
       uid:currentUid,
       station:qzStation,
       base:qzBaseScore,
-      bonus:Math.round(qzBonusScore*10)/10,
+      bonus:qzBonusScore,
       total:total
     },function(res){
-      if(res&&res.total_score){
-        document.getElementById('home-score').textContent=res.total_score;
+      /* อัปเดต home-score และ home-rank ทันทีจาก response */
+      if(res&&res.total_score!=null){
+        var scoreEl=document.getElementById('home-score');
+        if(scoreEl)scoreEl.textContent=res.total_score;
+      }
+      if(res&&res.rank!=null){
+        var rankEl=document.getElementById('home-rank');
+        if(rankEl)rankEl.textContent=res.rank;
       }
     });
   }
+
   document.getElementById('quiz-active-view').style.display='none';
   document.getElementById('quiz-result-view').style.display='block';
   document.getElementById('qr-score').textContent=total.toFixed(1);
@@ -1801,242 +1480,72 @@ function showQzResult(){
   document.getElementById('qr-bonus').textContent=qzBonusScore.toFixed(1);
 }
 
-/* ═══════════════════════════════════════════
-   SURVEY
-═══════════════════════════════════════════ */
-var svCur=0,svSel=-1,svAns=[];
-var SV_Q=[
-  {q:'ก่อนวันนี้ คุณคิดว่าฝ่ายวิศวกรรมทำอะไร?',c:['ซ่อมเครื่องจักรเมื่อมันพัง','ดูแลระบบไฟฟ้าและเครื่องจักรของโรงงาน','วางแผนและป้องกันไม่ให้เครื่องจักรพัง','ไม่แน่ใจ / ไม่เคยนึกถึง']},
-  {q:'กิจกรรมวันนี้เป็นอย่างไรบ้าง?',c:['ดีมาก อยากมาอีก','ดี ได้ความรู้','พอใช้ได้','ควรปรับปรุง']},
-  {q:'วันนี้คุณเป็นใครมากที่สุด?',c:['คนสายละเอียด — ทุกไมครอนมีความหมาย','คนที่ทำให้ทุกอย่างหมุน — เข้าใจแรง เข้าใจระบบ','คนสายควบคุม — ชอบออโตเมต ไม่ชอบทำซ้ำ','คนที่มองเห็นปัญหาก่อนใคร — ดูแลให้ทุกอย่างไม่พัง']},
-  {q:'ได้ความรู้ใหม่จากกิจกรรมนี้แค่ไหน?',c:['มากมาย ไม่เคยรู้มาก่อน','พอสมควร ได้เติมเต็มบางส่วน','เล็กน้อย รู้อยู่แล้วบ้าง','แทบไม่ได้เลย']},
-  {q:'เวลาในแต่ละฐานเหมาะสมไหม?',c:['พอดีมาก','น้อยเกินไป อยากอยู่นานกว่านี้','นานเกินไป','ไม่แน่ใจ']},
-  {q:'ระบบ Quiz สนุกแค่ไหน?',c:['สนุกมาก ตื่นเต้นตลอด','สนุกดี เหมาะกับกิจกรรม','ธรรมดา ไม่ได้รู้สึกอะไรพิเศษ','ซับซ้อนเกินไป ใช้ยาก']},
-  {q:'แอปพลิเคชันวันนี้เป็นอย่างไร?',c:['ใช้ง่ายมาก ลื่นไหล','ใช้ได้ มีปัญหาบ้างนิดหน่อย','ช้า / ค้างบ่อย','งงตั้งแต่แรก ไม่รู้จะทำอะไร']},
-  {q:'ถ้ามีกิจกรรมแบบนี้อีกครั้ง คุณจะ...?',c:['มาแน่นอน และแนะนำเพื่อน','มาถ้าว่างอยู่','ยังไม่แน่ใจ','ไม่ค่อยสนใจ']},
-  {q:'หลังวันนี้ ถ้าต้องแนะนำฝ่ายวิศวกรรมให้คนอื่น คุณทำได้ไหม?',c:['ได้เลย อธิบายได้ทุกฝ่าย','ได้บางส่วน อธิบายได้บางฝ่าย','ได้นิดหน่อย แต่ยังไม่มั่นใจ','ยังไม่ได้เลย ต้องเรียนรู้เพิ่ม']},
-  {q:'อยากลองมาทำงานที่ฝ่ายวิศวกรรมแค่ไหน?',c:['สนใจมาก อยากลองจริงๆ','พอสนใจ ถ้ามีโอกาสก็ไม่แย่','ยังไม่ได้คิด แต่วันนี้ได้เปิดมุมมอง']}
-];
-
-function renderSurveyCard(){
-  var card=document.getElementById('home-survey-card');
-  var badge=document.getElementById('survey-card-badge');
-  var title=document.getElementById('survey-card-title');
-  var sub=document.getElementById('survey-card-sub');
-  if(!card)return;
-  if(surveyDone){
-    card.style.cssText='border-radius:18px;padding:16px 14px;display:flex;align-items:center;gap:12px;transition:.18s;background:#f0fdf4;border:1.5px solid #86efac;cursor:default;opacity:1;';
-    title.style.color='#16a34a';title.textContent='แบบประเมิน — ส่งแล้ว ✓';
-    sub.style.color='#16a34a';sub.textContent='ขอบคุณสำหรับความคิดเห็น';
-    badge.textContent='✓ เสร็จแล้ว';badge.style.cssText='font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:#dcfce7;color:#16a34a;border:1px solid #86efac;';
-  } else if(qzDoneMap['PM']){
-    card.style.cssText='border-radius:18px;padding:16px 14px;display:flex;align-items:center;gap:12px;transition:.18s;background:var(--bg);border:1.5px solid var(--navy);cursor:pointer;opacity:1;box-shadow:0 4px 14px rgba(15,34,72,.12);';
-    title.style.color='var(--navy)';title.textContent='แบบประเมินความพึงพอใจ';
-    sub.style.color='var(--muted)';sub.textContent='10 ข้อ · ใช้เวลาประมาณ 2 นาที';
-    badge.textContent='ทำได้เลย →';badge.style.cssText='font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:var(--navy);color:#fff;border:1px solid var(--navy);';
-  } else {
-    card.style.cssText='border-radius:18px;padding:16px 14px;display:flex;align-items:center;gap:12px;transition:.18s;background:var(--bg2);border:1.5px solid var(--border);opacity:.55;cursor:not-allowed;';
-    title.style.color='var(--muted)';title.textContent='แบบประเมินความพึงพอใจ';
-    sub.style.color='var(--muted)';sub.textContent='ทำ Quiz ฐาน PM ให้ครบก่อน';
-    badge.textContent='🔒 ล็อก';badge.style.cssText='font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:var(--bg3);color:var(--muted);border:1px solid var(--border);';
-  }
-}
-
-function openSurvey(){
-  if(!qzDoneMap['PM']){showStationToast('ทำ Quiz ฐาน PM ให้จบก่อน');return;}
-  if(surveyDone){showStationToast('ทำแบบประเมินแล้ว ขอบคุณ');return;}
-  svCur=0;svSel=-1;svAns=[];
-  go('survey');
-  svRender();
-}
-
-function svRender(){
-  var q=SV_Q[svCur];
-  document.getElementById('sv-qnum').textContent='คำถามที่ '+(svCur+1);
-  document.getElementById('sv-qtext').textContent=q.q;
-  document.getElementById('sv-counter').textContent=(svCur+1)+' / '+SV_Q.length;
-  document.getElementById('sv-bar').style.width=Math.round((svCur+1)/SV_Q.length*100)+'%';
-  svSel=svAns[svCur]!==undefined?svAns[svCur]:-1;
-  var L=['A','B','C','D'];
-  document.getElementById('sv-choices').innerHTML=q.c.map(function(c,i){
-    var s=svSel===i;
-    return'<button onclick="svPick('+i+')" style="background:'+(s?'var(--blue-light)':'var(--bg)')+';border:1.5px solid '+(s?'var(--accent)':'var(--border)')+';border-radius:11px;padding:10px 13px;font-size:13px;color:'+(s?'var(--accent)':'var(--navy)')+';cursor:pointer;text-align:left;font-family:inherit;display:flex;align-items:center;gap:9px;transition:.15s;width:100%;">'
-      +'<div style="width:22px;height:22px;border-radius:50%;background:'+(s?'var(--accent)':'var(--bg2)')+';display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;color:'+(s?'#fff':'var(--navy)')+';">'+L[i]+'</div>'
-      +'<span>'+c+'</span></button>';
-  }).join('');
-  var btn=document.getElementById('sv-next-btn');
-  if(svSel>=0){btn.style.opacity='1';btn.style.pointerEvents='auto';}
-  else{btn.style.opacity='.35';btn.style.pointerEvents='none';}
-  btn.textContent=svCur<SV_Q.length-1?'ถัดไป →':'ส่งแบบประเมิน ✓';
-}
-
-function svPick(i){svSel=i;svAns[svCur]=i;svRender();}
-
-function svNext(){
-  if(svSel<0)return;
-  if(svCur<SV_Q.length-1){svCur++;svRender();return;}
-  showLoad();
-  var answers=SV_Q.map(function(q,i){return q.c[svAns[i]!==undefined?svAns[i]:0];});
-  apiPost({action:'saveSurvey',uid:currentUid,answers:answers},function(res){
-    hideLoad();
-    if(res.error){showStationToast(res.error);return;}
-    surveyDone=true;
-    document.getElementById('sv-q-view').style.display='none';
-    document.getElementById('sv-done-view').style.display='block';
-    document.getElementById('sv-bar').style.width='100%';
-    document.getElementById('sv-counter').textContent='เสร็จสิ้น';
-  });
-}
-
-/* ═══════════════════════════════════════════
-   SCAN BONUS
-═══════════════════════════════════════════ */
+/* ── Scan Bonus ── */
 var bonusScanner=null,bonusBusy=false,lastBonusScanAt=0;
-
 function enterScanBonus(){
   var uid=currentUid;
-  if(!uid){
-    document.getElementById('sb-result').innerHTML='<div class="scan-result bad"><div class="sic">⚠️</div><div class="stitle">กรุณาเข้าสู่ระบบก่อน</div><div class="sdesc">กลับไปล็อกอินที่หน้าหลัก</div></div>';
-    return;
-  }
-  apiGet('getMembers',function(res){
-    var m=(res.members||[]).find(function(x){return x.uid===uid;});
-    if(m){
-      document.getElementById('sb-av').textContent=(m.full_name||'?').charAt(0);
-      document.getElementById('sb-name').textContent=m.full_name;
-      document.getElementById('sb-uid').textContent='UID: '+m.uid+(m.department?' · '+m.department:'');
-      document.getElementById('sb-total').textContent=m.total_score||0;
-    }
-  });
+  if(!uid){document.getElementById('sb-result').innerHTML='<div class="scan-result bad"><div class="sic">⚠️</div><div class="stitle">กรุณาเข้าสู่ระบบก่อน</div><div class="sdesc">กลับไปล็อกอินที่หน้าหลัก</div></div>';return;}
+  apiGet('getMembers',function(res){var m=(res.members||[]).find(function(x){return x.uid===uid;});if(m){document.getElementById('sb-av').textContent=(m.full_name||'?').charAt(0);document.getElementById('sb-name').textContent=m.full_name;document.getElementById('sb-uid').textContent='UID: '+m.uid+(m.department?' · '+m.department:'');document.getElementById('sb-total').textContent=m.total_score||0;}});
   startBonusScanner();
 }
-
 function startBonusScanner(){
-  if(bonusScanner)return;
-  var el=document.getElementById('scan-reader');
-  if(!el)return;
+  if(bonusScanner)return;var el=document.getElementById('scan-reader');if(!el)return;
   bonusScanner=new Html5Qrcode('scan-reader');
-  bonusScanner.start(
-    {facingMode:'environment'},
-    {fps:10,qrbox:{width:200,height:200}},
-    onBonusScan,
-    function(){}
-  ).then(function(){
-    document.getElementById('scan-hint').textContent='เล็งกล้องไปที่ QR ของฐาน';
-  }).catch(function(){
-    document.getElementById('scan-hint').innerHTML='<span style="color:var(--red)">เปิดกล้องไม่ได้ — กรุณาอนุญาตการใช้กล้อง</span>';
-    bonusScanner=null;
-  });
+  bonusScanner.start({facingMode:'environment'},{fps:10,qrbox:{width:200,height:200}},onBonusScan,function(){})
+    .then(function(){document.getElementById('scan-hint').textContent='เล็งกล้องไปที่ QR ของฐาน';})
+    .catch(function(){document.getElementById('scan-hint').innerHTML='<span style="color:var(--red)">เปิดกล้องไม่ได้ — กรุณาอนุญาตการใช้กล้อง</span>';bonusScanner=null;});
 }
-
-function stopBonusScanner(){
-  if(bonusScanner){
-    try{bonusScanner.stop().catch(function(){});}catch(e){}
-    bonusScanner=null;
-  }
-}
-
+function stopBonusScanner(){if(bonusScanner){try{bonusScanner.stop().catch(function(){});}catch(e){}bonusScanner=null;}}
 function onBonusScan(text){
-  var now=Date.now();
-  if(bonusBusy||(now-lastBonusScanAt)<2500)return;
+  var now=Date.now();if(bonusBusy||(now-lastBonusScanAt)<2500)return;
   var m=String(text).trim().toUpperCase().match(/^ENS-BONUS-(EE|ME|TO|PM)$/);
-  if(!m){
-    showBonusScanResult(false,'QR ไม่ถูกต้อง','ไม่ใช่ QR โบนัสประจำฐาน');
-    lastBonusScanAt=now;return;
-  }
-  lastBonusScanAt=now;bonusBusy=true;
-  document.getElementById('scan-hint').textContent='กำลังบันทึกคะแนน…';
+  if(!m){showBonusScanResult(false,'QR ไม่ถูกต้อง','ไม่ใช่ QR โบนัสประจำฐาน');lastBonusScanAt=now;return;}
+  lastBonusScanAt=now;bonusBusy=true;document.getElementById('scan-hint').textContent='กำลังบันทึกคะแนน…';
   apiPost({action:'bonusScan',uid:currentUid,station:m[1]},function(res){
-    bonusBusy=false;
-    document.getElementById('scan-hint').textContent='เล็งกล้องไปที่ QR ของฐาน';
-    if(res&&res.success){
-      document.getElementById('sb-total').textContent=res.total_score;
-      showBonusScanResult(true,'รับโบนัสฐาน '+res.station+' สำเร็จ!','+'+res.bonus+' คะแนน · รวม '+res.total_score+' คะแนน');
-      if(navigator.vibrate)navigator.vibrate([60,40,60]);
-    } else {
-      showBonusScanResult(false,'รับโบนัสไม่ได้',(res&&res.error)||'เกิดข้อผิดพลาด');
-    }
+    bonusBusy=false;document.getElementById('scan-hint').textContent='เล็งกล้องไปที่ QR ของฐาน';
+    if(res&&res.success){document.getElementById('sb-total').textContent=res.total_score;showBonusScanResult(true,'รับโบนัสฐาน '+res.station+' สำเร็จ!','+'+res.bonus+' คะแนน · รวม '+res.total_score+' คะแนน');if(navigator.vibrate)navigator.vibrate([60,40,60]);}
+    else{showBonusScanResult(false,'รับโบนัสไม่ได้',(res&&res.error)||'เกิดข้อผิดพลาด');}
   });
 }
+function showBonusScanResult(ok,title,desc){document.getElementById('sb-result').innerHTML='<div class="scan-result '+(ok?'ok':'bad')+'"><div class="sic">'+(ok?'✅':'⚠️')+'</div><div class="stitle">'+title+'</div><div class="sdesc">'+desc+'</div></div>';}
 
-function showBonusScanResult(ok,title,desc){
-  document.getElementById('sb-result').innerHTML='<div class="scan-result '+(ok?'ok':'bad')+'">'
-    +'<div class="sic">'+(ok?'✅':'⚠️')+'</div>'
-    +'<div class="stitle">'+title+'</div>'
-    +'<div class="sdesc">'+desc+'</div></div>';
-}
-
-/* ═══════════════════════════════════════════
-   SPLASH + INIT
-═══════════════════════════════════════════ */
+/* ── Splash + Init ── */
 window.addEventListener('load',function(){
-  var splash=document.getElementById('pg-splash');
-  splash.style.display='flex';
+  var splash=document.getElementById('pg-splash');splash.style.display='flex';
   document.getElementById('pg-preview').classList.remove('active');
   apiGet('getSettings',function(res){if(res.settings)settingsCache=res.settings;});
-  apiGet('getEmployees',function(res){
-    var employees=(res&&res.employees)||[];
-    employeeDB=employees.map(function(e){return{firstName:e.firstName,lastName:e.lastName,dept:e.dept,position:e.position||''};});
-  });
+  apiGet('getEmployees',function(res){var e=(res&&res.employees)||[];employeeDB=e.map(function(x){return{firstName:x.firstName,lastName:x.lastName,dept:x.dept,position:x.position||''};});});
   apiGet('getAppSettings',function(res){if(res&&!res.error)appSettings=res;});
-
-  var uid=loadSessionUid();
-  var token=loadSessionToken();
-  var sessionResult=null;
-
+  var uid=loadSessionUid();var token=loadSessionToken();var sessionResult=null;
   if(uid&&token){
     var statusEl=document.getElementById('splash-status');
     setTimeout(function(){if(statusEl){statusEl.style.opacity='1';statusEl.textContent='กำลังตรวจสอบ session...';}},800);
     apiGet('getMembers',function(res){
       var m=(res.members||[]).find(function(x){return x.uid===uid;});
       sessionResult=(m&&m.has_session)?'valid':'invalid';
-      currentUid=(sessionResult==='valid')?uid:null;
-      currentToken=(sessionResult==='valid')?token:null;
-      if(sessionResult==='invalid') clearSession();
+      currentUid=(sessionResult==='valid')?uid:null;currentToken=(sessionResult==='valid')?token:null;
+      if(sessionResult==='invalid')clearSession();
     });
   }
-
   setTimeout(function(){
     splash.classList.add('hide');
     setTimeout(function(){
       splash.style.display='none';
-      if(sessionResult==='valid'){
-        go('home');loadHome();startSessionPolling();
-      } else if(sessionResult==='invalid'){
-        goToPreview();
-      } else if(uid&&token&&sessionResult===null){
-        var wait=setInterval(function(){
-          if(sessionResult!==null){
-            clearInterval(wait);
-            if(sessionResult==='valid'){go('home');loadHome();startSessionPolling();}
-            else goToPreview();
-          }
-        },200);
+      if(sessionResult==='valid'){go('home');loadHome();startSessionPolling();}
+      else if(sessionResult==='invalid'){goToPreview();}
+      else if(uid&&token&&sessionResult===null){
+        var wait=setInterval(function(){if(sessionResult!==null){clearInterval(wait);if(sessionResult==='valid'){go('home');loadHome();startSessionPolling();}else goToPreview();}},200);
         setTimeout(function(){if(sessionResult===null){clearInterval(wait);goToPreview();}},5000);
-      } else {
-        goToPreview();
-      }
+      } else {goToPreview();}
     },600);
   },2200);
 });
 
 function addToCalendar(){
-  var ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Engineering Synergy 2026//TH','BEGIN:VEVENT','UID:engineering-synergy-2026@smpc','DTSTAMP:20260614T000000Z','DTSTART:20260703T020000Z','DTEND:20260703T050000Z','SUMMARY:Engineering Synergy 2026','DESCRIPTION:กิจกรรม Engineer for a Day — ฝ่ายวิศวกรรม','LOCATION:Shop floor ฝ่ายวิศวกรรม','END:VEVENT','END:VCALENDAR'].join('\r\n');
-  var blob=new Blob([ics],{type:'text/calendar;charset=utf-8'});
-  var url=URL.createObjectURL(blob);
-  var a=document.createElement('a');
-  a.href=url;a.download='engineering-synergy-2026.ics';
-  document.body.appendChild(a);a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  var ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Engineering Synergy 2026//TH','BEGIN:VEVENT','UID:engineering-synergy-2026@smpc','DTSTAMP:20260614T000000Z','DTSTART:20260710T020000Z','DTEND:20260710T050000Z','SUMMARY:Engineering Synergy 2026','DESCRIPTION:กิจกรรม Engineer for a Day — ฝ่ายวิศวกรรม','LOCATION:Shop floor ฝ่ายวิศวกรรม','END:VEVENT','END:VCALENDAR'].join('\r\n');
+  var blob=new Blob([ics],{type:'text/calendar;charset=utf-8'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='engineering-synergy-2026.ics';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
 }
-
-function goToPreview(){
-  go('preview');
-  var ep=document.getElementById('entry-panel');
-  if(ep) ep.style.transform='translateY(100%)';
-  startPreviewRing(3);
-}
+function goToPreview(){go('preview');var ep=document.getElementById('entry-panel');if(ep)ep.style.transform='translateY(100%)';startPreviewRing(3);}
 </script>
 </body>
 </html>
