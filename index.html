@@ -894,16 +894,21 @@ function confirmEnter(){
   });
 }
 function afterAuth(){
-  apiGet('getAppSettings',function(res){if(res&&!res.error)appSettings=res;});
-  if(appSettings.coming_soon){
-    apiGet('getMembers',function(mr){
-      var m=(mr.members||[]).find(function(x){return x.uid===currentUid;});
-      var fullName=m?m.full_name:'';
-      var isBypass=(appSettings.bypass_list||[]).indexOf(fullName)>=0;
-      if(!isBypass){updateCountdown();setInterval(updateCountdown,1000);go('coming');}
-      else{goHome();}
-    });
-  } else {goHome();}
+  /* FIX: รอ getAppSettings ตอบจริงก่อนตัดสินใจ (เดิมเช็ค appSettings cache เก่าทันที
+     ทำให้หน้า preview วูบโผล่ระหว่างรอ API) — แสดง loading คั่นกันหน้าวูบ */
+  showLoad();
+  apiGet('getAppSettings',function(res){
+    if(res&&!res.error)appSettings=res;
+    if(appSettings.coming_soon){
+      apiGet('getMembers',function(mr){
+        hideLoad();
+        var m=(mr.members||[]).find(function(x){return x.uid===currentUid;});
+        var isBypass=(appSettings.bypass_list||[]).indexOf(m?m.full_name:'')>=0;
+        if(!isBypass){updateCountdown();setInterval(updateCountdown,1000);go('coming');}
+        else{goHome();}
+      });
+    } else {hideLoad();goHome();}
+  });
 }
 
 /* ── Session polling ── */
