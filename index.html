@@ -31,21 +31,21 @@
   ║  v1.2.0 [BUG-01..04] quiz score/flow/retake/refresh      ║
   ╔══════════════════════════════════════════════════════════╗
   ║  Engineering Synergy 2026                               ║
-  ║  Version : 1.6.0                                        ║
-  ║  Date    : 2026-06-21                                   ║
+  ║  Version : 1.7.0                                        ║
+  ║  Date    : 2026-06-25                                   ║
   ╠══════════════════════════════════════════════════════════╣
-  ║  v1.6.0 — MERGED FROM EARLIER VERSION (doc4)             ║
-  ║  [MERGE-1] Pre-quiz warning popup restored                ║
-  ║            - quiz-start-overlay ก่อนเข้าทำ quiz จริง      ║
-  ║            - startConfirmedQuiz/cancelQuizStart           ║
-  ║            - confirmQuitQuiz กันกด back หนีกลางคัน       ║
-  ║  [MERGE-2] ระบบแบบประเมิน (Survey) restored ครบชุด        ║
-  ║            - pg-survey + การ์ดใน home (ล็อกจนทำ PM เสร็จ) ║
-  ║            - คำถาม 10 ข้อจาก doc4 (verbatim)              ║
-  ║            - backend saveSurvey มีอยู่แล้วใน .gs ปัจจุบัน  ║
-  ╚══════════════════════════════════════════════════════════╝
+  ║  v1.7.0 — SECURITY + COMING SOON COUNT                  ║
+  ║  [FIX-7] ย้าย Admin password ออกจาก HTML ไปเก็บใน GAS  ║
+  ║           - ลบ ADMIN_PASS และ adminPassOverride ออก     ║
+  ║           - doAdminLogin/doAdminLogin2 → verifyAdmin API ║
+  ║           - doResetPass → updateAdminPass API            ║
+  ║           ⚠️ BACKEND ต้องมี verifyAdmin + updateAdminPass║
+  ║  [FIX-8] Coming Soon แสดงยอดผู้ลงทะเบียน                ║
+  ║           - pill "X คน ลงทะเบียนแล้ว" ใต้ countdown     ║
+  ║           - loadComingSoonCount() fetch getMembers       ║
+  ╠══════════════════════════════════════════════════════════╣
 -->
-<title>Engineering Synergy 2026 · v1.6.0</title>
+<title>Engineering Synergy 2026 · v1.7.0</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -358,6 +358,13 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
         <div class="cd-unit"><div class="cd-unit-num accent" id="cd-secs">--</div><div class="cd-unit-lbl">วินาที</div></div>
       </div>
     </div>
+    <!-- [FIX-8] ยอดผู้ลงทะเบียน — โหลดจาก loadComingSoonCount() ตอนแสดงหน้านี้ -->
+    <div id="cs-reg-wrap" style="text-align:center;margin-bottom:16px;opacity:0;transition:opacity .5s;">
+      <div style="display:inline-flex;align-items:baseline;gap:6px;background:var(--bg2);border:1.5px solid var(--border);border-radius:20px;padding:9px 20px;">
+        <span id="cs-reg-count" style="font-size:20px;font-weight:700;color:var(--navy);font-variant-numeric:tabular-nums;">—</span>
+        <span style="font-size:13px;color:var(--sub);">คน ลงทะเบียนแล้ว</span>
+      </div>
+    </div>
     <button onclick="addToCalendar()" style="width:100%;max-width:240px;padding:13px;background:var(--navy);border:none;border-radius:13px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:8px;">📅 บันทึกเข้าปฏิทิน</button>
     <button class="btn-outline" style="max-width:240px;margin:0 auto;" onclick="goPreview()">← กลับหน้าหลัก</button>
   </div>
@@ -496,7 +503,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
   <div style="padding-top:22px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center">
     <div>
       <div style="font-size:20px;font-weight:700;color:var(--navy);letter-spacing:-.4px">Admin</div>
-      <div style="font-size:12px;color:var(--muted);margin-top:2px">Engineering Synergy 2026 · v1.6.0</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px">Engineering Synergy 2026 · v1.7.0</div>
     </div>
     <button class="btn-ghost-sm" style="color:var(--muted);font-size:12px" onclick="document.getElementById('admin-exit-overlay').style.display='flex'">← ออก</button>
   </div>
@@ -717,11 +724,11 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
    Engineering Synergy 2026 · v1.6.0
    Fixes: BUG-01..08 + FIX-1..6 (Active/Disable Quiz)
 ═══════════════════════════════════════════════════════ */
-var APP_VERSION='1.6.0';
+var APP_VERSION='1.7.0';
 
 var API='https://script.google.com/macros/s/AKfycbx8jJ-Mq3mLAwWS_ZhAxiUKbibP_qBbV2WUIUGQvGoIzduY3C-UI12aRGh6D4aFew9h/exec';
-var ADMIN_PASS='engineer_1997';
-var adminPassOverride=null;
+/* [FIX-7] ADMIN_PASS ย้ายไปเก็บใน GAS backend แล้ว (verifyAdmin)
+   ไม่มี plaintext password ใน HTML source อีกต่อไป */
 
 var STATIONS=[
   {id:'TO',icon:'🔬',name:'Tooling Eng.',label:'Tooling Eng.',activity:'Micrometer Pro',color:'#92400e',accent:'#f59e0b'},
@@ -806,6 +813,8 @@ function go(page,param){
   }
   else if(page==='scan-bonus'){enterScanBonus();document.getElementById('pg-scan-bonus').classList.add('active');}
   else if(page==='survey'){document.getElementById('pg-survey').classList.add('active');}
+  /* [FIX-8] coming soon: โหลดยอดผู้ลงทะเบียนทุกครั้งที่แสดงหน้านี้ */
+  else if(page==='coming'){document.getElementById('pg-coming').classList.add('active');loadComingSoonCount();}
   else{var el=document.getElementById('pg-'+page);if(el)el.classList.add('active');}
   window.scrollTo(0,0);
 }
@@ -825,6 +834,19 @@ function updateCountdown(){
   document.getElementById('cd-hours').textContent=String(h).padStart(2,'0');
   document.getElementById('cd-mins').textContent=String(m).padStart(2,'0');
   document.getElementById('cd-secs').textContent=String(s).padStart(2,'0');
+}
+
+/* [FIX-8] loadComingSoonCount — แสดงยอดผู้ลงทะเบียนในหน้า Coming Soon
+   ถูกเรียกจาก go('coming') ทุกครั้ง */
+function loadComingSoonCount(){
+  var wrap=document.getElementById('cs-reg-wrap');
+  var el=document.getElementById('cs-reg-count');
+  apiGet('getMembers',function(res){
+    if(res.error||!res.members)return;
+    var count=res.members.length;
+    if(el)el.textContent=count;
+    if(wrap)wrap.style.opacity='1';
+  });
 }
 
 /* ── Fuzzy match ── */
@@ -870,11 +892,15 @@ function closeAdminEntry(){
     document.getElementById('entry-panel').style.transform='translateY(0)';
   },300);
 }
+/* [FIX-7] doAdminLogin2 — ตรวจรหัสผ่าน admin ผ่าน API */
 function doAdminLogin2(){
   var pass=document.getElementById('al-pass2').value;
-  var correct=adminPassOverride||ADMIN_PASS;
-  if(pass===correct){document.getElementById('al-pass2').value='';document.getElementById('al-err2').style.display='none';go('admin');}
-  else{showErr(document.getElementById('al-err2'),'รหัสผ่านไม่ถูกต้อง');}
+  showLoad();
+  apiPost({action:'verifyAdmin',pass:pass},function(res){
+    hideLoad();
+    if(res.ok){document.getElementById('al-pass2').value='';document.getElementById('al-err2').style.display='none';go('admin');}
+    else{showErr(document.getElementById('al-err2'),'รหัสผ่านไม่ถูกต้อง');}
+  });
 }
 function onRegSubmit(){
   var btn=document.getElementById('reg-submit');
@@ -1086,19 +1112,37 @@ function renderHomeSkeleton(){
 }
 function renderHomeError(){var el=document.getElementById('home-score');if(el)el.textContent='—';}
 
+/* [FIX-7] doAdminLogin — ตรวจรหัสผ่าน admin ผ่าน API (ไม่เปรียบเทียบใน browser อีกต่อไป) */
 function doAdminLogin(){
   var passEl=document.getElementById('al-pass');var errEl=document.getElementById('al-err');
   if(!passEl||!errEl)return;
-  var pass=passEl.value;var correct=adminPassOverride||ADMIN_PASS;
-  if(pass===correct){passEl.value='';errEl.style.display='none';document.getElementById('admin-entry-panel').style.opacity='0';document.getElementById('admin-entry-panel').style.pointerEvents='none';go('admin');}
-  else{showErr(errEl,'รหัสผ่านไม่ถูกต้อง');}
+  var pass=passEl.value;
+  showLoad();
+  apiPost({action:'verifyAdmin',pass:pass},function(res){
+    hideLoad();
+    if(res.ok){passEl.value='';errEl.style.display='none';document.getElementById('admin-entry-panel').style.opacity='0';document.getElementById('admin-entry-panel').style.pointerEvents='none';go('admin');}
+    else{showErr(errEl,'รหัสผ่านไม่ถูกต้อง');}
+  });
 }
+/* [FIX-7] doResetPass — ขั้นที่ 2 (เปลี่ยนรหัส) ส่งผ่าน updateAdminPass API */
 var rpStep=1;
 function doResetPass(){
   var errEl=document.getElementById('rp-err'),okEl=document.getElementById('rp-ok');
   errEl.style.display='none';okEl.style.display='none';
   if(rpStep===1){var ans=document.getElementById('rp-ans').value.trim();if(ans==='ราษฎร์เจริญ'){rpStep=2;document.getElementById('rp-new-wrap').style.display='block';okEl.textContent='✅ ตอบถูกต้อง กรุณากรอกรหัสผ่านใหม่';okEl.style.display='block';}else{showErr(errEl,'คำตอบไม่ถูกต้อง');}}
-  else{var newPass=document.getElementById('rp-new').value.trim();if(newPass.length<4){showErr(errEl,'รหัสผ่านต้องมีอย่างน้อย 4 ตัวอักษร');return;}adminPassOverride=newPass;rpStep=1;document.getElementById('rp-new-wrap').style.display='none';document.getElementById('rp-ans').value='';document.getElementById('rp-new').value='';okEl.textContent='✅ เปลี่ยนรหัสผ่านสำเร็จ';okEl.style.display='block';setTimeout(function(){go('admin-login');},1500);}
+  else{
+    var newPass=document.getElementById('rp-new').value.trim();
+    if(newPass.length<4){showErr(errEl,'รหัสผ่านต้องมีอย่างน้อย 4 ตัวอักษร');return;}
+    showLoad();
+    apiPost({action:'updateAdminPass',newPass:newPass},function(res){
+      hideLoad();
+      if(res.error){showErr(errEl,res.error);return;}
+      rpStep=1;document.getElementById('rp-new-wrap').style.display='none';
+      document.getElementById('rp-ans').value='';document.getElementById('rp-new').value='';
+      okEl.textContent='✅ เปลี่ยนรหัสผ่านสำเร็จ';okEl.style.display='block';
+      setTimeout(function(){go('admin-login');},1500);
+    });
+  }
 }
 
 /* ── Station grid ── */
