@@ -31,19 +31,19 @@
   ║  v1.2.0 [BUG-01..04] quiz score/flow/retake/refresh      ║
   ╔══════════════════════════════════════════════════════════╗
   ║  Engineering Synergy 2026                               ║
-  ║  Version : 1.7.3                                        ║
+  ║  Version : 1.7.4                                        ║
   ║  Date    : 2026-06-25                                   ║
   ╠══════════════════════════════════════════════════════════╣
-  ║  v1.7.3 — SESSION NOTIFICATION FIX                      ║
-  ║  [FIX-11] เปลี่ยน kick overlay จาก force-logout         ║
-  ║           → แจ้งเตือนให้รีเฟรชหน้าแทน                  ║
-  ║           - ข้อความ: "มีการอัปเดตข้อมูล"               ║
-  ║           - dismissKick() ใช้ window.location.reload()  ║
-  ║             แทน clearSession()+goPreview()              ║
-  ║           - reload → re-verify session → home อัตโนมัติ ║
+  ║  v1.7.4 — QUIZ ORDER MODE + SURVEY UNLOCK               ║
+  ║  [FIX-12] Admin toggle โหมดลำดับ Quiz                   ║
+  ║           - เปิด = sequential (TO→ME→EE→PM เหมือนเดิม)  ║
+  ║           - ปิด = free order (ทำฐานไหนก่อนก็ได้)        ║
+  ║           - บันทึกใน app_settings quiz_free_mode        ║
+  ║           Survey unlock เปลี่ยนเป็นครบ 4 ฐาน           ║
+  ║           (TO+ME+EE+PM) เสมอ ไม่ขึ้นกับโหมด            ║
   ╠══════════════════════════════════════════════════════════╣
 -->
-<title>Engineering Synergy 2026 · v1.7.3</title>
+<title>Engineering Synergy 2026 · v1.7.4</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -503,7 +503,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
   <div style="padding-top:22px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center">
     <div>
       <div style="font-size:20px;font-weight:700;color:var(--navy);letter-spacing:-.4px">Admin</div>
-      <div style="font-size:12px;color:var(--muted);margin-top:2px">Engineering Synergy 2026 · v1.7.3</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px">Engineering Synergy 2026 · v1.7.4</div>
     </div>
     <button class="btn-ghost-sm" style="color:var(--muted);font-size:12px" onclick="document.getElementById('admin-exit-overlay').style.display='flex'">← ออก</button>
   </div>
@@ -569,9 +569,23 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
         </label>
       </div>
     </div>
+    <!-- [FIX-12] โหมดลำดับ Quiz — sequential หรือ free order -->
+    <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:14px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+        <div>
+          <div style="font-size:14px;font-weight:600;color:var(--navy);">โหมดลำดับ Quiz</div>
+          <div style="font-size:12px;color:var(--sub);margin-top:3px;line-height:1.55;">เปิด = ต้องทำตามลำดับ TO→ME→EE→PM<br>ปิด = ทำฐานไหนก่อนก็ได้</div>
+          <div id="qm-pill" style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;margin-top:6px;background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;">● เรียงตามลำดับ</div>
+        </div>
+        <label style="position:relative;width:44px;height:26px;flex-shrink:0;">
+          <input type="checkbox" id="qm-toggle" style="opacity:0;width:0;height:0;" onchange="onQuizModeToggle()">
+          <span id="qm-track" style="position:absolute;inset:0;background:var(--navy);border-radius:13px;cursor:pointer;transition:.3s;">
+            <span id="qm-knob" style="position:absolute;width:20px;height:20px;background:#fff;border-radius:50%;top:3px;left:3px;transition:.3s;box-shadow:0 1px 4px rgba(0,0,0,.15);transform:translateX(18px);"></span>
+          </span>
+        </label>
+      </div>
+    </div>
     <div class="sec-lbl">Bypass Coming Soon</div>
-    <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:14px;padding:12px 16px;margin-bottom:14px;">
-      <div style="font-size:12px;color:var(--sub);margin-bottom:10px;line-height:1.6;">รายชื่อนี้เข้า Home ได้เลยโดยไม่ติด Coming Soon</div>
       <div id="bypass-list-wrap">
         <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bg2);">
           <div style="font-size:13px;font-weight:600;color:var(--navy);">วัชรพล มีดี</div>
@@ -749,7 +763,7 @@ var STATION_MAP={
 /* FIX-6: ลบ STATION_INFO ออกแล้ว — ผู้ใช้เพียงรายเดียวคือ onStationClick() ซึ่งถูกลบไปแล้ว */
 
 var currentStation=null,currentUid=null,currentToken=null,employeeDB=[],settingsCache={};
-var appSettings={coming_soon:true,bypass_list:['วัชรพล มีดี'],quiz_order:['TO','ME','EE','PM']};
+var appSettings={coming_soon:true,bypass_list:['วัชรพล มีดี'],quiz_order:['TO','ME','EE','PM'],quiz_free_mode:false};
 
 /* FIX: merge getAppSettings response อย่างปลอดภัย — กันกรณี backend ส่ง bypass_list
    เป็น array ว่าง [] (เพราะ sheet app_settings ไม่มี row bypass_list) มาเขียนทับ default
@@ -759,6 +773,7 @@ function applyAppSettings(res){
   if(res.coming_soon!=null)appSettings.coming_soon=res.coming_soon;
   if(Array.isArray(res.bypass_list)&&res.bypass_list.length)appSettings.bypass_list=res.bypass_list;
   if(Array.isArray(res.quiz_order)&&res.quiz_order.length)appSettings.quiz_order=res.quiz_order;
+  if(res.quiz_free_mode!=null)appSettings.quiz_free_mode=res.quiz_free_mode; // [FIX-12]
 }
 var seenPopup={},qrScanner=null,stLog={EE:[],ME:[],TO:[],PM:[]};
 var selectedReg=null;
@@ -1156,18 +1171,21 @@ function doResetPass(){
 /* ── Station grid ── */
 var currentStationDetail=null;
 var QUIZ_ORDER_HOME=['TO','ME','EE','PM'];
-/* FIX-3e/3f: getStationState รองรับฐานที่ admin ปิด (stationActive[id]===false)
-   - ฐานที่ปิด → คืน 'disabled' (แสดงจาง + ป้ายปิดชั่วคราว ทำไม่ได้)
-   - การปลดล็อกฐานถัดไป: ข้ามฐานที่ปิดไปเลย ดูเฉพาะ "ฐานที่เปิด" ก่อนหน้า
-     ถ้าฐานเปิดก่อนหน้าทั้งหมดเสร็จแล้ว (หรือไม่มีฐานเปิดก่อนหน้า) → available */
+/* FIX-3e/3f + FIX-12: getStationState
+   - disabled: ฐานที่ admin ปิด
+   - done: ทำ quiz เสร็จแล้ว
+   - [FIX-12] free mode (quiz_free_mode=true): ทุกฐานที่เปิดอยู่ available พร้อมกัน
+   - sequential mode: ต้องผ่านฐานก่อนหน้า (ข้ามฐานที่ปิด) */
 function getStationState(id){
   if(stationActive[id]===false)return 'disabled';
   if(qzDoneMap&&qzDoneMap[id])return 'done';
+  /* [FIX-12] free mode — ทำฐานไหนก่อนก็ได้ */
+  if(appSettings.quiz_free_mode)return 'available';
+  /* sequential mode — ต้องผ่านฐานก่อนหน้า */
   var i=QUIZ_ORDER_HOME.indexOf(id);
-  /* หาฐานที่ "เปิดอยู่" ก่อนหน้า id ในลำดับ */
   var prevEnabled=null;
   for(var j=i-1;j>=0;j--){if(stationActive[QUIZ_ORDER_HOME[j]]!==false){prevEnabled=QUIZ_ORDER_HOME[j];break;}}
-  if(!prevEnabled)return 'available';                 // ไม่มีฐานเปิดก่อนหน้า → ฐานแรกที่ทำได้
+  if(!prevEnabled)return 'available';
   if(qzDoneMap&&qzDoneMap[prevEnabled])return 'available';
   return 'locked';
 }
@@ -1359,7 +1377,16 @@ function loadAdmin(){
     /* FIX-3c: โหลดสถานะ active ต่อฐานจาก settings (default true ถ้า backend ยังไม่ส่ง field นี้) */
     stationActive[id]=(st&&st.active!=null)?(st.active!==false):true;});
     renderStationActiveToggles();}});
-  apiGet('getAppSettings',function(res){if(res&&!res.error){applyAppSettings(res);var tog=document.getElementById('cs-toggle');var pill=document.getElementById('cs-pill');var track=document.getElementById('cs-track');var knob=document.getElementById('cs-knob');var on=res.coming_soon;if(tog)tog.checked=on;if(pill){pill.textContent=on?'● กำลังแสดง Coming Soon':'● เปิดใช้งานปกติ';pill.style.background=on?'#fff7ed':'#f0fdf4';pill.style.color=on?'#c2410c':'#16a34a';pill.style.borderColor=on?'#fed7aa':'#bbf7d0';}if(track)track.style.background=on?'var(--navy)':'var(--border)';if(knob)knob.style.transform=on?'translateX(18px)':'translateX(0)';}});
+  apiGet('getAppSettings',function(res){if(res&&!res.error){applyAppSettings(res);
+    var tog=document.getElementById('cs-toggle');var pill=document.getElementById('cs-pill');var track=document.getElementById('cs-track');var knob=document.getElementById('cs-knob');var on=res.coming_soon;if(tog)tog.checked=on;if(pill){pill.textContent=on?'● กำลังแสดง Coming Soon':'● เปิดใช้งานปกติ';pill.style.background=on?'#fff7ed':'#f0fdf4';pill.style.color=on?'#c2410c':'#16a34a';pill.style.borderColor=on?'#fed7aa':'#bbf7d0';}if(track)track.style.background=on?'var(--navy)':'var(--border)';if(knob)knob.style.transform=on?'translateX(18px)':'translateX(0)';
+    /* [FIX-12] quiz mode toggle UI */
+    var qmTog=document.getElementById('qm-toggle');var qmPill=document.getElementById('qm-pill');var qmTrack=document.getElementById('qm-track');var qmKnob=document.getElementById('qm-knob');
+    var isSeq=!res.quiz_free_mode;
+    if(qmTog)qmTog.checked=isSeq;
+    if(qmPill){qmPill.textContent=isSeq?'● เรียงตามลำดับ':'● ทำอิสระ';qmPill.style.background=isSeq?'#eff6ff':'#f0fdf4';qmPill.style.color=isSeq?'#1d4ed8':'#166534';qmPill.style.borderColor=isSeq?'#bfdbfe':'#bbf7d0';}
+    if(qmTrack)qmTrack.style.background=isSeq?'var(--navy)':'var(--border)';
+    if(qmKnob)qmKnob.style.transform=isSeq?'translateX(18px)':'translateX(0)';
+  }});
 }
 function confirmAdminExit(){document.getElementById('admin-exit-overlay').style.display='none';goPreview();}
 function goPreview(){
@@ -1389,6 +1416,17 @@ function onCsToggle(){
   pill.textContent=on?'● กำลังแสดง Coming Soon':'● เปิดใช้งานปกติ';pill.style.background=on?'#fff7ed':'#f0fdf4';pill.style.color=on?'#c2410c':'#16a34a';pill.style.borderColor=on?'#fed7aa':'#bbf7d0';
   track.style.background=on?'var(--navy)':'var(--border)';knob.style.transform=on?'translateX(18px)':'translateX(0)';
   appSettings.coming_soon=on;apiPost({action:'saveAppSettings',settings:{coming_soon:on}},function(){});
+}
+/* [FIX-12] onQuizModeToggle — checked=sequential(false free), unchecked=free(true free) */
+function onQuizModeToggle(){
+  var isSeq=document.getElementById('qm-toggle').checked;
+  var freeMode=!isSeq;
+  appSettings.quiz_free_mode=freeMode;
+  var pill=document.getElementById('qm-pill'),track=document.getElementById('qm-track'),knob=document.getElementById('qm-knob');
+  if(pill){pill.textContent=isSeq?'● เรียงตามลำดับ':'● ทำอิสระ';pill.style.background=isSeq?'#eff6ff':'#f0fdf4';pill.style.color=isSeq?'#1d4ed8':'#166534';pill.style.borderColor=isSeq?'#bfdbfe':'#bbf7d0';}
+  if(track)track.style.background=isSeq?'var(--navy)':'var(--border)';
+  if(knob)knob.style.transform=isSeq?'translateX(18px)':'translateX(0)';
+  apiPost({action:'saveAppSettings',settings:{quiz_free_mode:freeMode}},function(){});
 }
 
 /* ─────────────────────────────────────────────
@@ -1763,12 +1801,14 @@ function renderSurveyCard(){
   var title=document.getElementById('survey-card-title');
   var sub=document.getElementById('survey-card-sub');
   if(!card)return;
+  /* [FIX-12] unlock เมื่อครบ 4 ฐาน (TO+ME+EE+PM) เสมอ ไม่ว่าจะ free หรือ sequential */
+  var allDone=['TO','ME','EE','PM'].every(function(id){return !!qzDoneMap[id];});
   if(surveyDone){
     card.style.cssText='border-radius:18px;padding:16px 14px;display:flex;align-items:center;gap:12px;transition:.18s;background:#f0fdf4;border:1.5px solid #86efac;cursor:default;opacity:1;';
     title.style.color='#16a34a';title.textContent='แบบประเมิน — ส่งแล้ว ✓';
     sub.style.color='#16a34a';sub.textContent='ขอบคุณสำหรับความคิดเห็น';
     badge.textContent='✓ เสร็จแล้ว';badge.style.cssText='font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:#dcfce7;color:#16a34a;border:1px solid #86efac;';
-  } else if(qzDoneMap['PM']){
+  } else if(allDone){
     card.style.cssText='border-radius:18px;padding:16px 14px;display:flex;align-items:center;gap:12px;transition:.18s;background:var(--bg);border:1.5px solid var(--navy);cursor:pointer;opacity:1;box-shadow:0 4px 14px rgba(15,34,72,.12);';
     title.style.color='var(--navy)';title.textContent='แบบประเมินความพึงพอใจ';
     sub.style.color='var(--muted)';sub.textContent='10 ข้อ · ใช้เวลาประมาณ 2 นาที';
@@ -1776,13 +1816,15 @@ function renderSurveyCard(){
   } else {
     card.style.cssText='border-radius:18px;padding:16px 14px;display:flex;align-items:center;gap:12px;transition:.18s;background:var(--bg2);border:1.5px solid var(--border);opacity:.55;cursor:not-allowed;';
     title.style.color='var(--muted)';title.textContent='แบบประเมินความพึงพอใจ';
-    sub.style.color='var(--muted)';sub.textContent='ทำ Quiz ฐาน PM ให้ครบก่อน';
+    sub.style.color='var(--muted)';sub.textContent='ทำ Quiz ให้ครบทั้ง 4 ฐานก่อน';
     badge.textContent='🔒 ล็อก';badge.style.cssText='font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:var(--bg3);color:var(--muted);border:1px solid var(--border);';
   }
 }
 
 function openSurvey(){
-  if(!qzDoneMap['PM']){showStationToast('ทำ Quiz ฐาน PM ให้จบก่อน');return;}
+  /* [FIX-12] ต้องครบ 4 ฐาน (TO+ME+EE+PM) เสมอ ไม่ว่าจะ free หรือ sequential mode */
+  var allDone=['TO','ME','EE','PM'].every(function(id){return !!qzDoneMap[id];});
+  if(!allDone){showStationToast('ทำ Quiz ให้ครบทั้ง 4 ฐานก่อน');return;}
   if(surveyDone){showStationToast('ทำแบบประเมินแล้ว ขอบคุณ');return;}
   svCur=0;svSel=-1;svAns=[];
   go('survey');
