@@ -31,21 +31,17 @@
   ║  v1.2.0 [BUG-01..04] quiz score/flow/retake/refresh      ║
   ╔══════════════════════════════════════════════════════════╗
   ║  Engineering Synergy 2026                               ║
-  ║  Version : 1.7.0                                        ║
+  ║  Version : 1.7.1                                        ║
   ║  Date    : 2026-06-25                                   ║
   ╠══════════════════════════════════════════════════════════╣
-  ║  v1.7.0 — SECURITY + COMING SOON COUNT                  ║
-  ║  [FIX-7] ย้าย Admin password ออกจาก HTML ไปเก็บใน GAS  ║
-  ║           - ลบ ADMIN_PASS และ adminPassOverride ออก     ║
-  ║           - doAdminLogin/doAdminLogin2 → verifyAdmin API ║
-  ║           - doResetPass → updateAdminPass API            ║
-  ║           ⚠️ BACKEND ต้องมี verifyAdmin + updateAdminPass║
-  ║  [FIX-8] Coming Soon แสดงยอดผู้ลงทะเบียน                ║
-  ║           - pill "X คน ลงทะเบียนแล้ว" ใต้ countdown     ║
-  ║           - loadComingSoonCount() fetch getMembers       ║
+  ║  v1.7.1 — BUG FIX                                       ║
+  ║  [FIX-9] สแกน Bonus ข้ามฐานไม่ได้อีกต่อไป              ║
+  ║           - scanBonusStation เก็บฐานที่คาดหวัง          ║
+  ║           - openStationScan() set ค่าก่อน go('scan')    ║
+  ║           - onBonusScan() ตรวจ QR ตรงฐานก่อน API call  ║
   ╠══════════════════════════════════════════════════════════╣
 -->
-<title>Engineering Synergy 2026 · v1.7.0</title>
+<title>Engineering Synergy 2026 · v1.7.1</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -503,7 +499,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
   <div style="padding-top:22px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center">
     <div>
       <div style="font-size:20px;font-weight:700;color:var(--navy);letter-spacing:-.4px">Admin</div>
-      <div style="font-size:12px;color:var(--muted);margin-top:2px">Engineering Synergy 2026 · v1.7.0</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px">Engineering Synergy 2026 · v1.7.1</div>
     </div>
     <button class="btn-ghost-sm" style="color:var(--muted);font-size:12px" onclick="document.getElementById('admin-exit-overlay').style.display='flex'">← ออก</button>
   </div>
@@ -766,6 +762,7 @@ var EVENT_OPEN=new Date('2026-07-03T09:00:00+07:00');
    ถ้าใครเปลี่ยนเป็น let/const จะพังเงียบทันที จึงย้ายมาไว้ตรงนี้ให้ชัดเจน */
 var qzDoneMap={}; // {TO:true, ME:true, ...} ฐานที่ user ทำ quiz เสร็จแล้ว
 var surveyDone=false; // restored from doc4 — true เมื่อ user ส่งแบบประเมินแล้ว
+var scanBonusStation=null; // [FIX-9] ฐานที่ user เปิดหน้าสแกน — ต้องตรงกับ QR ที่สแกน
 
 /* FIX-3: stationActive — ฐานที่ admin เปิด/ปิด quiz ได้ (default เปิดหมด)
    ค่าจริงจะถูก override จาก settings.active ที่ backend ส่งมาใน loadHome()/loadAdmin()
@@ -1291,7 +1288,9 @@ function confirmQuitQuiz(){
   showStationToast('ต้องทำ Quiz ให้จบก่อนกดกลับ');
 }
 
-function openStationScan(){closeStationDetail();go('scan-bonus');}
+/* [FIX-9] openStationScan — บันทึกฐานปัจจุบันไว้ใน scanBonusStation
+   เพื่อให้ onBonusScan() ตรวจว่า QR ที่สแกนตรงกับฐานที่คาดหวัง */
+function openStationScan(){scanBonusStation=currentStationDetail;closeStationDetail();go('scan-bonus');}
 
 /* ── Popup (station info) ──
    FIX-6: ลบ onStationClick() ออกแล้ว — เป็น dead code ไม่ถูกเรียกจาก element ใดในระบบ
@@ -1673,6 +1672,11 @@ function onBonusScan(text){
   var now=Date.now();if(bonusBusy||(now-lastBonusScanAt)<2500)return;
   var m=String(text).trim().toUpperCase().match(/^ENS-BONUS-(EE|ME|TO|PM)$/);
   if(!m){showBonusScanResult(false,'QR ไม่ถูกต้อง','ไม่ใช่ QR โบนัสประจำฐาน');lastBonusScanAt=now;return;}
+  /* [FIX-9] ตรวจว่า QR ที่สแกนตรงกับฐานที่ user เปิดอยู่ — ป้องกันสแกนข้ามฐาน */
+  if(scanBonusStation&&m[1]!==scanBonusStation){
+    showBonusScanResult(false,'QR ไม่ตรงกับฐานนี้','คุณอยู่ฐาน '+scanBonusStation+' แต่สแกน QR ฐาน '+m[1]);
+    lastBonusScanAt=now;return;
+  }
   lastBonusScanAt=now;bonusBusy=true;document.getElementById('scan-hint').textContent='กำลังบันทึกคะแนน…';
   apiPost({action:'bonusScan',uid:currentUid,station:m[1]},function(res){
     bonusBusy=false;document.getElementById('scan-hint').textContent='เล็งกล้องไปที่ QR ของฐาน';
