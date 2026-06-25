@@ -31,19 +31,19 @@
   ║  v1.2.0 [BUG-01..04] quiz score/flow/retake/refresh      ║
   ╔══════════════════════════════════════════════════════════╗
   ║  Engineering Synergy 2026                               ║
-  ║  Version : 1.7.2                                        ║
+  ║  Version : 1.7.3                                        ║
   ║  Date    : 2026-06-25                                   ║
   ╠══════════════════════════════════════════════════════════╣
-  ║  v1.7.2 — QUIZ IMAGE SUPPORT                            ║
-  ║  [FIX-10] Quiz รองรับรูปภาพประกอบคำถาม                  ║
-  ║           - qa-qimg-wrap แสดงเมื่อ q.img มีค่า          ║
-  ║           - renderQzQ() show/hide + set src             ║
-  ║           - โหลดรูปล้มเหลว → ซ่อน wrapper อัตโนมัติ    ║
-  ║           ⚠️ GAS: getQuestions() ต้อง return field img  ║
-  ║              sheet questions เพิ่ม column H = image_url ║
+  ║  v1.7.3 — SESSION NOTIFICATION FIX                      ║
+  ║  [FIX-11] เปลี่ยน kick overlay จาก force-logout         ║
+  ║           → แจ้งเตือนให้รีเฟรชหน้าแทน                  ║
+  ║           - ข้อความ: "มีการอัปเดตข้อมูล"               ║
+  ║           - dismissKick() ใช้ window.location.reload()  ║
+  ║             แทน clearSession()+goPreview()              ║
+  ║           - reload → re-verify session → home อัตโนมัติ ║
   ╠══════════════════════════════════════════════════════════╣
 -->
-<title>Engineering Synergy 2026 · v1.7.2</title>
+<title>Engineering Synergy 2026 · v1.7.3</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -370,13 +370,15 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
 
 <!-- HOME -->
 <div id="pg-home" class="page" style="position:relative;">
+  <!-- [FIX-11] เปลี่ยน kick overlay จาก force-logout → แจ้งให้รีเฟรช
+       dismissKick() ใช้ window.location.reload() แทน clearSession()+goPreview() -->
   <div id="kick-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);z-index:300;align-items:flex-end;justify-content:center;">
     <div style="background:#fff;border-radius:24px 24px 0 0;padding:24px 24px 48px;width:100%;max-width:420px;">
       <div style="width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px;"></div>
-      <div style="font-size:28px;margin-bottom:10px;">🔒</div>
-      <div style="font-size:18px;font-weight:700;color:var(--navy);margin-bottom:6px;">ถูกออกจากระบบ</div>
-      <div style="font-size:13px;color:var(--sub);line-height:1.65;margin-bottom:22px;">Admin ได้ reset session ของคุณ<br>กรุณาเข้าสู่ระบบใหม่อีกครั้ง</div>
-      <button class="btn btn-navy" onclick="dismissKick()">รับทราบ เข้าสู่ระบบใหม่</button>
+      <div style="font-size:28px;margin-bottom:10px;">🔄</div>
+      <div style="font-size:18px;font-weight:700;color:var(--navy);margin-bottom:6px;">มีการอัปเดตข้อมูล</div>
+      <div style="font-size:13px;color:var(--sub);line-height:1.65;margin-bottom:22px;">ข้อมูลกิจกรรมมีการเปลี่ยนแปลง<br>กรุณารีเฟรชหน้าเพื่ออัปเดตข้อมูล</div>
+      <button class="btn btn-navy" onclick="dismissKick()">↻ รีเฟรชหน้า</button>
     </div>
   </div>
   <div id="st-popup" style="display:none">
@@ -501,7 +503,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
   <div style="padding-top:22px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center">
     <div>
       <div style="font-size:20px;font-weight:700;color:var(--navy);letter-spacing:-.4px">Admin</div>
-      <div style="font-size:12px;color:var(--muted);margin-top:2px">Engineering Synergy 2026 · v1.7.2</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px">Engineering Synergy 2026 · v1.7.3</div>
     </div>
     <button class="btn-ghost-sm" style="color:var(--muted);font-size:12px" onclick="document.getElementById('admin-exit-overlay').style.display='flex'">← ออก</button>
   </div>
@@ -1052,7 +1054,10 @@ function startSessionPolling(){
 }
 function stopSessionPolling(){if(pollInterval){clearInterval(pollInterval);pollInterval=null;}}
 function showKickNotification(){var o=document.getElementById('kick-overlay');if(o)o.style.display='flex';}
-function dismissKick(){var o=document.getElementById('kick-overlay');if(o)o.style.display='none';currentUid=null;currentToken=null;clearSession();goPreview();}
+/* [FIX-11] dismissKick — reload แทน clearSession()+goPreview()
+   page reload → re-verify session จาก localStorage → กลับ home อัตโนมัติ
+   (ถ้า session ยังอยู่ → home, ถ้าหมดจริง → preview ตามปกติ) */
+function dismissKick(){var o=document.getElementById('kick-overlay');if(o)o.style.display='none';window.location.reload();}
 
 /* ── Home ── */
 function goHome(){go('home');loadHome();startSessionPolling();}
