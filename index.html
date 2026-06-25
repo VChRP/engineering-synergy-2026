@@ -31,17 +31,19 @@
   ║  v1.2.0 [BUG-01..04] quiz score/flow/retake/refresh      ║
   ╔══════════════════════════════════════════════════════════╗
   ║  Engineering Synergy 2026                               ║
-  ║  Version : 1.7.1                                        ║
+  ║  Version : 1.7.2                                        ║
   ║  Date    : 2026-06-25                                   ║
   ╠══════════════════════════════════════════════════════════╣
-  ║  v1.7.1 — BUG FIX                                       ║
-  ║  [FIX-9] สแกน Bonus ข้ามฐานไม่ได้อีกต่อไป              ║
-  ║           - scanBonusStation เก็บฐานที่คาดหวัง          ║
-  ║           - openStationScan() set ค่าก่อน go('scan')    ║
-  ║           - onBonusScan() ตรวจ QR ตรงฐานก่อน API call  ║
+  ║  v1.7.2 — QUIZ IMAGE SUPPORT                            ║
+  ║  [FIX-10] Quiz รองรับรูปภาพประกอบคำถาม                  ║
+  ║           - qa-qimg-wrap แสดงเมื่อ q.img มีค่า          ║
+  ║           - renderQzQ() show/hide + set src             ║
+  ║           - โหลดรูปล้มเหลว → ซ่อน wrapper อัตโนมัติ    ║
+  ║           ⚠️ GAS: getQuestions() ต้อง return field img  ║
+  ║              sheet questions เพิ่ม column H = image_url ║
   ╠══════════════════════════════════════════════════════════╣
 -->
-<title>Engineering Synergy 2026 · v1.7.1</title>
+<title>Engineering Synergy 2026 · v1.7.2</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -499,7 +501,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
   <div style="padding-top:22px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center">
     <div>
       <div style="font-size:20px;font-weight:700;color:var(--navy);letter-spacing:-.4px">Admin</div>
-      <div style="font-size:12px;color:var(--muted);margin-top:2px">Engineering Synergy 2026 · v1.7.1</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px">Engineering Synergy 2026 · v1.7.2</div>
     </div>
     <button class="btn-ghost-sm" style="color:var(--muted);font-size:12px" onclick="document.getElementById('admin-exit-overlay').style.display='flex'">← ออก</button>
   </div>
@@ -647,6 +649,10 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
       <div id="qa-bonus-pill" style="font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid #86efac;color:#10b981;background:#f0fdf4;transition:.3s;">⚡ +5.0</div>
     </div>
     <div id="qa-qcard" style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:13px 14px;margin-bottom:10px;transition:border-color .3s,background .3s;">
+      <!-- [FIX-10] รูปประกอบคำถาม — แสดงเมื่อ q.img มีค่า โหลดจาก URL ใน sheet questions column H -->
+      <div id="qa-qimg-wrap" style="display:none;margin:-13px -14px 12px;border-radius:12px 12px 0 0;overflow:hidden;background:var(--bg3);border-bottom:1px solid var(--border);min-height:140px;display:none;align-items:center;justify-content:center;">
+        <img id="qa-qimg" src="" alt="รูปประกอบคำถาม" style="width:100%;max-height:220px;object-fit:contain;display:block;">
+      </div>
       <div id="qa-qnum" style="font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:5px;">คำถามที่ 1</div>
       <div id="qa-qtext" style="font-size:14px;font-weight:600;line-height:1.6;color:var(--navy);"></div>
     </div>
@@ -1545,6 +1551,17 @@ function renderQzQ(){
   document.getElementById('qa-prog').style.width=(qzCur/qzQuestions.length*100)+'%';
   document.getElementById('qa-qnum').textContent='คำถามที่ '+(qzCur+1);
   document.getElementById('qa-qtext').textContent=q.q;
+  /* [FIX-10] แสดงรูปถ้า q.img มีค่า / ซ่อนถ้าไม่มี */
+  var imgWrap=document.getElementById('qa-qimg-wrap');
+  var imgEl=document.getElementById('qa-qimg');
+  if(q.img){
+    imgEl.src=q.img;
+    imgEl.onerror=function(){imgWrap.style.display='none';};
+    imgWrap.style.display='flex';
+  } else {
+    imgWrap.style.display='none';
+    imgEl.src='';
+  }
   document.getElementById('qa-result').style.display='none';
   document.getElementById('qa-confirm').style.display='none';
   document.getElementById('qa-next').disabled=true;document.getElementById('qa-next').style.opacity='.3';
