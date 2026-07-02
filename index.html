@@ -31,20 +31,21 @@
   ║  v1.2.0 [BUG-01..04] quiz score/flow/retake/refresh      ║
   ╔══════════════════════════════════════════════════════════╗
   ║  Engineering Synergy 2026                               ║
-  ║  Version : 1.8.14                                       ║
+  ║  Version : 1.8.15                                       ║
   ║  Date    : 2026-07-02                                   ║
   ╠══════════════════════════════════════════════════════════╣
-  ║  v1.8.14 — STALE DATA FIX (3 จุด)                       ║
-  ║  [1] enterScanBonus — เคลียร์ #sb-result ทันที          ║
-  ║      + โชว์ "กำลังตรวจสอบ..." กันข้อความฐานเก่าค้าง     ║
-  ║  [2] startQzStation — เคลียร์ครบทุก UI chrome           ║
-  ║      (counter/score/progress/timer/result/next button) ║
-  ║      กันฐานเก่าปนฐานใหม่ระหว่างรอโหลดคำถาม             ║
-  ║  [3] loadStationStats (admin) — โชว์ "กำลังโหลด..."     ║
-  ║      กันเลขสถิติเก่าค้างตอนสลับแท็บกลับมา (severity ต่ำ)║
+  ║  v1.8.15 — BACK GUARD: รองรับทั้ง iOS และ Android       ║
+  ║  [ปัญหา v1.8.13] popstate อย่างเดียวดักไม่ทัน Android   ║
+  ║  Predictive Back animation บางเครื่อง — หลุดออกแอปได้   ║
+  ║  FIX: เพิ่ม 2 ชั้นการป้องกัน                             ║
+  ║  Layer 1: Navigation API (Chrome/Edge) — ดัก synchronous║
+  ║           ก่อนเปลี่ยนหน้าจริง แก้ปัญหา animation ไม่ทัน  ║
+  ║  Layer 2: pushState/popstate — fallback สำหรับ iOS      ║
+  ║           Safari + universal (เดิม) เสริม buffer 2 ชั้น ║
+  ║           กันกด/swipe รัวเร็วเกิน JS ตามทัน              ║
   ╠══════════════════════════════════════════════════════════╣
 -->
-<title>Engineering Synergy 2026 · v1.8.14</title>
+<title>Engineering Synergy 2026 · v1.8.15</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -590,7 +591,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
   <div style="padding-top:22px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center">
     <div>
       <div style="font-size:20px;font-weight:700;color:var(--navy);letter-spacing:-.4px">Admin</div>
-      <div style="font-size:12px;color:var(--muted);margin-top:2px">Engineering Synergy 2026 · v1.8.14</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px">Engineering Synergy 2026 · v1.8.15</div>
     </div>
     <button class="btn-ghost-sm" style="color:var(--muted);font-size:12px" onclick="document.getElementById('admin-exit-overlay').style.display='flex'">← ออก</button>
   </div>
@@ -849,7 +850,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
    Engineering Synergy 2026 · v1.6.0
    Fixes: BUG-01..08 + FIX-1..6 (Active/Disable Quiz)
 ═══════════════════════════════════════════════════════ */
-var APP_VERSION='1.8.14';
+var APP_VERSION='1.8.15';
 
 var API='https://script.google.com/macros/s/AKfycbx8jJ-Mq3mLAwWS_ZhAxiUKbibP_qBbV2WUIUGQvGoIzduY3C-UI12aRGh6D4aFew9h/exec';
 /* [FIX-7] ADMIN_PASS ย้ายไปเก็บใน GAS backend แล้ว (verifyAdmin)
@@ -913,13 +914,17 @@ function hideLoad(){document.getElementById('loading').classList.remove('show');
 function showErr(el,msg){el.textContent=msg;el.style.display='block';}
 
 /* ── Nav ── */
-/* [v1.8.13] Popstate guard — กันหลุดแอปตอนกดปุ่ม back ของมือถือ (navigation bar/gesture)
-   เปลี่ยนจาก v1.8.8: ตัดข้อยกเว้น home/preview ออก — กันทุกหน้าแบบไม่มีทางออกเลย
-   (เดิมปล่อยให้ออกจาก home/preview ได้ แต่การกดครั้งแรกไม่มี feedback ให้เห็น
-   ทำให้ user กดซ้ำแล้วหลุดออกจากแอปจริงๆ ตอนกดครั้งที่ 2 — จึงตัดข้อยกเว้นทิ้งทั้งหมด)
+/* [v1.8.15] Universal back-button guard — ป้องกันทั้ง iOS และ Android
+   Layer 1: Navigation API (window.navigation) — Chrome/Edge/Android
+            ดักได้ synchronous ก่อนเปลี่ยนหน้าจริง แก้ปัญหา Android Predictive
+            Back animation ที่ popstate ดักไม่ทัน (fire หลังเริ่ม animation ไปแล้ว)
+   Layer 2: pushState/popstate — fallback สำหรับ iOS Safari และเบราว์เซอร์ที่ไม่มี
+            Navigation API (ยังคงทำงานคู่กันบน Chrome เป็น defense-in-depth ด้วย)
+   เสริมความทนทาน: ดัน guard entry สำรอง 2 ชั้นทุกครั้ง กันกด/swipe รัวเร็วเกิน JS ตามทัน
    ออกจากแอปได้ทางเดียว: กดปุ่ม "ออกจากระบบ" ในแอป หรือปิดแท็บ/เบราว์เซอร์เอง */
-function pushGuardState(){history.pushState({guard:true},'');}
-window.addEventListener('popstate',function(){
+var GUARD_BUFFER=2;
+function pushGuardState(){for(var i=0;i<GUARD_BUFFER;i++){history.pushState({guard:true},'');}}
+function handleBackAttempt(){
   var quizActive=document.getElementById('quiz-active-view')&&document.getElementById('quiz-active-view').style.display==='block';
   if(quizActive){
     showStationToast('ต้องทำ Quiz ให้จบก่อนกดกลับ');
@@ -952,9 +957,19 @@ window.addEventListener('popstate',function(){
     pushGuardState();
     return;
   }
-  /* [v1.8.13] อยู่ home/preview ก็ยังกันเหมือนกัน — ไม่มีข้อยกเว้นแล้ว ออกไม่ได้เลย */
+  /* อยู่ home/preview ก็ยังกันเหมือนกัน — ไม่มีข้อยกเว้น ออกไม่ได้เลย */
   pushGuardState();
-});
+}
+/* Layer 1: Navigation API — ดักก่อนเปลี่ยนหน้าจริง (รองรับเฉพาะ Chrome/Edge) */
+if('navigation' in window){
+  window.navigation.addEventListener('navigate',function(e){
+    if(e.navigationType==='traverse'){
+      e.intercept({handler:function(){handleBackAttempt();return Promise.resolve();}});
+    }
+  });
+}
+/* Layer 2: pushState/popstate — fallback หลักสำหรับ iOS Safari + universal */
+window.addEventListener('popstate',function(){handleBackAttempt();});
 
 function go(page,param){
   stopQR();
