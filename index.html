@@ -31,25 +31,19 @@
   ║  v1.2.0 [BUG-01..04] quiz score/flow/retake/refresh      ║
   ╔══════════════════════════════════════════════════════════╗
   ║  Engineering Synergy 2026                               ║
-  ║  Version : 1.8.8                                        ║
+  ║  Version : 1.8.10                                       ║
   ║  Date    : 2026-07-02                                   ║
   ╠══════════════════════════════════════════════════════════╣
-  ║  v1.8.8 — 6-ITEM BATCH UPDATE                           ║
-  ║  [1] Popstate guard — กันหลุดแอปตอนกดปุ่ม back มือถือ   ║
-  ║      กันเด็ดขาดตอนทำ Quiz + จัดการ overlay/admin/scan   ║
-  ║  [2] Coming Soon bg slideshow — crossfade 2-layer      ║
-  ║      + จางลง 50% (BG_FADE_OPACITY=.5) แทนสลับดื้อๆ     ║
-  ║  [3] Version indicator หน้า Preview (9px, opacity .4)   ║
-  ║      + sync APP_VERSION ให้ตรงกับ version จริงเสมอ      ║
-  ║  [4] "Engineering Synergy 2026" ตัวใหญ่ขึ้น (13→17px)   ║
-  ║  [5] ซ่อนปุ่ม "บันทึกเข้าปฏิทิน" (คง fn ไว้เผื่อใช้)    ║
-  ║  [6] Odometer countdown — ตัดหน่วย "วัน" ออก            ║
-  ║      เหลือ ชม:นาที:วินาที + roll-up animation ทุกวินาที  ║
-  ║      ⚠️ ลบ CSS class เดิม cd-row/cd-unit/cd-sep ทิ้ง    ║
-  ║      แก้ cs-bg selector ให้ตรงกับ .od-* (กัน conflict)  ║
+  ║  v1.8.10 — BUG FIX: popstate go('home') blank screen    ║
+  ║  [BUG] scanActive + fallback branch ใน popstate handler ║
+  ║  เรียก go('home') ตรงๆ แทน goHome() → ไม่เรียก loadHome ║
+  ║  ทำให้หน้า home โชว์ว่างเปล่า ("แอพหาย") ตอนกดปุ่ม back ║
+  ║  FIX: เปลี่ยนเป็น goHome() + เช็ค currentUid&&currentToken║
+  ║  (เดิมเช็คแค่ currentUid ทำให้ coming-soon registerOnly  ║
+  ║   ที่ยังไม่มี session ถูกพาไป home ผิดๆ)                ║
   ╠══════════════════════════════════════════════════════════╣
 -->
-<title>Engineering Synergy 2026 · v1.8.8</title>
+<title>Engineering Synergy 2026 · v1.8.10</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -426,7 +420,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
   <!-- [v1.8.1] bg slideshow overlay — แสดงเมื่อ startBgSlideshow() -->
   <div id="cs-bg-overlay" style="display:none;position:absolute;inset:0;background:rgba(0,0,10,.58);z-index:1;pointer-events:none;"></div>
   <div class="coming-wrap" style="position:relative;z-index:2;">
-    <div style="font-size:17px;font-weight:700;color:var(--accent);letter-spacing:.5px;text-transform:uppercase;margin-bottom:14px;">Engineering Synergy 2026</div>
+    <div style="font-size:22px;font-weight:700;color:var(--accent);letter-spacing:1px;text-transform:uppercase;margin-bottom:14px;text-shadow:0 2px 10px rgba(0,0,0,.25);">Engineering Synergy 2026</div>
     <div style="font-size:28px;font-weight:700;color:var(--navy);letter-spacing:-.5px;margin-bottom:8px;">Coming Soon</div>
     <div style="font-size:14px;color:var(--muted);line-height:1.85;margin-bottom:20px;">แล้วพบกัน<br>วันศุกร์ที่ 3 กรกฎาคม 2569 เวลา 09:00 น.<br>ณ Shop floor ฝ่ายวิศวกรรม</div>
     <div class="cd-box">
@@ -595,7 +589,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
   <div style="padding-top:22px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center">
     <div>
       <div style="font-size:20px;font-weight:700;color:var(--navy);letter-spacing:-.4px">Admin</div>
-      <div style="font-size:12px;color:var(--muted);margin-top:2px">Engineering Synergy 2026 · v1.8.8</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px">Engineering Synergy 2026 · v1.8.10</div>
     </div>
     <button class="btn-ghost-sm" style="color:var(--muted);font-size:12px" onclick="document.getElementById('admin-exit-overlay').style.display='flex'">← ออก</button>
   </div>
@@ -854,7 +848,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
    Engineering Synergy 2026 · v1.6.0
    Fixes: BUG-01..08 + FIX-1..6 (Active/Disable Quiz)
 ═══════════════════════════════════════════════════════ */
-var APP_VERSION='1.8.8';
+var APP_VERSION='1.8.10';
 
 var API='https://script.google.com/macros/s/AKfycbx8jJ-Mq3mLAwWS_ZhAxiUKbibP_qBbV2WUIUGQvGoIzduY3C-UI12aRGh6D4aFew9h/exec';
 /* [FIX-7] ADMIN_PASS ย้ายไปเก็บใน GAS backend แล้ว (verifyAdmin)
@@ -946,14 +940,14 @@ window.addEventListener('popstate',function(){
   var scanActive=document.getElementById('pg-scan-bonus')&&document.getElementById('pg-scan-bonus').classList.contains('active');
   if(scanActive){
     stopBonusScanner();
-    go('home');
+    if(currentUid&&currentToken){goHome();}else{go('preview');}
     pushGuardState();
     return;
   }
   var homeActive=document.getElementById('pg-home')&&document.getElementById('pg-home').classList.contains('active');
   var previewActive=document.getElementById('pg-preview')&&document.getElementById('pg-preview').classList.contains('active');
   if(!homeActive&&!previewActive){
-    go(currentUid?'home':'preview');
+    if(currentUid&&currentToken){goHome();}else{go('preview');}
     pushGuardState();
     return;
   }
@@ -1001,41 +995,79 @@ function loadSessionToken(){try{return localStorage.getItem('eoh_token');}catch(
 function clearSession(){try{localStorage.removeItem('eoh_uid');localStorage.removeItem('eoh_token');}catch(e){}}
 
 /* ── Countdown ── */
-/* [v1.8.8] Odometer countdown — ตัดหน่วย "วัน" ออก เหลือ ชม:นาที:วินาที
-   สร้าง digit strips (0-9) แบบ lazy init ครั้งแรก แล้วเลื่อน translateY ทุก tick */
-var odHrsStrips=null,odMinsStrips=null,odSecsStrips=null;
-function makeOdDigit(container){
+/* [v1.8.9] Odometer countdown — หมุนทางเดียวเสมอ (ไม่ย้อนกลับตอนตัวเลขข้ามรอบ เช่น 00→59)
+   หลักการ: strip เรียงเลขถอยหลัง 9,8,7...0 วนซ้ำ 2 รอบ (20 ช่อง)
+   ทุก tick คำนวณ "จำนวนก้าวที่ต้องเลื่อน" จากค่าเก่า→ใหม่แบบ modulo (ไม่ใช้ตำแหน่งสัมบูรณ์)
+   ทำให้ strip เลื่อนไปทิศเดียว (ลง) เสมอ ไม่ว่าค่าจริงจะเพิ่มหรือลดก็ตาม
+   หลัง transition จบ จะ "รีเซ็ตเงียบ" กลับรอบแรกแบบไม่มี animation (มองไม่เห็นเพราะเลขซ้ำกัน) */
+var ODO_ROW_H=46,ODO_CYCLES=2;
+var odHrsState=null,odMinsState=null,odSecsState=null;
+function makeOdDigit(container,initVal){
   var box=document.createElement('div');
   box.className='od-digit';
   var strip=document.createElement('div');
   strip.className='od-strip';
-  for(var i=0;i<10;i++){var s=document.createElement('span');s.textContent=i;strip.appendChild(s);}
+  for(var c=0;c<ODO_CYCLES;c++){for(var d=9;d>=0;d--){var s=document.createElement('span');s.textContent=d;strip.appendChild(s);}}
   box.appendChild(strip);
   container.appendChild(box);
-  return strip;
+  var startSlot=9-initVal; /* ตำแหน่งของค่าเริ่มต้นในรอบแรก (เลขเรียงถอยหลัง 9..0) */
+  strip.style.transition='none';
+  strip.style.transform='translateY(-'+(startSlot*ODO_ROW_H)+'px)';
+  return {strip:strip,slot:startSlot,val:initVal};
 }
-function initOdometer(){
-  if(odHrsStrips)return; /* กันสร้างซ้ำ */
+function stepOdDigit(state,newVal){
+  if(state.val===newVal)return; /* ค่าไม่เปลี่ยน ไม่ต้องขยับ */
+  var steps=(state.val-newVal+10)%10; /* จำนวนก้าวเลื่อนลง (modulo กันค่าติดลบ) */
+  var newSlot=state.slot+steps;
+  requestAnimationFrame(function(){
+    state.strip.style.transition='';
+    state.strip.style.transform='translateY(-'+(newSlot*ODO_ROW_H)+'px)';
+  });
+  state.val=newVal;
+  state.slot=newSlot;
+  /* ถ้าเลื่อนเข้ารอบที่ 2 แล้ว → รอ transition จบแล้วรีเซ็ตกลับรอบแรกแบบไม่มี animation (มองไม่เห็น) */
+  if(newSlot>=10){
+    setTimeout(function(){
+      state.slot=newSlot-10;
+      state.strip.style.transition='none';
+      state.strip.style.transform='translateY(-'+(state.slot*ODO_ROW_H)+'px)';
+      void state.strip.offsetWidth; /* force reflow */
+      state.strip.style.transition='';
+    },550);
+  }
+}
+function initOdometer(h,m,s){
+  if(odHrsState)return; /* กันสร้างซ้ำ */
   var hrsEl=document.getElementById('od-hrs'),minsEl=document.getElementById('od-mins'),secsEl=document.getElementById('od-secs');
   if(!hrsEl||!minsEl||!secsEl)return;
-  odHrsStrips=[makeOdDigit(hrsEl),makeOdDigit(hrsEl)];
-  odMinsStrips=[makeOdDigit(minsEl),makeOdDigit(minsEl)];
-  odSecsStrips=[makeOdDigit(secsEl),makeOdDigit(secsEl)];
+  var hs=String(h).padStart(2,'0'),ms=String(m).padStart(2,'0'),ss=String(s).padStart(2,'0');
+  odHrsState=[makeOdDigit(hrsEl,parseInt(hs[0])),makeOdDigit(hrsEl,parseInt(hs[1]))];
+  odMinsState=[makeOdDigit(minsEl,parseInt(ms[0])),makeOdDigit(minsEl,parseInt(ms[1]))];
+  odSecsState=[makeOdDigit(secsEl,parseInt(ss[0])),makeOdDigit(secsEl,parseInt(ss[1]))];
 }
-function setOdPair(strips,num){
-  if(!strips)return;
+function setOdPair(states,num){
+  if(!states)return;
   var s=String(num).padStart(2,'0');
-  strips[0].style.transform='translateY(-'+(parseInt(s[0])*46)+'px)';
-  strips[1].style.transform='translateY(-'+(parseInt(s[1])*46)+'px)';
+  stepOdDigit(states[0],parseInt(s[0]));
+  stepOdDigit(states[1],parseInt(s[1]));
 }
+var countdownZeroTriggered=false; /* [v1.8.9] กันเรียก slideshow ซ้ำเมื่อนับถึง 0 */
 function updateCountdown(){
-  initOdometer();
   var diff=EVENT_OPEN-new Date();
-  if(diff<=0){setOdPair(odHrsStrips,0);setOdPair(odMinsStrips,0);setOdPair(odSecsStrips,0);return;}
-  var h=Math.floor(diff/3600000),m=Math.floor((diff%3600000)/60000),s=Math.floor((diff%60000)/1000);
-  setOdPair(odHrsStrips,h);
-  setOdPair(odMinsStrips,m);
-  setOdPair(odSecsStrips,s);
+  var h=diff>0?Math.floor(diff/3600000):0,m=diff>0?Math.floor((diff%3600000)/60000):0,s=diff>0?Math.floor((diff%60000)/1000):0;
+  initOdometer(h,m,s); /* ครั้งแรกเท่านั้น — ครั้งต่อไปฟังก์ชันจะ no-op เอง */
+  setOdPair(odHrsState,h);
+  setOdPair(odMinsState,m);
+  setOdPair(odSecsState,s);
+  /* [v1.8.9] นับถึง 00:00:00 → เข้า slideshow 4 หน้าอัตโนมัติ (ครั้งเดียว กันเรียกซ้ำทุก tick) */
+  if(diff<=0&&!countdownZeroTriggered){
+    countdownZeroTriggered=true;
+    setTimeout(function(){
+      stopBgSlideshow(); /* หยุด loop bg ก่อน ไม่งั้นจะซ้อนกับ one-shot slideshow */
+      introTarget='entry';introLoop=false;introDurCurrent=INTRO_DUR;
+      showIntroSlideshow();
+    },400);
+  }
 }
 
 /* [FIX-8] loadComingSoonCount — แสดงยอดผู้ลงทะเบียนในหน้า Coming Soon
