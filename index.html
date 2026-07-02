@@ -31,16 +31,25 @@
   ║  v1.2.0 [BUG-01..04] quiz score/flow/retake/refresh      ║
   ╔══════════════════════════════════════════════════════════╗
   ║  Engineering Synergy 2026                               ║
-  ║  Version : 1.8.6                                        ║
+  ║  Version : 1.8.8                                        ║
   ║  Date    : 2026-07-02                                   ║
   ╠══════════════════════════════════════════════════════════╣
-  ║  v1.8.6 — QUIZ CACHE-BUSTING FIX                        ║
-  ║  [BUG] startQzStation ใช้ raw fetch() ไม่มี timestamp   ║
-  ║  → browser cache คำถามเก่า แม้อัปเดต sheet แล้ว        ║
-  ║  FIX: เพิ่ม &t=Date.now() + loading state + null safety ║
+  ║  v1.8.8 — 6-ITEM BATCH UPDATE                           ║
+  ║  [1] Popstate guard — กันหลุดแอปตอนกดปุ่ม back มือถือ   ║
+  ║      กันเด็ดขาดตอนทำ Quiz + จัดการ overlay/admin/scan   ║
+  ║  [2] Coming Soon bg slideshow — crossfade 2-layer      ║
+  ║      + จางลง 50% (BG_FADE_OPACITY=.5) แทนสลับดื้อๆ     ║
+  ║  [3] Version indicator หน้า Preview (9px, opacity .4)   ║
+  ║      + sync APP_VERSION ให้ตรงกับ version จริงเสมอ      ║
+  ║  [4] "Engineering Synergy 2026" ตัวใหญ่ขึ้น (13→17px)   ║
+  ║  [5] ซ่อนปุ่ม "บันทึกเข้าปฏิทิน" (คง fn ไว้เผื่อใช้)    ║
+  ║  [6] Odometer countdown — ตัดหน่วย "วัน" ออก            ║
+  ║      เหลือ ชม:นาที:วินาที + roll-up animation ทุกวินาที  ║
+  ║      ⚠️ ลบ CSS class เดิม cd-row/cd-unit/cd-sep ทิ้ง    ║
+  ║      แก้ cs-bg selector ให้ตรงกับ .od-* (กัน conflict)  ║
   ╠══════════════════════════════════════════════════════════╣
 -->
-<title>Engineering Synergy 2026 · v1.8.7</title>
+<title>Engineering Synergy 2026 · v1.8.8</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -174,12 +183,17 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
 /* ── Coming Soon ── */
 .coming-wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 0;}
 .cd-box{background:var(--bg2);border:1.5px solid var(--border);border-radius:20px;padding:24px 28px;width:100%;max-width:320px;margin:0 auto 24px;}
-.cd-row{display:flex;justify-content:center;align-items:flex-end;gap:4px;}
-.cd-unit{text-align:center;min-width:52px;}
-.cd-unit-num{font-size:32px;font-weight:700;color:var(--navy);line-height:1;font-variant-numeric:tabular-nums;}
-.cd-unit-num.accent{color:var(--accent);}
-.cd-unit-lbl{font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-top:4px;}
-.cd-sep{font-size:26px;font-weight:300;color:var(--border2);padding-bottom:8px;}
+/* [v1.8.8] Odometer-style countdown — แทน cd-row/cd-unit เดิม */
+.od-wrap{display:flex;justify-content:center;align-items:flex-end;gap:12px;}
+.od-group{display:flex;flex-direction:column;align-items:center;gap:8px;}
+.od-digits{display:flex;gap:3px;}
+.od-digit{position:relative;width:32px;height:46px;border-radius:6px;background:linear-gradient(180deg,#2f2f2f 0%,#1a1a1a 100%);box-shadow:0 2px 6px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.05);overflow:hidden;}
+.od-digit .od-strip{position:absolute;left:0;right:0;top:0;display:flex;flex-direction:column;transition:transform .5s cubic-bezier(.4,0,.2,1);}
+.od-digit .od-strip span{height:46px;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Sans Thai',monospace;font-size:24px;font-weight:600;color:#f0ede4;line-height:1;font-variant-numeric:tabular-nums;}
+.od-digit::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.3) 0%,transparent 18%,transparent 82%,rgba(0,0,0,.3) 100%);pointer-events:none;z-index:2;}
+.od-label{font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;}
+.od-sep{font-size:22px;font-weight:300;color:var(--border2);padding-bottom:16px;}
+
 
 /* ── Scan bonus (user) ── */
 .me-bar{display:flex;align-items:center;gap:10px;background:var(--blue-light);border:1px solid #bfdbfe;border-radius:12px;padding:11px 14px;margin-bottom:16px;}
@@ -205,9 +219,8 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
 /* ── Coming Soon bg slideshow mode ── */
 #pg-coming.cs-bg .coming-wrap{text-shadow:0 1px 4px rgba(0,0,0,.6);}
 #pg-coming.cs-bg .cd-box{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);}
-#pg-coming.cs-bg .cd-unit-num{color:#fff!important;}
-#pg-coming.cs-bg .cd-unit-num.accent{color:#93c5fd!important;}
-#pg-coming.cs-bg .cd-unit-lbl,#pg-coming.cs-bg .cd-sep{color:rgba(255,255,255,.65)!important;}
+#pg-coming.cs-bg .od-label{color:rgba(255,255,255,.65)!important;}
+#pg-coming.cs-bg .od-sep{color:rgba(255,255,255,.65)!important;}
 #pg-coming.cs-bg .btn-outline{color:#fff!important;border-color:rgba(255,255,255,.35)!important;background:rgba(255,255,255,.08)!important;}
 #pg-coming.cs-bg #cs-reg-wrap>div{background:rgba(255,255,255,.12)!important;border-color:rgba(255,255,255,.2)!important;}
 #pg-coming.cs-bg #cs-reg-count{color:#fff!important;}
@@ -366,6 +379,8 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
       <button class="btn-ghost-sm" style="color:var(--muted);font-size:12px" onclick="go('reset-pass')">ลืมรหัสผ่าน?</button>
     </div>
   </div>
+  <!-- [v1.8.8] version indicator — เล็ก จาง ไม่สะดุดตา -->
+  <div id="pv-app-version" style="position:absolute;bottom:10px;right:14px;font-size:9px;color:var(--muted);opacity:.4;letter-spacing:.3px;pointer-events:none;z-index:1;"></div>
 </div>
 
 <div id="pg-register" class="page"></div>
@@ -405,22 +420,32 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
 
 <!-- COMING SOON -->
 <div id="pg-coming" class="page" style="position:relative;overflow:hidden;">
+  <!-- [v1.8.8] crossfade image layers — สลับกันแสดงด้วย opacity transition แทนเปลี่ยน backgroundImage ตรงๆ -->
+  <div id="cs-bg-layer-a" style="display:none;position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transition:opacity 1.2s ease;z-index:0;"></div>
+  <div id="cs-bg-layer-b" style="display:none;position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transition:opacity 1.2s ease;z-index:0;"></div>
   <!-- [v1.8.1] bg slideshow overlay — แสดงเมื่อ startBgSlideshow() -->
-  <div id="cs-bg-overlay" style="display:none;position:absolute;inset:0;background:rgba(0,0,10,.58);z-index:0;pointer-events:none;"></div>
-  <div class="coming-wrap" style="position:relative;z-index:1;">
-    <div style="font-size:13px;font-weight:600;color:var(--accent);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;">Engineering Synergy 2026</div>
+  <div id="cs-bg-overlay" style="display:none;position:absolute;inset:0;background:rgba(0,0,10,.58);z-index:1;pointer-events:none;"></div>
+  <div class="coming-wrap" style="position:relative;z-index:2;">
+    <div style="font-size:17px;font-weight:700;color:var(--accent);letter-spacing:.5px;text-transform:uppercase;margin-bottom:14px;">Engineering Synergy 2026</div>
     <div style="font-size:28px;font-weight:700;color:var(--navy);letter-spacing:-.5px;margin-bottom:8px;">Coming Soon</div>
     <div style="font-size:14px;color:var(--muted);line-height:1.85;margin-bottom:20px;">แล้วพบกัน<br>วันศุกร์ที่ 3 กรกฎาคม 2569 เวลา 09:00 น.<br>ณ Shop floor ฝ่ายวิศวกรรม</div>
     <div class="cd-box">
       <div style="font-size:10px;font-weight:600;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;margin-bottom:16px;">เหลือเวลา</div>
-      <div class="cd-row">
-        <div class="cd-unit"><div class="cd-unit-num" id="cd-days">--</div><div class="cd-unit-lbl">วัน</div></div>
-        <div class="cd-sep">:</div>
-        <div class="cd-unit"><div class="cd-unit-num" id="cd-hours">--</div><div class="cd-unit-lbl">ชม.</div></div>
-        <div class="cd-sep">:</div>
-        <div class="cd-unit"><div class="cd-unit-num" id="cd-mins">--</div><div class="cd-unit-lbl">นาที</div></div>
-        <div class="cd-sep">:</div>
-        <div class="cd-unit"><div class="cd-unit-num accent" id="cd-secs">--</div><div class="cd-unit-lbl">วินาที</div></div>
+      <div class="od-wrap">
+        <div class="od-group">
+          <div class="od-digits" id="od-hrs"></div>
+          <div class="od-label">ชม.</div>
+        </div>
+        <div class="od-sep">:</div>
+        <div class="od-group">
+          <div class="od-digits" id="od-mins"></div>
+          <div class="od-label">นาที</div>
+        </div>
+        <div class="od-sep">:</div>
+        <div class="od-group">
+          <div class="od-digits" id="od-secs"></div>
+          <div class="od-label">วินาที</div>
+        </div>
       </div>
     </div>
     <!-- [FIX-8] ยอดผู้ลงทะเบียน — โหลดจาก loadComingSoonCount() ตอนแสดงหน้านี้ -->
@@ -430,7 +455,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
         <span style="font-size:13px;color:var(--sub);">คน ลงทะเบียนแล้ว</span>
       </div>
     </div>
-    <button onclick="addToCalendar()" style="width:100%;max-width:240px;padding:13px;background:var(--navy);border:none;border-radius:13px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:8px;">📅 บันทึกเข้าปฏิทิน</button>
+    <button onclick="addToCalendar()" style="display:none;width:100%;max-width:240px;padding:13px;background:var(--navy);border:none;border-radius:13px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:10px;align-items:center;justify-content:center;gap:8px;">📅 บันทึกเข้าปฏิทิน</button>
     <button class="btn-outline" style="max-width:240px;margin:0 auto;" onclick="goPreview()">← กลับหน้าหลัก</button>
   </div>
 </div>
@@ -570,7 +595,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
   <div style="padding-top:22px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center">
     <div>
       <div style="font-size:20px;font-weight:700;color:var(--navy);letter-spacing:-.4px">Admin</div>
-      <div style="font-size:12px;color:var(--muted);margin-top:2px">Engineering Synergy 2026 · v1.8.7</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px">Engineering Synergy 2026 · v1.8.8</div>
     </div>
     <button class="btn-ghost-sm" style="color:var(--muted);font-size:12px" onclick="document.getElementById('admin-exit-overlay').style.display='flex'">← ออก</button>
   </div>
@@ -829,7 +854,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
    Engineering Synergy 2026 · v1.6.0
    Fixes: BUG-01..08 + FIX-1..6 (Active/Disable Quiz)
 ═══════════════════════════════════════════════════════ */
-var APP_VERSION='1.7.0';
+var APP_VERSION='1.8.8';
 
 var API='https://script.google.com/macros/s/AKfycbx8jJ-Mq3mLAwWS_ZhAxiUKbibP_qBbV2WUIUGQvGoIzduY3C-UI12aRGh6D4aFew9h/exec';
 /* [FIX-7] ADMIN_PASS ย้ายไปเก็บใน GAS backend แล้ว (verifyAdmin)
@@ -893,6 +918,48 @@ function hideLoad(){document.getElementById('loading').classList.remove('show');
 function showErr(el,msg){el.textContent=msg;el.style.display='block';}
 
 /* ── Nav ── */
+/* [v1.8.8] Popstate guard — กันหลุดแอปตอนกดปุ่ม back ของมือถือ (navigation bar/gesture)
+   หลักการ: pushState สร้าง history entry กันชนไว้ 1 ชั้น แล้วดัก popstate event
+   - กำลังทำ Quiz อยู่ → เตือน + pushState ใหม่ทันที (กันหลุดเด็ดขาด)
+   - อยู่หน้าอื่นที่ไม่ใช่ home/preview → พาไป home/ปิด overlay แทน + pushState ใหม่
+   - อยู่ home/preview (จุดเริ่มต้น) → ปล่อยผ่านให้ออกแอปได้ตามปกติ (ไม่ block ทั้งหมด) */
+function pushGuardState(){history.pushState({guard:true},'');}
+window.addEventListener('popstate',function(){
+  var quizActive=document.getElementById('quiz-active-view')&&document.getElementById('quiz-active-view').style.display==='block';
+  if(quizActive){
+    showStationToast('ต้องทำ Quiz ให้จบก่อนกดกลับ');
+    pushGuardState();
+    return;
+  }
+  var stDetail=document.getElementById('st-detail-overlay');
+  if(stDetail&&stDetail.style.display==='block'){
+    closeStationDetail();
+    pushGuardState();
+    return;
+  }
+  var admActive=document.getElementById('pg-admin')&&document.getElementById('pg-admin').classList.contains('active');
+  if(admActive){
+    goPreview();
+    pushGuardState();
+    return;
+  }
+  var scanActive=document.getElementById('pg-scan-bonus')&&document.getElementById('pg-scan-bonus').classList.contains('active');
+  if(scanActive){
+    stopBonusScanner();
+    go('home');
+    pushGuardState();
+    return;
+  }
+  var homeActive=document.getElementById('pg-home')&&document.getElementById('pg-home').classList.contains('active');
+  var previewActive=document.getElementById('pg-preview')&&document.getElementById('pg-preview').classList.contains('active');
+  if(!homeActive&&!previewActive){
+    go(currentUid?'home':'preview');
+    pushGuardState();
+    return;
+  }
+  /* อยู่ home/preview แล้ว → ปล่อยให้ออกแอปได้ตามปกติ ไม่ pushState ซ้ำ */
+});
+
 function go(page,param){
   stopQR();
   stopBonusScanner();
@@ -934,14 +1001,41 @@ function loadSessionToken(){try{return localStorage.getItem('eoh_token');}catch(
 function clearSession(){try{localStorage.removeItem('eoh_uid');localStorage.removeItem('eoh_token');}catch(e){}}
 
 /* ── Countdown ── */
+/* [v1.8.8] Odometer countdown — ตัดหน่วย "วัน" ออก เหลือ ชม:นาที:วินาที
+   สร้าง digit strips (0-9) แบบ lazy init ครั้งแรก แล้วเลื่อน translateY ทุก tick */
+var odHrsStrips=null,odMinsStrips=null,odSecsStrips=null;
+function makeOdDigit(container){
+  var box=document.createElement('div');
+  box.className='od-digit';
+  var strip=document.createElement('div');
+  strip.className='od-strip';
+  for(var i=0;i<10;i++){var s=document.createElement('span');s.textContent=i;strip.appendChild(s);}
+  box.appendChild(strip);
+  container.appendChild(box);
+  return strip;
+}
+function initOdometer(){
+  if(odHrsStrips)return; /* กันสร้างซ้ำ */
+  var hrsEl=document.getElementById('od-hrs'),minsEl=document.getElementById('od-mins'),secsEl=document.getElementById('od-secs');
+  if(!hrsEl||!minsEl||!secsEl)return;
+  odHrsStrips=[makeOdDigit(hrsEl),makeOdDigit(hrsEl)];
+  odMinsStrips=[makeOdDigit(minsEl),makeOdDigit(minsEl)];
+  odSecsStrips=[makeOdDigit(secsEl),makeOdDigit(secsEl)];
+}
+function setOdPair(strips,num){
+  if(!strips)return;
+  var s=String(num).padStart(2,'0');
+  strips[0].style.transform='translateY(-'+(parseInt(s[0])*46)+'px)';
+  strips[1].style.transform='translateY(-'+(parseInt(s[1])*46)+'px)';
+}
 function updateCountdown(){
+  initOdometer();
   var diff=EVENT_OPEN-new Date();
-  if(diff<=0){['days','hours','mins','secs'].forEach(function(k){document.getElementById('cd-'+k).textContent='00';});return;}
-  var d=Math.floor(diff/86400000),h=Math.floor((diff%86400000)/3600000),m=Math.floor((diff%3600000)/60000),s=Math.floor((diff%60000)/1000);
-  document.getElementById('cd-days').textContent=String(d).padStart(2,'0');
-  document.getElementById('cd-hours').textContent=String(h).padStart(2,'0');
-  document.getElementById('cd-mins').textContent=String(m).padStart(2,'0');
-  document.getElementById('cd-secs').textContent=String(s).padStart(2,'0');
+  if(diff<=0){setOdPair(odHrsStrips,0);setOdPair(odMinsStrips,0);setOdPair(odSecsStrips,0);return;}
+  var h=Math.floor(diff/3600000),m=Math.floor((diff%3600000)/60000),s=Math.floor((diff%60000)/1000);
+  setOdPair(odHrsStrips,h);
+  setOdPair(odMinsStrips,m);
+  setOdPair(odSecsStrips,s);
 }
 
 /* [FIX-8] loadComingSoonCount — แสดงยอดผู้ลงทะเบียนในหน้า Coming Soon
@@ -2004,6 +2098,8 @@ function onBonusScan(text){
 function showBonusScanResult(ok,title,desc){document.getElementById('sb-result').innerHTML='<div class="scan-result '+(ok?'ok':'bad')+'"><div class="sic">'+(ok?'✅':'⚠️')+'</div><div class="stitle">'+title+'</div><div class="sdesc">'+desc+'</div></div>';}
 
 /* ── Splash + Init ── */
+pushGuardState(); /* [v1.8.8] สร้างเบาะกันชน history ตั้งแต่แอปเริ่มโหลด */
+var pvVerEl=document.getElementById('pv-app-version');if(pvVerEl)pvVerEl.textContent='v'+APP_VERSION;
 window.addEventListener('load',function(){
   var splash=document.getElementById('pg-splash');splash.style.display='flex';
   document.getElementById('pg-preview').classList.remove('active');
@@ -2161,15 +2257,20 @@ function getCsBgImages(){
   csBgImages=Array.from(imgs).map(function(i){return i.src;});
   return csBgImages;
 }
+/* [v1.8.8] crossfade ระหว่าง 2 layer แทนเปลี่ยน backgroundImage ตรงๆ — เนียนกว่า
+   BG_FADE_OPACITY = ความจางของภาพพื้นหลัง (.5 = จางลง 50% ตามที่ขอ) */
+var BG_FADE_OPACITY=.5;
+var csBgActiveLayer='a';
 function startBgSlideshow(){
   var imgs=getCsBgImages();if(!imgs.length)return;
   var cs=document.getElementById('pg-coming');
   var ov=document.getElementById('cs-bg-overlay');
-  if(!cs)return;
-  csBgIdx=0;introLoop=true;
-  cs.style.backgroundImage='url('+imgs[0]+')';
-  cs.style.backgroundSize='cover';
-  cs.style.backgroundPosition='center';
+  var layerA=document.getElementById('cs-bg-layer-a'),layerB=document.getElementById('cs-bg-layer-b');
+  if(!cs||!layerA||!layerB)return;
+  csBgIdx=0;introLoop=true;csBgActiveLayer='a';
+  layerA.style.backgroundImage='url('+imgs[0]+')';
+  layerA.style.display='block';layerB.style.display='block';
+  requestAnimationFrame(function(){layerA.style.opacity=BG_FADE_OPACITY;});
   cs.classList.add('cs-bg');
   if(ov)ov.style.display='block';
   /* override inline color styles ที่ CSS selector เข้าไม่ถึง */
@@ -2183,15 +2284,23 @@ function startBgSlideshow(){
   clearInterval(csBgTimer);
   csBgTimer=setInterval(function(){
     csBgIdx=(csBgIdx+1)%imgs.length;
-    cs.style.backgroundImage='url('+imgs[csBgIdx]+')';
+    var showing=csBgActiveLayer==='a'?layerA:layerB;
+    var hiding=csBgActiveLayer==='a'?layerB:layerA;
+    hiding.style.backgroundImage='url('+imgs[csBgIdx]+')';
+    hiding.style.opacity=BG_FADE_OPACITY;
+    showing.style.opacity=0;
+    csBgActiveLayer=csBgActiveLayer==='a'?'b':'a';
   },3000);
 }
 function stopBgSlideshow(){
   if(!introLoop)return;
   clearInterval(csBgTimer);introLoop=false;csBgImages=null;
   var cs=document.getElementById('pg-coming');
+  var layerA=document.getElementById('cs-bg-layer-a'),layerB=document.getElementById('cs-bg-layer-b');
+  if(layerA){layerA.style.opacity=0;layerA.style.display='none';layerA.style.backgroundImage='';}
+  if(layerB){layerB.style.opacity=0;layerB.style.display='none';layerB.style.backgroundImage='';}
   if(cs){
-    cs.style.backgroundImage='';cs.style.backgroundSize='';cs.style.backgroundPosition='';cs.classList.remove('cs-bg');
+    cs.classList.remove('cs-bg');
     /* restore inline colors */
     cs.querySelectorAll('[data-bg-orig-color]').forEach(function(el){el.style.color=el.dataset.bgOrigColor;delete el.dataset.bgOrigColor;});
   }
