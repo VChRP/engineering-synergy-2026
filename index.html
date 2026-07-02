@@ -40,7 +40,7 @@
   ║  FIX: เพิ่ม &t=Date.now() + loading state + null safety ║
   ╠══════════════════════════════════════════════════════════╣
 -->
-<title>Engineering Synergy 2026 · v1.8.6</title>
+<title>Engineering Synergy 2026 · v1.8.7</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -570,7 +570,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
   <div style="padding-top:22px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center">
     <div>
       <div style="font-size:20px;font-weight:700;color:var(--navy);letter-spacing:-.4px">Admin</div>
-      <div style="font-size:12px;color:var(--muted);margin-top:2px">Engineering Synergy 2026 · v1.8.6</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px">Engineering Synergy 2026 · v1.8.7</div>
     </div>
     <button class="btn-ghost-sm" style="color:var(--muted);font-size:12px" onclick="document.getElementById('admin-exit-overlay').style.display='flex'">← ออก</button>
   </div>
@@ -1216,7 +1216,7 @@ function loadHome(onDone){
     QUIZ_ORDER.forEach(function(id){var st=settingsCache&&settingsCache[id];stationActive[id]=(st&&st.active!=null)?(st.active!==false):true;});
 
     var sorted=members.slice().sort(function(a,b){return b.total_score-a.total_score;});
-    var rank=m?sorted.findIndex(function(x){return x.uid===m.uid;})+1:'—';
+    var rank=m?(m.total_score>0?sorted.findIndex(function(x){return x.uid===m.uid;})+1:'—'):'—';
     document.getElementById('home-name').textContent=m?m.full_name.split(' ')[0]:'—';
     var emp=employeeDB.find(function(e){return(e.firstName+' '+e.lastName)===(m&&m.full_name);});
     document.getElementById('home-dept').textContent=emp&&emp.position?emp.position:(m&&m.department)||'—';
