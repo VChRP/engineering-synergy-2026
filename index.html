@@ -31,17 +31,15 @@
   ║  v1.2.0 [BUG-01..04] quiz score/flow/retake/refresh      ║
   ╔══════════════════════════════════════════════════════════╗
   ║  Engineering Synergy 2026                               ║
-  ║  Version : 1.8.1                                        ║
+  ║  Version : 1.8.2                                        ║
   ║  Date    : 2026-07-02                                   ║
   ╠══════════════════════════════════════════════════════════╣
-  ║  v1.8.1 — SLIDESHOW LOGIC REVAMP + NEW IMAGES           ║
-  ║  เปลี่ยนรูป portrait + ปรับ logic ใหม่ทั้งหมด           ║
-  ║  Coming Soon ON  → looping bg (3s) บน coming soon page  ║
-  ║  Coming Soon OFF → one-shot (5s) หลัง login → home      ║
-  ║  Bypass          → one-shot (5s) หลัง login → home      ║
+  ║  v1.8.2 — BG SLIDESHOW FIX                              ║
+  ║  เปลี่ยน approach: ใช้ background-image บน pg-coming    ║
+  ║  แทนการยุ่งกับ z-index ของ pg-intro (ง่าย + เชื่อถือได้)║
   ╠══════════════════════════════════════════════════════════╣
 -->
-<title>Engineering Synergy 2026 · v1.8.1</title>
+<title>Engineering Synergy 2026 · v1.8.2</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -203,6 +201,13 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
 /* ── Intro Slideshow [v1.8.0] ── */
 .intro-sl{position:absolute;inset:0;opacity:0;transition:opacity .5s ease;pointer-events:none;}
 .intro-sl.on{opacity:1;pointer-events:auto;}
+/* ── Coming Soon bg slideshow mode ── */
+#pg-coming.cs-bg .coming-wrap{background:rgba(255,255,255,.1);backdrop-filter:blur(2px);border-radius:24px;padding:28px 20px;margin:0 8px;}
+#pg-coming.cs-bg .cd-unit-num{color:#fff!important;}
+#pg-coming.cs-bg .cd-unit-num.accent{color:#93c5fd!important;}
+#pg-coming.cs-bg .cd-unit-lbl,#pg-coming.cs-bg .cd-sep{color:rgba(255,255,255,.6)!important;}
+#pg-coming.cs-bg .cd-box{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.2);}
+#pg-coming.cs-bg [style*="color:var(--navy)"],#pg-coming.cs-bg [style*="color:var(--muted)"]{color:#fff!important;}
 </style>
 </head>
 <body>
@@ -396,8 +401,10 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
 </div>
 
 <!-- COMING SOON -->
-<div id="pg-coming" class="page">
-  <div class="coming-wrap">
+<div id="pg-coming" class="page" style="position:relative;overflow:hidden;">
+  <!-- [v1.8.1] bg slideshow overlay — แสดงเมื่อ startBgSlideshow() -->
+  <div id="cs-bg-overlay" style="display:none;position:absolute;inset:0;background:rgba(0,0,10,.58);z-index:0;pointer-events:none;"></div>
+  <div class="coming-wrap" style="position:relative;z-index:1;">
     <div style="font-size:13px;font-weight:600;color:var(--accent);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;">Engineering Synergy 2026</div>
     <div style="font-size:28px;font-weight:700;color:var(--navy);letter-spacing:-.5px;margin-bottom:8px;">Coming Soon</div>
     <div style="font-size:14px;color:var(--muted);line-height:1.85;margin-bottom:20px;">แล้วพบกัน<br>วันศุกร์ที่ 3 กรกฎาคม 2569 เวลา 09:00 น.<br>ณ Shop floor ฝ่ายวิศวกรรม</div>
@@ -560,7 +567,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
   <div style="padding-top:22px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center">
     <div>
       <div style="font-size:20px;font-weight:700;color:var(--navy);letter-spacing:-.4px">Admin</div>
-      <div style="font-size:12px;color:var(--muted);margin-top:2px">Engineering Synergy 2026 · v1.8.1</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px">Engineering Synergy 2026 · v1.8.2</div>
     </div>
     <button class="btn-ghost-sm" style="color:var(--muted);font-size:12px" onclick="document.getElementById('admin-exit-overlay').style.display='flex'">← ออก</button>
   </div>
@@ -2127,29 +2134,39 @@ function showIntroSlideshow(){
   buildIntroDots();gotoIntroSlide(0);
 }
 /* [v1.8.1] bg mode — แสดงเป็น background ของหน้า coming soon วนลูป 3s */
-function startBgSlideshow(){
-  var el=document.getElementById('pg-intro');if(!el)return;
-  el.style.zIndex='1';el.style.display='block';el.style.opacity='1';
-  /* ซ่อน UI ที่ไม่ต้องการใน bg mode */
-  var skip=document.getElementById('intro-skip');if(skip)skip.style.display='none';
-  var cta=document.getElementById('intro-cta');if(cta)cta.style.display='none';
-  var dots=document.getElementById('intro-dots');if(dots)dots.style.display='none';
-  /* ทำ pg-coming เป็น transparent overlay ทับบน slideshow */
-  var cs=document.getElementById('pg-coming');
-  if(cs){cs.style.position='fixed';cs.style.inset='0';cs.style.zIndex='2';
-    cs.style.background='rgba(0,0,10,.65)';cs.style.overflowY='auto';}
-  introLoop=true;introDurCurrent=3000;
-  buildIntroDots();gotoIntroSlide(0);
+/* [v1.8.2] startBgSlideshow — approach ใหม่ใช้ background-image บน pg-coming โดยตรง
+   ง่ายกว่า เชื่อถือได้กว่า ไม่ต้องยุ่งกับ z-index ของ pg-intro */
+var csBgTimer=null,csBgIdx=0,csBgImages=null;
+function getCsBgImages(){
+  if(csBgImages&&csBgImages.length)return csBgImages;
+  var imgs=document.querySelectorAll('#pg-intro .intro-sl img');
+  csBgImages=Array.from(imgs).map(function(i){return i.src;});
+  return csBgImages;
 }
-/* [v1.8.1] หยุด bg slideshow และ restore สถานะปกติ */
+function startBgSlideshow(){
+  var imgs=getCsBgImages();if(!imgs.length)return;
+  var cs=document.getElementById('pg-coming');
+  var ov=document.getElementById('cs-bg-overlay');
+  if(!cs)return;
+  csBgIdx=0;introLoop=true;
+  cs.style.backgroundImage='url('+imgs[0]+')';
+  cs.style.backgroundSize='cover';
+  cs.style.backgroundPosition='center';
+  cs.classList.add('cs-bg');
+  if(ov)ov.style.display='block';
+  clearInterval(csBgTimer);
+  csBgTimer=setInterval(function(){
+    csBgIdx=(csBgIdx+1)%imgs.length;
+    cs.style.backgroundImage='url('+imgs[csBgIdx]+')';
+  },3000);
+}
 function stopBgSlideshow(){
   if(!introLoop)return;
-  clearTimeout(introTimer);introLoop=false;introDurCurrent=INTRO_DUR;
-  var el=document.getElementById('pg-intro');
-  if(el){el.style.display='none';el.style.zIndex='850';el.style.opacity='1';}
-  var skip=document.getElementById('intro-skip');if(skip)skip.style.display='block';
+  clearInterval(csBgTimer);introLoop=false;csBgImages=null;
   var cs=document.getElementById('pg-coming');
-  if(cs){cs.style.position='';cs.style.inset='';cs.style.zIndex='';cs.style.background='';}
+  if(cs){cs.style.backgroundImage='';cs.style.backgroundSize='';cs.style.backgroundPosition='';cs.classList.remove('cs-bg');}
+  var ov=document.getElementById('cs-bg-overlay');
+  if(ov)ov.style.display='none';
 }
 function buildIntroDots(){
   var wrap=document.getElementById('intro-dots');if(!wrap)return;
@@ -2179,8 +2196,7 @@ function gotoIntroSlide(n){
   var dotsWrap=document.getElementById('intro-dots');
   if(dotsWrap)dotsWrap.style.bottom=isLast?'22px':'34px';
   introTimer=setTimeout(function(){
-    if(introLoop){gotoIntroSlide((n+1)%N);}      /* bg mode — วนลูปไม่หยุด */
-    else if(isLast){proceedFromIntro();}           /* one-shot — จบแล้วดำเนินการ */
+    if(isLast){proceedFromIntro();}
     else{gotoIntroSlide(n+1);}
   },introDurCurrent);
 }
