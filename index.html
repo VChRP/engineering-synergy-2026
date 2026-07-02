@@ -39,7 +39,7 @@
   ║  แทนการยุ่งกับ z-index ของ pg-intro (ง่าย + เชื่อถือได้)║
   ╠══════════════════════════════════════════════════════════╣
 -->
-<title>Engineering Synergy 2026 · v1.8.4</title>
+<title>Engineering Synergy 2026 · v1.8.5</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -283,8 +283,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
     </div>
   </div>
 
-  <div id="intro-dots" style="position:absolute;bottom:34px;left:0;right:0;display:flex;justify-content:center;gap:7px;z-index:20;"></div>
-  <button id="intro-cta" onclick="proceedFromIntro()" style="display:none;position:absolute;bottom:68px;left:24px;right:24px;z-index:30;background:#fff;border:none;color:#0f2248;font-size:15px;font-weight:700;padding:15px;border-radius:14px;cursor:pointer;font-family:'IBM Plex Sans Thai',sans-serif;align-items:center;justify-content:center;">เริ่มต้นกิจกรรม →</button>
+  <div id="intro-dots" style="position:absolute;bottom:22px;left:0;right:0;display:flex;justify-content:center;gap:7px;z-index:20;"></div>
 </div>
 
 <div class="wrap">
@@ -570,7 +569,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
   <div style="padding-top:22px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center">
     <div>
       <div style="font-size:20px;font-weight:700;color:var(--navy);letter-spacing:-.4px">Admin</div>
-      <div style="font-size:12px;color:var(--muted);margin-top:2px">Engineering Synergy 2026 · v1.8.4</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px">Engineering Synergy 2026 · v1.8.5</div>
     </div>
     <button class="btn-ghost-sm" style="color:var(--muted);font-size:12px" onclick="document.getElementById('admin-exit-overlay').style.display='flex'">← ออก</button>
   </div>
@@ -2205,11 +2204,7 @@ function gotoIntroSlide(n){
   /* progress bar */
   var pb=document.getElementById('intro-pb');
   if(pb){pb.style.transition='none';pb.style.width='0%';requestAnimationFrame(function(){requestAnimationFrame(function(){pb.style.transition='width '+introDurCurrent+'ms linear';pb.style.width='100%';});});}
-  /* cta on last slide */
-  var cta=document.getElementById('intro-cta');var isLast=(n===slides.length-1);
-  if(cta)cta.style.display=isLast?'flex':'none';
-  var dotsWrap=document.getElementById('intro-dots');
-  if(dotsWrap)dotsWrap.style.bottom=isLast?'22px':'34px';
+  var isLast=(n===slides.length-1);
   introTimer=setTimeout(function(){
     if(isLast){proceedFromIntro();}
     else{gotoIntroSlide(n+1);}
