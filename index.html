@@ -31,18 +31,16 @@
   ║  v1.2.0 [BUG-01..04] quiz score/flow/retake/refresh      ║
   ╔══════════════════════════════════════════════════════════╗
   ║  Engineering Synergy 2026                               ║
-  ║  Version : 1.8.11                                       ║
+  ║  Version : 1.8.12                                       ║
   ║  Date    : 2026-07-02                                   ║
   ╠══════════════════════════════════════════════════════════╣
-  ║  v1.8.11 — ODOMETER DIRECTION FIX                       ║
-  ║  [BUG] เดิม strip เรียงถอยหลัง 9→0 + เลื่อนขึ้น          ║
-  ║  ทำให้ตัวเลขดู "หมุนขึ้น" ขัดกับความรู้สึกนับถอยหลัง    ║
-  ║  FIX: เปลี่ยน strip เรียงขึ้น 0→9 + เลื่อนลงแทน         ║
-  ║  เลขใหม่ไหลลงจากบน เลขเก่าไหลออกล่าง ตรงความรู้สึก      ║
-  ║  กลไกกันหมุนย้อนกลับ (v1.8.9) ยังทำงานเหมือนเดิม        ║
+  ║  v1.8.12 — SCAN BONUS: ซ่อนกล้องถ้ารับไปแล้ว            ║
+  ║  enterScanBonus() เช็ค scores[station_bonus] ก่อนเปิด   ║
+  ║  กล้องเสมอ ถ้ารับโบนัสฐานนี้ไปแล้ว → ไม่เปิดกล้อง       ║
+  ║  ซ่อน card สแกน + โชว์การ์ดเขียว "ได้รับไปแล้ว +N คะแนน"║
   ╠══════════════════════════════════════════════════════════╣
 -->
-<title>Engineering Synergy 2026 · v1.8.11</title>
+<title>Engineering Synergy 2026 · v1.8.12</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -588,7 +586,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
   <div style="padding-top:22px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center">
     <div>
       <div style="font-size:20px;font-weight:700;color:var(--navy);letter-spacing:-.4px">Admin</div>
-      <div style="font-size:12px;color:var(--muted);margin-top:2px">Engineering Synergy 2026 · v1.8.11</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px">Engineering Synergy 2026 · v1.8.12</div>
     </div>
     <button class="btn-ghost-sm" style="color:var(--muted);font-size:12px" onclick="document.getElementById('admin-exit-overlay').style.display='flex'">← ออก</button>
   </div>
@@ -832,7 +830,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
     <div class="me-tot"><div class="v" id="sb-total">0</div><div class="l">คะแนนรวม</div></div>
   </div>
   <div id="sb-result"></div>
-  <div style="background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:18px 16px;">
+  <div id="sb-scan-card" style="background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:18px 16px;">
     <div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:4px;">📷 สแกน QR ของฐาน</div>
     <div style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6;">เล็งกล้องไปที่ QR code ที่เจ้าหน้าที่ประจำฐานเปิดไว้</div>
     <div id="scan-reader" style="margin-bottom:10px;"></div>
@@ -847,7 +845,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
    Engineering Synergy 2026 · v1.6.0
    Fixes: BUG-01..08 + FIX-1..6 (Active/Disable Quiz)
 ═══════════════════════════════════════════════════════ */
-var APP_VERSION='1.8.11';
+var APP_VERSION='1.8.12';
 
 var API='https://script.google.com/macros/s/AKfycbx8jJ-Mq3mLAwWS_ZhAxiUKbibP_qBbV2WUIUGQvGoIzduY3C-UI12aRGh6D4aFew9h/exec';
 /* [FIX-7] ADMIN_PASS ย้ายไปเก็บใน GAS backend แล้ว (verifyAdmin)
@@ -2097,9 +2095,26 @@ function showQzResult(){
 var bonusScanner=null,bonusBusy=false,lastBonusScanAt=0;
 function enterScanBonus(){
   var uid=currentUid;
-  if(!uid){document.getElementById('sb-result').innerHTML='<div class="scan-result bad"><div class="sic">⚠️</div><div class="stitle">กรุณาเข้าสู่ระบบก่อน</div><div class="sdesc">กลับไปล็อกอินที่หน้าหลัก</div></div>';return;}
-  apiGet('getMembers',function(res){var m=(res.members||[]).find(function(x){return x.uid===uid;});if(m){document.getElementById('sb-av').textContent=(m.full_name||'?').charAt(0);document.getElementById('sb-name').textContent=m.full_name;document.getElementById('sb-uid').textContent='UID: '+m.uid+(m.department?' · '+m.department:'');document.getElementById('sb-total').textContent=m.total_score||0;}});
-  startBonusScanner();
+  var scanCard=document.getElementById('sb-scan-card');
+  if(scanCard)scanCard.style.display=''; /* reset ทุกครั้งที่เข้าหน้านี้ */
+  if(!uid){document.getElementById('sb-result').innerHTML='<div class="scan-result bad"><div class="sic">⚠️</div><div class="stitle">กรุณาเข้าสู่ระบบก่อน</div><div class="sdesc">กลับไปล็อกอินที่หน้าหลัก</div></div>';if(scanCard)scanCard.style.display='none';return;}
+  apiGet('getMembers',function(res){
+    var m=(res.members||[]).find(function(x){return x.uid===uid;});
+    if(m){
+      document.getElementById('sb-av').textContent=(m.full_name||'?').charAt(0);
+      document.getElementById('sb-name').textContent=m.full_name;
+      document.getElementById('sb-uid').textContent='UID: '+m.uid+(m.department?' · '+m.department:'');
+      document.getElementById('sb-total').textContent=m.total_score||0;
+      /* [v1.8.12] เช็คว่ารับโบนัสฐานนี้ไปแล้วหรือยัง — ถ้าใช่ ซ่อนกล้อง ไม่ต้องเปิดสแกนเนอร์ */
+      var bonusKey=scanBonusStation?(scanBonusStation+'_bonus'):null;
+      if(bonusKey&&m.scores&&m.scores[bonusKey]!==undefined){
+        if(scanCard)scanCard.style.display='none';
+        showBonusScanResult(true,'ได้รับโบนัสฐาน '+scanBonusStation+' ไปแล้ว','+'+m.scores[bonusKey]+' คะแนน · ไม่สามารถรับซ้ำได้');
+        return;
+      }
+    }
+    startBonusScanner();
+  });
 }
 function startBonusScanner(){
   if(bonusScanner)return;var el=document.getElementById('scan-reader');if(!el)return;
