@@ -31,16 +31,15 @@
   ║  v1.2.0 [BUG-01..04] quiz score/flow/retake/refresh      ║
   ╔══════════════════════════════════════════════════════════╗
   ║  Engineering Synergy 2026                               ║
-  ║  Version : 1.7.8                                        ║
-  ║  Date    : 2026-06-26                                   ║
+  ║  Version : 1.7.9                                        ║
+  ║  Date    : 2026-07-02                                   ║
   ╠══════════════════════════════════════════════════════════╣
-  ║  v1.7.8 — BENTO REFINEMENT                              ║
-  ║  [FIX-15b] ย้าย online pill ขึ้นบน bento               ║
-  ║            ตัด proportion rows ออก                     ║
-  ║            เพิ่มการ์ดฝ่ายอันดับ 4-5                    ║
+  ║  v1.7.9 — BENTO ALL DEPTS                               ║
+  ║  [FIX-15c] เพิ่ม compact grid แสดงทุกฝ่าย              ║
+  ║            รองรับ N ฝ่ายไม่จำกัด                        ║
   ╠══════════════════════════════════════════════════════════╣
 -->
-<title>Engineering Synergy 2026 · v1.7.8</title>
+<title>Engineering Synergy 2026 · v1.7.9</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -500,7 +499,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
   <div style="padding-top:22px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center">
     <div>
       <div style="font-size:20px;font-weight:700;color:var(--navy);letter-spacing:-.4px">Admin</div>
-      <div style="font-size:12px;color:var(--muted);margin-top:2px">Engineering Synergy 2026 · v1.7.8</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px">Engineering Synergy 2026 · v1.7.9</div>
     </div>
     <button class="btn-ghost-sm" style="color:var(--muted);font-size:12px" onclick="document.getElementById('admin-exit-overlay').style.display='flex'">← ออก</button>
   </div>
@@ -1429,6 +1428,7 @@ function confirmAdminExit(){document.getElementById('admin-exit-overlay').style.
 /* ─────────────────────────────────────────────
    [FIX-15] renderDeptBento — Bento box สรุปฝ่าย
    [FIX-15b] online bar อยู่บน / ตัด proportion rows ออก
+   [FIX-15c] เพิ่ม compact grid แสดงทุกฝ่าย
 ───────────────────────────────────────────── */
 function renderDeptBento(members){
   var el=document.getElementById('dept-bento');if(!el)return;
@@ -1438,30 +1438,39 @@ function renderDeptBento(members){
   /* group by dept */
   var dm={};members.forEach(function(m){var d=m.department||'อื่นๆ';dm[d]=(dm[d]||0)+1;});
   var depts=Object.keys(dm).map(function(k){return{name:k,count:dm[k]};}).sort(function(a,b){return b.count-a.count;});
-  var COLORS=['#085041','#be185d','#7c3aed','#1e40af','#b45309','#9a3412','#0369a1','#166534','#7f1d1d','#64748b'];
+  var COLORS=['#085041','#be185d','#7c3aed','#1e40af','#b45309','#9a3412','#0369a1','#166534','#7f1d1d','#64748b','#0e7490','#a16207','#6d28d9','#be123c','#0f766e','#c2410c','#4338ca','#0369a1','#047857','#7e22ce'];
   /* stacked bar */
-  var barHtml=depts.slice(0,8).map(function(d,i){return'<div style="height:100%;width:'+Math.round(d.count/total*100)+'%;background:'+(COLORS[i]||'#94a3b8')+'"></div>';}).join('');
-  /* top 3 */
+  var barHtml=depts.slice(0,10).map(function(d,i){return'<div style="height:100%;width:'+Math.round(d.count/total*100)+'%;background:'+(COLORS[i]||'#94a3b8')+'"></div>';}).join('');
+  /* top */
   var t1=depts[0]||{name:'—',count:0};
   var t2=depts[1]||{name:'—',count:0};
   var t3=depts[2]||{name:'—',count:0};
   var t1pct=Math.round(t1.count/total*100);
+  /* compact all-dept grid */
+  var allDeptCards=depts.map(function(d,i){
+    var pct=Math.round(d.count/total*100);
+    return'<div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:10px 11px;">'
+      +'<div style="font-size:10px;color:var(--muted);letter-spacing:.4px;text-transform:uppercase;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+d.name+'</div>'
+      +'<div style="font-size:20px;font-weight:700;color:var(--navy);line-height:1;">'+d.count+'</div>'
+      +'<div style="height:2px;background:var(--border);border-radius:2px;margin-top:7px;overflow:hidden;">'
+        +'<div style="height:100%;width:'+pct+'%;background:'+(COLORS[i]||'#94a3b8')+';border-radius:2px;"></div>'
+      +'</div>'
+    +'</div>';
+  }).join('');
   el.innerHTML=
-    /* [FIX-15b] online bar เหนือ bento */
+    /* online pill bar */
     '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;padding:0 2px;">'
       +'<div style="font-size:11px;font-weight:700;color:var(--navy);">สรุปตามฝ่าย</div>'
       +'<div style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:4px 11px;border-radius:20px;background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;">● '+online+' ออนไลน์</div>'
     +'</div>'
-    /* bento grid */
-    +'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px;">'
-    /* total — full width */
+    /* bento highlight grid */
+    +'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:7px;">'
+    /* total full width */
     +'<div style="grid-column:1/4;background:var(--navy);border-radius:14px;padding:13px;color:#fff;">'
       +'<div style="font-size:10px;opacity:.45;letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px;">สมาชิกทั้งหมด</div>'
-      +'<div style="display:flex;align-items:flex-end;justify-content:space-between;gap:6px;">'
-        +'<div><div style="font-size:34px;font-weight:700;line-height:1;">'+total+'</div>'
-        +'<div style="font-size:11px;opacity:.45;margin-top:3px;">คน · '+depts.length+' ฝ่าย</div></div>'
-      +'</div>'
-      +'<div style="height:4px;background:rgba(255,255,255,.1);border-radius:2px;margin-top:12px;overflow:hidden;display:flex;">'+barHtml+'</div>'
+      +'<div style="font-size:34px;font-weight:700;line-height:1;">'+total+'</div>'
+      +'<div style="font-size:11px;opacity:.45;margin-top:3px;">คน · '+depts.length+' ฝ่าย</div>'
+      +'<div style="height:4px;background:rgba(255,255,255,.1);border-radius:2px;margin-top:10px;overflow:hidden;display:flex;">'+barHtml+'</div>'
     +'</div>'
     /* top dept tall */
     +'<div style="grid-column:1;grid-row:2/4;background:#085041;border-radius:14px;padding:13px;color:#fff;display:flex;flex-direction:column;">'
@@ -1484,19 +1493,10 @@ function renderDeptBento(members){
       +'<div style="font-size:24px;font-weight:700;color:var(--navy);line-height:1;">'+t3.count+'</div>'
       +'<div style="height:3px;background:var(--border);border-radius:2px;margin-top:8px;overflow:hidden;"><div style="height:100%;width:'+Math.round(t3.count/total*100)+'%;background:'+(COLORS[2]||'#94a3b8')+';border-radius:2px;"></div></div>'
     +'</div>'
-    /* 4th */
-    +'<div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:12px;">'
-      +'<div style="font-size:10px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px;">'+(depts[3]?depts[3].name:'—')+'</div>'
-      +'<div style="font-size:24px;font-weight:700;color:var(--navy);line-height:1;">'+(depts[3]?depts[3].count:0)+'</div>'
-      +'<div style="height:3px;background:var(--border);border-radius:2px;margin-top:8px;overflow:hidden;"><div style="height:100%;width:'+(depts[3]?Math.round(depts[3].count/total*100):0)+'%;background:'+(COLORS[3]||'#94a3b8')+';border-radius:2px;"></div></div>'
     +'</div>'
-    /* 5th */
-    +'<div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:12px;">'
-      +'<div style="font-size:10px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px;">'+(depts[4]?depts[4].name:'—')+'</div>'
-      +'<div style="font-size:24px;font-weight:700;color:var(--navy);line-height:1;">'+(depts[4]?depts[4].count:0)+'</div>'
-      +'<div style="height:3px;background:var(--border);border-radius:2px;margin-top:8px;overflow:hidden;"><div style="height:100%;width:'+(depts[4]?Math.round(depts[4].count/total*100):0)+'%;background:'+(COLORS[4]||'#94a3b8')+';border-radius:2px;"></div></div>'
-    +'</div>'
-    +'</div>';
+    /* [FIX-15c] compact grid ทุกฝ่าย */
+    +'<div style="font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:7px;">ทุกฝ่าย ('+depts.length+')</div>'
+    +'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px;">'+allDeptCards+'</div>';
 }
 
 function getDeptCount(members){var d={};members.forEach(function(m){if(m.department)d[m.department]=1;});return Object.keys(d).length;}
