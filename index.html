@@ -1099,7 +1099,7 @@ function confirmEnter(){
         currentUid=res.uid;currentToken=null;  /* ไม่มี session ตอน coming soon */
         document.getElementById('reg-name').value='';document.getElementById('reg-dept-pill').style.display='none';selectedReg=null;
         showEntryLoading(true);
-        setTimeout(function(){hideEntryLoading();updateCountdown();setInterval(updateCountdown,1000);go('coming');},600);
+        setTimeout(function(){hideEntryLoading();updateCountdown();setInterval(updateCountdown,1000);go('coming');startBgSlideshow();},600);
       });
       return;
     }
