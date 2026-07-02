@@ -39,7 +39,7 @@
   ║  แทนการยุ่งกับ z-index ของ pg-intro (ง่าย + เชื่อถือได้)║
   ╠══════════════════════════════════════════════════════════╣
 -->
-<title>Engineering Synergy 2026 · v1.8.2</title>
+<title>Engineering Synergy 2026 · v1.8.4</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -202,12 +202,15 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
 .intro-sl{position:absolute;inset:0;opacity:0;transition:opacity .5s ease;pointer-events:none;}
 .intro-sl.on{opacity:1;pointer-events:auto;}
 /* ── Coming Soon bg slideshow mode ── */
-#pg-coming.cs-bg .coming-wrap{background:rgba(255,255,255,.1);backdrop-filter:blur(2px);border-radius:24px;padding:28px 20px;margin:0 8px;}
+#pg-coming.cs-bg .coming-wrap{text-shadow:0 1px 4px rgba(0,0,0,.6);}
+#pg-coming.cs-bg .cd-box{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);}
 #pg-coming.cs-bg .cd-unit-num{color:#fff!important;}
 #pg-coming.cs-bg .cd-unit-num.accent{color:#93c5fd!important;}
-#pg-coming.cs-bg .cd-unit-lbl,#pg-coming.cs-bg .cd-sep{color:rgba(255,255,255,.6)!important;}
-#pg-coming.cs-bg .cd-box{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.2);}
-#pg-coming.cs-bg [style*="color:var(--navy)"],#pg-coming.cs-bg [style*="color:var(--muted)"]{color:#fff!important;}
+#pg-coming.cs-bg .cd-unit-lbl,#pg-coming.cs-bg .cd-sep{color:rgba(255,255,255,.65)!important;}
+#pg-coming.cs-bg .btn-outline{color:#fff!important;border-color:rgba(255,255,255,.35)!important;background:rgba(255,255,255,.08)!important;}
+#pg-coming.cs-bg #cs-reg-wrap>div{background:rgba(255,255,255,.12)!important;border-color:rgba(255,255,255,.2)!important;}
+#pg-coming.cs-bg #cs-reg-count{color:#fff!important;}
+#pg-coming.cs-bg #cs-reg-wrap span:last-child{color:rgba(255,255,255,.75)!important;}
 </style>
 </head>
 <body>
@@ -567,7 +570,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
   <div style="padding-top:22px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center">
     <div>
       <div style="font-size:20px;font-weight:700;color:var(--navy);letter-spacing:-.4px">Admin</div>
-      <div style="font-size:12px;color:var(--muted);margin-top:2px">Engineering Synergy 2026 · v1.8.2</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px">Engineering Synergy 2026 · v1.8.4</div>
     </div>
     <button class="btn-ghost-sm" style="color:var(--muted);font-size:12px" onclick="document.getElementById('admin-exit-overlay').style.display='flex'">← ออก</button>
   </div>
@@ -2120,7 +2123,7 @@ function goToPreview(){go('preview');var ep=document.getElementById('entry-panel
    INTRO SLIDESHOW [v1.8.0]
    แสดงเมื่อ coming_soon=false + ไม่มี session
 ═══════════════════════════════════════════ */
-var introSlide=0,introTimer=null,INTRO_DUR=5000;
+var introSlide=0,introTimer=null,INTRO_DUR=3000;
 var introTarget='entry'; /* 'entry' = เปิด entry panel, 'home' = ไป home (bypass path) */
 var introLoop=false;       /* true = วนลูปไม่หยุด (bg mode บน coming soon) */
 var introDurCurrent=5000;  /* ms ต่อสไลด์ — 5000 ปกติ, 3000 สำหรับ bg mode */
@@ -2154,6 +2157,14 @@ function startBgSlideshow(){
   cs.style.backgroundPosition='center';
   cs.classList.add('cs-bg');
   if(ov)ov.style.display='block';
+  /* override inline color styles ที่ CSS selector เข้าไม่ถึง */
+  cs.querySelectorAll('.coming-wrap [style]').forEach(function(el){
+    var s=el.getAttribute('style')||'';
+    if(s.indexOf('color:var(--navy)')>-1||s.indexOf('color:var(--muted)')>-1||s.indexOf('color:var(--sub)')>-1||s.indexOf('color:var(--accent)')>-1){
+      el.dataset.bgOrigColor=el.style.color;
+      el.style.color='#fff';
+    }
+  });
   clearInterval(csBgTimer);
   csBgTimer=setInterval(function(){
     csBgIdx=(csBgIdx+1)%imgs.length;
@@ -2164,7 +2175,11 @@ function stopBgSlideshow(){
   if(!introLoop)return;
   clearInterval(csBgTimer);introLoop=false;csBgImages=null;
   var cs=document.getElementById('pg-coming');
-  if(cs){cs.style.backgroundImage='';cs.style.backgroundSize='';cs.style.backgroundPosition='';cs.classList.remove('cs-bg');}
+  if(cs){
+    cs.style.backgroundImage='';cs.style.backgroundSize='';cs.style.backgroundPosition='';cs.classList.remove('cs-bg');
+    /* restore inline colors */
+    cs.querySelectorAll('[data-bg-orig-color]').forEach(function(el){el.style.color=el.dataset.bgOrigColor;delete el.dataset.bgOrigColor;});
+  }
   var ov=document.getElementById('cs-bg-overlay');
   if(ov)ov.style.display='none';
 }
