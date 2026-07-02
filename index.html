@@ -1126,7 +1126,11 @@ function afterAuth(){
         var m=(mr.members||[]).find(function(x){return x.uid===currentUid;});
         var isBypass=(appSettings.bypass_list||[]).indexOf(m?m.full_name:'')>=0;
         if(!isBypass){updateCountdown();setInterval(updateCountdown,1000);go('coming');}
-        else{goHome();}
+        else{
+          /* [v1.8.0] bypass → ดู slideshow ก่อนเข้า home */
+          introTarget='home';
+          showIntroSlideshow();
+        }
       });
     } else {hideLoad();goHome();}
   });
@@ -2104,6 +2108,7 @@ function goToPreview(){go('preview');var ep=document.getElementById('entry-panel
    แสดงเมื่อ coming_soon=false + ไม่มี session
 ═══════════════════════════════════════════ */
 var introSlide=0,introTimer=null,INTRO_DUR=5000;
+var introTarget='entry'; /* 'entry' = เปิด entry panel, 'home' = ไป home (bypass path) */
 
 function showIntroSlideshow(){
   var el=document.getElementById('pg-intro');if(!el)return;
@@ -2146,10 +2151,16 @@ function proceedFromIntro(){
   clearTimeout(introTimer);
   var el=document.getElementById('pg-intro');
   if(el){el.style.opacity='0';setTimeout(function(){el.style.display='none';el.style.opacity='1';},500);}
-  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
-  document.getElementById('pg-preview').classList.add('active');
-  window.scrollTo(0,0);
-  openEntryPanel();
+  if(introTarget==='home'){
+    /* bypass path — มี session อยู่แล้ว ไปหน้า home เลย */
+    goHome();
+  } else {
+    /* new user path — เปิด entry panel */
+    document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+    document.getElementById('pg-preview').classList.add('active');
+    window.scrollTo(0,0);
+    openEntryPanel();
+  }
 }
 </script>
 </body>
