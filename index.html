@@ -31,16 +31,20 @@
   ║  v1.2.0 [BUG-01..04] quiz score/flow/retake/refresh      ║
   ╔══════════════════════════════════════════════════════════╗
   ║  Engineering Synergy 2026                               ║
-  ║  Version : 1.8.12                                       ║
+  ║  Version : 1.8.14                                       ║
   ║  Date    : 2026-07-02                                   ║
   ╠══════════════════════════════════════════════════════════╣
-  ║  v1.8.12 — SCAN BONUS: ซ่อนกล้องถ้ารับไปแล้ว            ║
-  ║  enterScanBonus() เช็ค scores[station_bonus] ก่อนเปิด   ║
-  ║  กล้องเสมอ ถ้ารับโบนัสฐานนี้ไปแล้ว → ไม่เปิดกล้อง       ║
-  ║  ซ่อน card สแกน + โชว์การ์ดเขียว "ได้รับไปแล้ว +N คะแนน"║
+  ║  v1.8.14 — STALE DATA FIX (3 จุด)                       ║
+  ║  [1] enterScanBonus — เคลียร์ #sb-result ทันที          ║
+  ║      + โชว์ "กำลังตรวจสอบ..." กันข้อความฐานเก่าค้าง     ║
+  ║  [2] startQzStation — เคลียร์ครบทุก UI chrome           ║
+  ║      (counter/score/progress/timer/result/next button) ║
+  ║      กันฐานเก่าปนฐานใหม่ระหว่างรอโหลดคำถาม             ║
+  ║  [3] loadStationStats (admin) — โชว์ "กำลังโหลด..."     ║
+  ║      กันเลขสถิติเก่าค้างตอนสลับแท็บกลับมา (severity ต่ำ)║
   ╠══════════════════════════════════════════════════════════╣
 -->
-<title>Engineering Synergy 2026 · v1.8.12</title>
+<title>Engineering Synergy 2026 · v1.8.14</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -586,7 +590,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
   <div style="padding-top:22px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center">
     <div>
       <div style="font-size:20px;font-weight:700;color:var(--navy);letter-spacing:-.4px">Admin</div>
-      <div style="font-size:12px;color:var(--muted);margin-top:2px">Engineering Synergy 2026 · v1.8.12</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px">Engineering Synergy 2026 · v1.8.14</div>
     </div>
     <button class="btn-ghost-sm" style="color:var(--muted);font-size:12px" onclick="document.getElementById('admin-exit-overlay').style.display='flex'">← ออก</button>
   </div>
@@ -845,7 +849,7 @@ body{font-family:'IBM Plex Sans Thai',-apple-system,BlinkMacSystemFont,sans-seri
    Engineering Synergy 2026 · v1.6.0
    Fixes: BUG-01..08 + FIX-1..6 (Active/Disable Quiz)
 ═══════════════════════════════════════════════════════ */
-var APP_VERSION='1.8.12';
+var APP_VERSION='1.8.14';
 
 var API='https://script.google.com/macros/s/AKfycbx8jJ-Mq3mLAwWS_ZhAxiUKbibP_qBbV2WUIUGQvGoIzduY3C-UI12aRGh6D4aFew9h/exec';
 /* [FIX-7] ADMIN_PASS ย้ายไปเก็บใน GAS backend แล้ว (verifyAdmin)
@@ -909,11 +913,11 @@ function hideLoad(){document.getElementById('loading').classList.remove('show');
 function showErr(el,msg){el.textContent=msg;el.style.display='block';}
 
 /* ── Nav ── */
-/* [v1.8.8] Popstate guard — กันหลุดแอปตอนกดปุ่ม back ของมือถือ (navigation bar/gesture)
-   หลักการ: pushState สร้าง history entry กันชนไว้ 1 ชั้น แล้วดัก popstate event
-   - กำลังทำ Quiz อยู่ → เตือน + pushState ใหม่ทันที (กันหลุดเด็ดขาด)
-   - อยู่หน้าอื่นที่ไม่ใช่ home/preview → พาไป home/ปิด overlay แทน + pushState ใหม่
-   - อยู่ home/preview (จุดเริ่มต้น) → ปล่อยผ่านให้ออกแอปได้ตามปกติ (ไม่ block ทั้งหมด) */
+/* [v1.8.13] Popstate guard — กันหลุดแอปตอนกดปุ่ม back ของมือถือ (navigation bar/gesture)
+   เปลี่ยนจาก v1.8.8: ตัดข้อยกเว้น home/preview ออก — กันทุกหน้าแบบไม่มีทางออกเลย
+   (เดิมปล่อยให้ออกจาก home/preview ได้ แต่การกดครั้งแรกไม่มี feedback ให้เห็น
+   ทำให้ user กดซ้ำแล้วหลุดออกจากแอปจริงๆ ตอนกดครั้งที่ 2 — จึงตัดข้อยกเว้นทิ้งทั้งหมด)
+   ออกจากแอปได้ทางเดียว: กดปุ่ม "ออกจากระบบ" ในแอป หรือปิดแท็บ/เบราว์เซอร์เอง */
 function pushGuardState(){history.pushState({guard:true},'');}
 window.addEventListener('popstate',function(){
   var quizActive=document.getElementById('quiz-active-view')&&document.getElementById('quiz-active-view').style.display==='block';
@@ -948,7 +952,8 @@ window.addEventListener('popstate',function(){
     pushGuardState();
     return;
   }
-  /* อยู่ home/preview แล้ว → ปล่อยให้ออกแอปได้ตามปกติ ไม่ pushState ซ้ำ */
+  /* [v1.8.13] อยู่ home/preview ก็ยังกันเหมือนกัน — ไม่มีข้อยกเว้นแล้ว ออกไม่ได้เลย */
+  pushGuardState();
 });
 
 function go(page,param){
@@ -1828,6 +1833,8 @@ function toggleStationActive(k,on){
 }
 function loadStationStats(){
   var el=document.getElementById('station-stats');if(!el)return;
+  /* [v1.8.14] เคลียร์ตัวเลขเก่าทันที กันค้างระหว่างรอโหลดสด (ตอนสลับแท็บกลับมา) */
+  el.innerHTML='<div style="text-align:center;color:var(--muted);padding:22px;font-size:13px;">กำลังโหลด...</div>';
   apiGet('getMembers',function(res){
     var members=res.members||[];var total=members.length;
     /* FIX-2 (BUG-07): ใช้ QUIZ_ORDER (TO→ME→EE→PM) ให้ตรงลำดับจริงที่ user เดิน
@@ -1952,6 +1959,23 @@ function startQzStation(station){
   document.getElementById('qa-choices').innerHTML='';
   document.getElementById('qa-confirm').style.display='none';
   document.getElementById('qa-next').disabled=true;document.getElementById('qa-next').style.opacity='.3';
+  /* [v1.8.14] เคลียร์ UI chrome ทั้งหมดที่ค้างจากฐานก่อนหน้า กันปนข้อมูลระหว่างรอโหลด */
+  document.getElementById('qa-counter').textContent='—';
+  document.getElementById('qa-score').textContent='0 คะแนน';
+  document.getElementById('qa-prog').style.width='0%';
+  document.getElementById('qa-qnum').textContent='คำถามที่ 1';
+  document.getElementById('qa-result').style.display='none';
+  document.getElementById('qa-next').textContent='ข้อถัดไป →';
+  stopQuizTimer();
+  document.getElementById('qa-ring-prog').style.strokeDashoffset='113';
+  document.getElementById('qa-ring-prog').style.stroke='#10b981';
+  document.getElementById('qa-ring-num').textContent=QZ_TIME;
+  document.getElementById('qa-ring-num').style.color='var(--navy)';
+  document.getElementById('qa-timer-lbl').textContent=QZ_TIME+' วินาที';
+  document.getElementById('qa-timer-lbl').style.color='var(--navy)';
+  var bp=document.getElementById('qa-bonus-pill');
+  bp.textContent='⚡ +'+QZ_BONUS_MAX.toFixed(1);bp.style.color='#10b981';bp.style.borderColor='#86efac';bp.style.background='#f0fdf4';
+  setQzUrgent(false);
   /* [BUG-FIX] เพิ่ม &t=Date.now() กัน browser cache — เดิมใช้ raw fetch() ไม่มี timestamp
      ทำให้ได้คำถามเก่าแม้จะอัปเดต sheet แล้ว (ต่างจาก apiGet ที่มี &t= ทุกครั้ง) */
   fetch(API+'?action=getQuestions&station='+station+'&t='+Date.now())
@@ -2097,8 +2121,11 @@ function enterScanBonus(){
   var uid=currentUid;
   var scanCard=document.getElementById('sb-scan-card');
   if(scanCard)scanCard.style.display=''; /* reset ทุกครั้งที่เข้าหน้านี้ */
+  /* [v1.8.14] เคลียร์ผลลัพธ์ฐานก่อนหน้าทันที กันข้อความเก่าค้างระหว่างรอโหลด (2-3 วิ) */
+  document.getElementById('sb-result').innerHTML='<div style="text-align:center;color:var(--muted);font-size:12px;padding:14px;">กำลังตรวจสอบ...</div>';
   if(!uid){document.getElementById('sb-result').innerHTML='<div class="scan-result bad"><div class="sic">⚠️</div><div class="stitle">กรุณาเข้าสู่ระบบก่อน</div><div class="sdesc">กลับไปล็อกอินที่หน้าหลัก</div></div>';if(scanCard)scanCard.style.display='none';return;}
   apiGet('getMembers',function(res){
+    document.getElementById('sb-result').innerHTML=''; /* เคลียร์ "กำลังตรวจสอบ..." ก่อนเขียนผลจริง */
     var m=(res.members||[]).find(function(x){return x.uid===uid;});
     if(m){
       document.getElementById('sb-av').textContent=(m.full_name||'?').charAt(0);
